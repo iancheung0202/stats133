@@ -1,0 +1,152 @@
+---
+title: "Project 1"
+author: "Ian Cheung"
+format: html
+---
+
+## 1 Dogs Data
+### 1.1 Image of dogs
+
+![Image from Country Living Magazine](https://hips.hearstapps.com/clv.h-cdn.co/assets/16/18/gettyimages-586890581.jpg)
+
+### 1.2 Vectors
+
+```{r}
+breed <- c("Beagle", "Bulldog", "Collie", "German Shepherd", "Golden Retriever", "Greyhound", "Labrador Retriever", "Pomeranian", "Pug", "Shiba Inu")
+avg_life <- c(12L, 9L, 13L, 9L, 11L, 12L, 11L, 14L, 14L, 15L)
+energy <- factor(c("high", "medium", "medium", "medium", "very high", "high", "very high", "medium", "medium", "medium"))
+trainability <- c(0.6, 0.6, 0.8, 1, 1, NA, 1, 0.6, 0.6, 0.4)
+friendly <- c(TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, FALSE)
+```
+
+### 1.3 Subscripting (aka Indexing, Slicing)
+
+1. What is the breed with the longest average life expectancy?
+```{r}
+breed[which.max(avg_life)]
+```
+2. How many breeds don’t tend to be very friendly?
+```{r}
+sum(!friendly)
+```
+3. What is the median trainability value of those breeds that are friendly?.
+```{r}
+median(trainability[friendly], na.rm=TRUE)
+```
+4. How many breeds have average life expectancy values smaller than the median average life expectancy?
+```{r}
+sum(avg_life < median(avg_life))
+```
+5. How many breeds have medium energy level and tend to be very friendly?
+```{r}
+sum(energy == "medium" & friendly == TRUE)
+```
+6. What breeds have medium energy level and tend to be very friendly?
+```{r}
+breed[energy == "medium" & friendly == TRUE]
+```
+7. What is the minimum trainability value for those breeds with an average lifetime of 13 years or more?
+```{r}
+min(trainability[avg_life >= 13], na.rm=TRUE)
+```
+## 2 Vectorized Functions
+1. `length()`
+* **Not vectorized.** `length()` does not operate on each internal element individually.
+```{r}
+vec <- c(10, 20, 30)
+length(vec)
+```
+
+2. `*`
+
+* **Vectorized.** It applies the multiplication operation to every element.
+```{r}
+vec <- c(1, 2, 3)
+vec * 2
+```
+
+3. `log()`
+
+* **Vectorized.** It returns a new vector where the natural log operation has been applied to every individual element.
+```{r}
+vec <- c(1, 10, 100)
+log(vec)
+```
+
+4. `max()`
+
+* **Not vectorized.** This is a summary function and only returns a single value
+```{r}
+vec <- c(5, 12, 8)
+max(vec)
+```
+
+5. `trunc()`
+
+* **Vectorized.** It performs the round operation on each element.
+```{r}
+vec <- c(1.9, 2.1, -3.5)
+trunc(vec)
+```
+
+## 3 Loan Amortization Payment Formula
+
+### 3.1 Computing Payment
+
+For a student loan of $45,000 at an interest rate of 5.25% to be paid off in 20 years:
+
+```{r}
+P <- 45000
+r <- 0.0525
+n <- 20
+k <- 12
+
+pmt <- P*((r/k) * (1+r/k)^(n*k)) / ((1 + r/k)^(n*k) - 1)
+pmt
+```
+
+### 3.2 Computing Years
+
+How many years it takes to reach a monthly payment of $220?
+
+```{r}
+n <- 34
+P*((r/k) * (1+r/k)^(n*k)) / ((1 + r/k)^(n*k) - 1)
+
+n <- 35
+P*((r/k) * (1+r/k)^(n*k)) / ((1 + r/k)^(n*k) - 1)
+
+```
+
+Based on the trial and error, it would take approximately **35 years** for the friend to be debt-free with payments of roughly $220.
+
+## 4 Future Value of Ordinary Annuity
+
+
+### 4.1 Function `annuity()`
+
+```{r}
+#' @title Future Value of Ordinary Annuity
+#' @param pmt periodic contribution
+#' @param r annual interest rate
+#' @param n number of years 
+#' @param k compounding periods per year 
+annuity <- function(pmt=0, r=0, n=0, k=12) {
+  if (r == 0) {
+    return(pmt * n * k)
+  } else {
+    fv <- pmt * (((1 + r/k)^(n*k) - 1) / (r/k))
+    return(fv)
+  }
+}
+
+```
+
+### 4.2 Using `annuity()`
+
+Calculating the accumulated amount for Mrs. Savingswood:
+
+```{r}
+savings <- annuity(pmt=100, r=0.10, n=15, k=12)
+savings
+```

@@ -1,0 +1,436 @@
+---
+title: "PS2: Matrices and Lists"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+```
+
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Use the template file `ps2-template.qmd` to answer the questions.
+
+-   Rename this file as `ps2-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps2-gaston-sanchez.qmd`).
+
+-   Submit both your qmd and HTML files to the corresponding assignment
+    submission in bCourses.
+
+:::
+
+
+
+# Subsetting Matrices
+
+Consider the matrix `mat = matrix(letters[1:15], nrow = 3, ncol = 5)` for the following questions. 
+
+```{r}
+mat = matrix(letters[1:15], nrow = 3, ncol = 5)
+mat
+```
+
+For each of the following 
+parts, write a subsetting command that produce the given outputs:
+
+a) `"e"`
+
+```{r}
+# your command
+mat[2,2]
+```
+
+\
+
+b) Matrix 2x2 with `"e", "h"` as a first row and `"f", "i"` as a second row
+
+```{r}
+# your command
+mat[2:3, 2:3]
+```
+
+\
+
+c) Vector `"a" "g" "m"`.
+
+```{r}
+# your command
+mat[1,][c(TRUE, FALSE, TRUE, FALSE, TRUE)]
+```
+
+\
+
+d) Matrix 3x3 in which the original 2nd and 4th columns are excluded.
+
+```{r}
+# your command
+mat[,-2][,-4]
+```
+
+\
+
+e) Matrix 3x5 in which the order of the rows is reversed (i.e. row 1 becomes row 3, row 2 becomes row 2, row 3 becomes row 1).
+
+```{r}
+# your command
+mat[nrow(mat):1,]
+```
+
+
+-----
+
+
+# Creating a List
+
+
+Consider an R list `cass` that when printed it gets displayed as follows:
+
+```
+$name
+    first    middle      last 
+"Cassian"   "Jeron"   "Andor" 
+
+$skills
+[1] "captain" "pilot"   "lier"    "shooter"
+
+$cargo
+    X  Y
+a 101 90
+b 201 80
+c 301 70
+
+$specs
+$specs$species
+[1] "human"
+
+$specs$gender
+[1] "male"
+
+$specs$height
+[1] 1.78
+```
+
+Write code to create the list `cass`, and display this object (i.e. print it). 
+Notice that `name` is a named character vector, `skills` is a character vector 
+with unnamed elements, `cargo` is a matrix with row and column names, and 
+`specs` is a list with 3 named elements.
+
+```{r}
+# your code
+name_vec <- c(first = "Cassian", middle = "Jeron", last = "Andor")
+skills_vec <- c("captain", "pilot", "lier", "shooter")
+cargo_mat <- matrix(c(101, 201, 301, 90, 80, 70), nrow = 3, ncol = 2, dimnames = list(c("a", "b", "c"), c("X", "Y")))
+specs_list <- list(species="human", gender="male", height=1.78)
+
+cass <- list(name=name_vec, skills=skills_vec, cargo=cargo_mat, specs=specs_list)
+print(cass)
+```
+
+
+
+-----
+
+
+# Subsetting Lists
+
+Consider the following list:
+
+```{r}
+list_example = list("letter" = c("A", "B", "C"), "value" = c(10, 50, 20))
+list_example
+```
+
+```{r}
+list_example["letter"]
+```
+```{r}
+list_example[["letter"]]
+```
+
+(a) What is the difference between `list_example["letter"]` and `list_example[["letter"]]`? 
+Explain.
+
+__Your Answer:__ 
+
+First one returns a subsetted list (still a list), while the latter one returns the actual content.
+
+(b) What does `list_example$letter[3]` return? Why?
+
+```{r}
+list_example$letter[3]
+```
+
+__Your Answer:__ 
+
+It returns the third element inside the letter sublist.
+
+(c) What does the command `list_example$value = NULL` do? Explain.
+
+```{r}
+list_example$value = NULL
+list_example
+```
+
+__Your Answer:__ 
+
+Removes the `value` slot entirely (NA only removes the value of the `value` slot but does not delete the slot)
+
+(d) What does the command `list_example$lgl = c(TRUE, FALSE, TRUE)` do? Explain.
+
+```{r}
+list_example$lgl = c(TRUE, FALSE, TRUE)
+list_example
+```
+
+__Your Answer:__ 
+
+Adds a new element to the list with value `lgl`.
+
+
+-----
+
+
+# Superheroes
+
+Consider the following image containing data of a handful of superheroes.
+
+::: {.callout-important}
+Refer to the file `ps2.html` to see the image with the superheroes data.
+:::
+
+
+## Creating Vectors
+
+Create vectors for the columns in the data table displayed above, 
+according to the following data types. If there are missing values, encode them 
+as `NA`. 
+
+- `name`: character vector (name of superhero)
+
+- `age`: integer vector (years)
+
+- `height`: real (i.e. double) vector (meters)
+
+- `weight`: real (i.e. double)  vector (kg)
+
+- `strength`: integer vector
+
+
+```{r}
+# your code
+name <- c("Superman", "Hulk", "Thor", "Batman", "Ironman")
+age <- c(18L, 35L, NA, 40L, 28L)
+height <- c(1.90, 5.02, 1.98, 1.88, 1.85)
+weight <- c(107, 1089, 110, 95, 102)
+strength <- c(3L, 3L, 3L, 1L, 2L)
+```
+
+
+-----
+
+
+# Matrix of Superheros
+
+## Creating a Matrix
+
+Use the vectors created in the preceding part to create a matrix `HEROES`. 
+This matrix should have dimensions: 5 rows, and 4 columns (age, height, 
+weight, and strength). Also, give names to both the rows and columns of 
+`HEROES` according to figure 1; and display this matrix.
+
+```{r}
+# your code
+HEROES <- cbind(age, height, weight, strength)
+rownames(HEROES) <- name
+HEROES
+```
+
+
+## Subscripting (aka Indexing, Slicing) a Matrix
+
+Refer to the matrix `HEROES`.
+
+a) Using `HEROES`, write a command that gives you the first 3 rows, and 
+columns `height` and `weight`.
+
+```{r}
+# your code
+HEROES[1:3, c("height", "weight")]
+```
+
+\
+
+b) Using `HEROES`, write a command that gives you the following output 
+(see below): age values arranged in decreasing order. _Hint_: `sort()` is
+your friend.
+
+```
+  Batman     Hulk  Ironman Superman 
+      40       35       28       18
+```
+
+```{r}
+# your code
+sort(HEROES[,"age"], decreasing=TRUE)
+```
+
+\
+
+c) Using `HEROES`, write a command that gives you the name of the youngest 
+superhero. _Hint_: `which.min()` is your friend.
+
+```{r}
+# your code
+rownames(HEROES)[which.min(HEROES[,"age"])]
+```
+
+\
+
+d) Using `HEROES`, write a command that gives you the number of superheroes that
+have a strength level less than or equal to 2. _Hint_: the function `sum()` is 
+your friend.
+
+```{r}
+# your code
+sum(HEROES[,"strength"] <= 2)
+```
+
+\
+
+e) Using `HEROES`, write a command that arranges its content by `weight`
+in decreasing order. _Hint_: the function `order()` is your friend.
+
+```{r}
+# your code
+HEROES[order(HEROES[,"weight"], decreasing=TRUE), ]
+```
+
+\
+
+f) Add a new row to `HEROES` with the data of Aquaman given below. _Hint_: the
+`rbind()` function is your friend. Display the updated `HEROES` matrix. To 
+clarify: `HEROES` should have 6 rows (Aquaman's data in row 6), and it should 
+also include Aquaman's name in the row names. 
+
+- name: Aquaman
+- age: 35
+- height: 1.85
+- weight: 147
+- strength: 3
+
+```{r}
+# your code
+aquaman_data <- c(35, 1.85, 147, 3)
+HEROES <- rbind(HEROES, aquaman_data)
+rownames(HEROES)[6] <- "Aquaman"
+HEROES
+```
+
+\
+
+g) Add a column `ratio` to `HEROES`. The values of `ratio` should be the 
+ratio of weight over height. _Hint_: the `cbind()` function is your friend. 
+Display the updated `HEROES` matrix. To clarify: `HEROES` should have 6 rows 
+and 5 columns. 
+
+```{r}
+# your code
+ratio_vec <- HEROES[,"weight"] / HEROES[,"height"]
+HEROES <- cbind(HEROES, ratio = ratio_vec)
+HEROES
+```
+
+\
+
+
+-----
+
+
+# List of Superheroes
+
+Create a list `heroes` containing the vectors created in problem 4.
+This list should have five elements (one vector per element). Make sure each 
+element of the list has the corresponding name so that you can refer to them
+by invoking either `heroes$name` or `heroes[["name"]]`. 
+Display your `heroes` list.
+
+```{r}
+# your code
+heroes <- list(name=name, age=age, height=height, weight=weight, strength=strength)
+```
+
+
+## Subscripting (aka Indexing, Slicing) a List
+
+__Refer to the list `heroes`__. Write R commands---displaying the output---that 
+answer the following questions. Answer each part in its individual code chunk.
+
+
+a) What is the name of the superhero with smallest strength level?
+_Hint_: the function `which.min()` is your friend.
+
+```{r}
+# your code
+heroes$name[which.min(heroes$strength)]
+```
+
+\
+
+b) How many superheroes have an unknown `age` value? _Hint_: the function 
+`is.na()` is your friend.
+
+```{r}
+# your code
+sum(is.na(heroes$age))
+```
+
+\
+
+c) What is the median age of superheroes (ignore missing values)?
+
+```{r}
+# your code
+median(heroes$age, na.rm=TRUE)
+```
+
+\
+
+d) What is the height of the superhero with the smallest weight value?
+_Hint_: the function `which.min()` is your friend.
+
+```{r}
+# your code
+heroes$height[which.min(heroes$weight)]
+```
+
+\
+
+e) How many superheroes have height values between 1.9 and 2.5 meters (inclusive)?
+_Hint_: the function `sum()` is your friend.
+
+```{r}
+# your code
+sum(heroes$height >= 1.9 & heroes$height <= 2.5)
+```
+
+\
+
+f) Sort the superheroes' names arranged---from smallest to largest---by their 
+weight/height ("weight over height") values. _Hint_: the function `order()` is 
+your friend.
+
+```{r}
+# your code
+heroes$name[order(heroes$weight / heroes$height)]
+```
+

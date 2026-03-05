@@ -1,0 +1,39 @@
+---
+title: "Demo Publication 1"
+author: "Ian Cheung"
+format: html
+---
+
+## Markdown
+
+This is my first [Quarto Hub](https://quartohub.com) demo.
+
+-   Coffee
+-   Tea
+-   Soda
+
+## Arithmetic
+```{r}
+1 + 2
+```
+## Vectors & Sequences
+```{r}
+v <- c(4, 9, 16)
+```
+
+```{r}
+seq(from=1, to=5, by=2)
+```
+
+```{r}
+rep(6, times=4)
+```
+## Vector Operations
+```{r}
+sqrt(v)
+log(v)
+sum(v)
+mean(v)
+min(v)
+max(v)
+```

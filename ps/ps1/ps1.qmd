@@ -1,0 +1,435 @@
+---
+title: "PS1: Vectors"
+subtitle: "STAT 133"
+author: "Your Name"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+```
+
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Use the template file `ps1.qmd` to answer the questions.
+
+-   Rename this file as `ps1-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps1-gaston-sanchez.qmd`).
+
+-   Submit both your `qmd` and `HTML` files to the corresponding assignment
+    submission in bCourses.
+
+:::
+
+
+# Numeric Sequences
+
+Use the `seq()` function to create the following vectors:
+
+a) `1 2 3 4 5 6 7 8 . . . 18 19 20`
+
+```{r}
+seq(from=1, to=20)
+
+```
+
+\
+
+b) `1.0 1.2 1.4 1.6 1.8 2.0`
+
+```{r}
+seq(from=1.0, to=2.0, by=0.2)
+
+```
+
+\
+
+c) `10 8 6 4 2 0 -2 -4 -6 -8 -10`
+
+```{r}
+seq(from=10, to=-10, by=-2)
+
+```
+
+\
+
+d) A sequence with the first 20 multiples of 3: `3 6 9 12 ...`. _Hint_: the `lengh.out` argument in `seq()` is your friend.
+
+```{r}
+seq(from=3, by=3, length.out=20)
+
+```
+
+
+-----
+
+
+# Replicates
+
+The function `rep()` allows you to create vectors of replicated elements in a handful of different ways. The main input is a vector `x`, and you can specify arguments such as `each`, `times` and `length.out`
+
+```r
+rep(x, each, times, length.out)
+```
+
+
+a) Figure out how to use the `rep()` function and the input vector `1:3` to create the output `1 1 2 2 3 3`
+
+```{r}
+v <- seq(from=1, to=3)
+rep(v, each=2)
+
+```
+
+\
+
+b) Figure out how to use the `rep()` function and the input vector `1:3` to create the output `1 2 3 1 2 3`
+
+```{r}
+rep(v, times=2)
+
+```
+
+\
+
+c) Figure out how to use the `rep()` function and the input vector `1:3` to create the output `1 1 2 2 3 3 1 1 2 2 3 3`
+
+```{r}
+rep(v, each=2, times=2)
+
+```
+
+\
+
+d) Figure out how to use the `rep()` function and the input vector `1:4` to create the output `1 2 2 3 3 3 4 4 4 4`
+
+```{r}
+v2 <- seq(from=1, to=4)
+rep(v2, times=v2)
+
+```
+
+
+-----
+
+
+# GSW Data (season 2025)
+
+The (raw) data for this problem has to do with some players from Golden State 
+Warriors (2025), displayed in the table below (source: Basketball-Reference).
+
+| number | player             | position | height | weight | experience |
+|--------|--------------------|----------|--------|--------|------------|
+|   30   | Stepehn Curry      |  PG      |  74    |  185   |    16      |
+|   10   | Jimmy Buttler      |  SF      |  78    |  230   |    14      |
+|   23   | Draymond Green     |  PF      |  78    |  230   |    13      |
+|    2   | Brandin Podziemski |  SG      |  76    |  205   |     2      |
+|    1   | Jonathan Kuminga   |  PF      |  79    |  225   |     4      |
+|    4   | Moses Moody        |  SG      |  77    |  211   |     4      |
+|   20   | Al Horford         |   C      |  80    |  240   |    18      |
+|    3   | Will Richard       |  SG      |  75    |  206   |     0      |
+
+
+## Creating Vectors (by hand)
+
+Use the "combine" function `c()` to create vectors for the columns in the data table displayed above, 
+according to the following data types.
+
+- `number`: integer vector
+
+- `player`: character vector
+
+- `position`: character vector
+
+- `height`: double (i.e. real) vector
+
+- `weight`: double (i.e. real) vector
+
+- `experience`: integer vector
+
+
+```{r}
+number <- c(30L, 10L, 23L, 2L, 1L, 4L, 20L, 3L)
+
+player <- c("Stephen Curry", "Jimmy Butler", "Draymond Green", "Brandin Podziemski", "Jonathan Kuminga", "Moses Moody", "Al Horford", "Will Richard")
+
+position <- c("PG", "SF", "PF", "SG", "PF", "SG", "C", "SG")
+
+height <- c(74, 78, 78, 76, 79, 77, 80, 75)
+
+weight <- c(185, 230, 230, 205, 225, 211, 240, 206)
+
+experience <- c(16L, 14L, 13L, 2L, 4L, 4L, 18L, 0L)
+
+```
+
+
+## Subsetting (i.e. indexing) Vectors
+
+Refer to the vectors created in the preceding subsection.
+Write R commands (just one single-line commands)---displaying the output---that
+answer the following questions:
+
+
+a) What is the weight of the heaviest player?
+
+```{r}
+max(weight)
+
+```
+
+<br>
+
+b) What is the name of the player that has a height of 80 inches`?
+
+```{r}
+player[height == 80]
+
+```
+
+<br>
+
+c) What is the position of the player with more years of experience?
+_Hint_: the `which.max()` function is your friend.
+
+```{r}
+position[which.max(experience)]
+
+```
+
+<br>
+
+d) What is the number of the lightest player? _Hint_: the `which.min()` 
+function is your friend.
+
+```{r}
+number[which.min(weight)]
+
+```
+
+<br>
+
+e) What is the average weight for those players with more than 5 years of
+experience?
+
+```{r}
+mean(weight[experience > 5])
+
+```
+
+<br>
+
+f) How many players have a weight larger than the average (i.e. mean) weight?
+_Hint_: the `sum()` function is your friend.
+
+```{r}
+sum(weight > mean(weight))
+
+```
+
+<br>
+
+g) How many players have between 9 and 12 years of experience (inclusive)?
+
+```{r}
+sum(experience >= 9 & experience <= 12)
+
+```
+
+<br>
+
+h) What is the median years of experience of _Shooting Guard_ (`SG`) players?
+
+```{r}
+# your code
+median(experience[position == "SG"])
+
+```
+
+<br>
+
+i) What is the median weight of those players with a position different of _Center_ (`C`)?
+
+```{r}
+median(weight[position != "C"])
+
+```
+
+<br>
+
+j) What is the first quartile (i.e. bottom 25th percentile) of years of
+experience among _Power Forwards_ (`PF`) and _Shooting Guards_ (`SG`).
+_Hint_: the `quantile()` function is your friend.
+
+```{r}
+quantile(experience[position == "PF" | position == "SG"], 0.25)
+
+```
+
+
+-----
+
+
+# Subsetting Commands
+
+Consider the vector `vec = c("x", "y", "a", "b")`. For each of the following 
+parts, write at least two different subsetting commands that produce the given 
+outputs:
+
+
+a) `"x"`
+
+```{r}
+vec = c("x", "y", "a", "b")
+vec[1]
+vec[-c(2, 3, 4)]
+
+```
+
+\
+
+b) `"b" "a" "y" "x"`
+
+```{r}
+vec[4:1]
+vec[c(4, 3, 2, 1)]
+
+```
+
+\
+
+c) `"b" "b" "b"`
+
+```{r}
+vec[c(4, 4, 4)]
+vec[rep(4, 3)]
+
+```
+
+\
+
+d) `"x" "y`
+
+```{r}
+vec[1:2]
+vec[c(TRUE, TRUE, FALSE, FALSE)]
+
+```
+
+
+-----
+
+
+# Technical questions about vectors
+
+Consider the following two vectors `x` and `y`:
+
+```{r}
+x <- c(1, 2, 3, 4, 5)
+
+y <- c("a", "b", "c", "d", "e")
+```
+
+In the following parts, indicate True or False for whether the given command
+involves: a) coercion, and/or b) vectorization, and/or c) recycling.
+
+
+1) `y[x <= 2L]`
+
+    a) coercion (FALSE)
+    b) vectorization (TRUE)
+    c) recycling (FALSE)
+
+
+2) `y[x[5]]`
+
+    a) coercion (FALSE)
+    b) vectorization (FALSE)
+    c) recycling (FALSE)
+
+
+3) `x[y != 'c']`
+
+    a) coercion (FALSE)
+    b) vectorization (TRUE)
+    c) recycling (FALSE)
+
+
+4) `y[x/x]`
+
+    a) coercion (TRUE)
+    b) vectorization (TRUE)
+    c) recycling (FALSE)
+
+
+-----
+
+
+# File Paths
+
+Consider the following file structure depicted below. Note that the first forward slash `/` indicates the root directory.
+
+```
+/
+  project/
+    README.md
+    data/
+      rawdata/
+        rawdata.csv
+        rawdata-dictionary.md
+      cleandata/
+        cleandata.csv
+        cleandata-dictionary.md
+    code/
+      functions.R
+      clean-data-script.R
+```
+
+\
+
+a) What is the absolute path to the folder `cleandata/`?
+
+```{bash eval = FALSE}
+/project/data/cleandata/
+```
+
+\
+
+b) What is the relative path from `functions.R` to `cleandata.csv`?
+
+```{bash eval = FALSE}
+../data/cleandata/cleandata.csv
+```
+
+\
+
+c) What is the relative path from `rawdata.csv` to `clean-data-script.R`?
+
+```{bash eval = FALSE}
+../../code/clean-data-script.R
+```
+
+\
+
+d) Assume that your current directory is the `cleandata/` directory. Write the Unix command that lists the contents in the `project/` directory.
+
+```{bash eval = FALSE}
+ls ../../
+```
+
+\
+
+e) Assume that your current directory is the `data/` directory. Write the Unix command that makes a new directory called `output/` located at the same level of `data/` and `code/`.
+
+```{bash eval = FALSE}
+mkdir ../output
+```
+

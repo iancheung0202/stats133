@@ -1,0 +1,59 @@
+---
+title: "EV Adoption"
+subtitle: "California Energy Commission"
+author: "Ian Cheung"
+format:
+  revealjs:
+    code-folding: true
+    echo: true
+    embed-resources: true
+    transition: slide
+    background-transition: fade
+---
+
+## Introduction
+
+This is the 2023 sales data to identify trends in adoption of EV. 
+
+---
+
+## State of the Counties {background-color="#eef6ff"}
+
+```{r}
+#| label: county-stats
+#| code-line-numbers: "9-10"
+library(dplyr)
+ev_sales <- read.csv("ev-sales-cleaned.csv")
+
+county_summary <- ev_sales %>%
+  group_by(county) %>%
+  summarise(total_sales = sum(sales)) %>%
+  arrange(total_sales)
+
+lowest_county <- filter(county_summary, total_sales == min(total_sales))
+highest_county <- filter(county_summary, total_sales == max(total_sales))
+
+```
+
+* **Highest Adoption:** `r highest_county$county` (`r highest_county$total_sales` sales)
+* **Lowest Adoption:** `r lowest_county$county` (`r lowest_county$total_sales` sales)
+
+---
+
+## Model Popularity {background-color="#fef8dbff"}
+
+```{r}
+#| label: model-stats
+#| code-line-numbers: "6-7"
+model_stats <- ev_sales %>%
+  group_by(make, model) %>%
+  summarise(total_model_sales = sum(sales)) %>%
+  arrange(desc(total_model_sales))
+
+top_model <- model_stats[1, ]
+bottom_model <- model_stats[nrow(model_stats), ]
+
+```
+
+* **Most Popular:** `r top_model$make` `r top_model$model`
+* **Least Popular:** `r bottom_model$make` `r bottom_model$model`

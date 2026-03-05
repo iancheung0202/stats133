@@ -1,0 +1,378 @@
+---
+title: "PS4: Data Wrangling"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(tidyverse)
+```
+
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Download the template file `ps4.qmd` to answer the questions.
+
+-   Rename `ps4.qmd` to `ps4-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps4-gaston-sanchez.qmd`).
+
+-   Submit both your qmd and HTML files to the corresponding assignment
+    submission in bCourses.
+
+:::
+
+
+```{r load-tidyverse}
+# load necessary library, do not remove.
+library(tidyverse)
+```
+
+# Superheroes
+
+Consider the vectors of superhero information from Problem Set 2
+
+```{r}
+name <- c('Superman', 'Hulk', 'Thor', 'Batman', 'Ironman')
+
+age <- c(18L, 35L, NA, 40L, 28L)
+
+height <- c(1.90, 5.02, 1.98, 1.88, 1.85)
+
+weight <- c(107, 1089, 110, 95, 102)
+
+strength <- c(3L, 3L, 3L, 1L, 2L)
+```
+
+## `data.frame()`
+
+In Problem Set 2, we used `cbind()` to comine these vectors into a matrix. Now, use `data.frame()` to combine the atomic vectors above into a dataframe called `HEROES` with the columns `name`, `age`, `height`, `weight`, and `strength`.
+
+```{r}
+# your code here.
+# HEROES_MATRIX <- cbind(name, age, height, weight, strength)
+HEROES <- data.frame(name, age, height, weight, strength)
+print(HEROES)
+```
+
+\
+
+## Subsetting Dataframes
+
+a) Use a function to find the number of rows and columns (the dimension) of the dataframe.
+
+```{r}
+# your code here
+dim(HEROES)
+# or
+nrow(HEROES)
+ncol(HEROES)
+```
+
+\
+
+b) Use a function to get the last two rows of the dataframe.
+
+```{r}
+# your code here
+tail(HEROES, n = 2)
+```
+
+\
+
+c) Write code to create a new dataframe containing only the `name` and `strength` columns.
+
+```{r}
+# your code here
+heroes_subset <- HEROES[, c("name", "strength")]
+heroes_subset <- subset(HEROES, select = c(name, strength))
+print(heroes_subset)
+```
+
+\
+
+## Row Names
+
+You may have noticed that, by default, the columns were named when the dataframe was created, but the rows were not. Write code to get the current rownames of the dataframe `HEROES`.
+
+```{r}
+# your code here
+rownames(HEROES)
+```
+
+\
+
+Now, `data.frame()` has an optional input that allows you to set the row names when you create the dataframe. Type `help(data.frame)` into the r *console* (not terminal) to learn more about `data.frame()`. 
+
+What input allows you to set the row names? What types of objects can you give it? For example, if you set it to `3L` when creating `HEROES`, is that a valid input? If so, what would that mean?
+
+:::{.callout-note}
+# Type Your Answer in this Callout Block
+
+The input that allows you to set row names is `row.names`. We can provide: a character vector of unique names with a length equal to the number of rows, an integer vector of unique numbers, a single character string or integer indicating which column of the data should be used as the row names, or NULL, which defaults to the sequence numbers.
+
+Yes, 3L is a valid input, but it doesn't mean the row name is "3". In the context of the data.frame() function, providing a single integer like 3L tells R to use the 3rd column of the data as the row names. In your HEROES example, the 3rd column is height, so setting row.names = 3L would result in the heroes' heights becoming the labels for the rows.
+
+:::
+
+\
+
+Lastly, using two different methods, recreate the dataframe `HEROES` using `data.frame()`, but use the `names` vector as the names of the rows. Do not set the names of the rows after the dataframe has been created, you should be able to do this when using `data.frame()` and the input you described in the last part. (The new dataframe should *not* have a column containing the names!)
+
+a) Method 1
+
+```{r}
+# your code here
+HEROES <- data.frame(
+  age = age,
+  height = height,
+  weight = weight,
+  strength = strength,
+  row.names = name
+)
+print(HEROES)
+```
+
+\
+
+b) Method 2
+
+```{r}
+# your code here
+HEROES <- data.frame(
+  name, # Use as row name
+  age, 
+  height, 
+  weight, 
+  strength,
+  row.names = 1L
+)
+
+print(HEROES)
+```
+
+\
+
+# Data `mpg`
+
+We'll be working with the data set `mpg` that comes in _tidyverse_. This dataset contains a subset of the fuel economy data collected by the EPA. `mpg` contains only models which had a new release every year between 1999 and 2008 - this was used as a proxy for the popularity of the car.
+
+Let's focus on those models released in 2008.
+
+```{r}
+# load in dataset, do not remove.
+dat <- filter(mpg, year == 2008)
+```
+
+## `dplyer`
+
+### Slice (Subsetting Rows)
+
+a) Use `slice()` to subset the data by selecting the first 5 rows.
+
+```{r}
+# your code here
+dat |> slice(1:5)
+```
+
+\
+
+
+b) Use `slice()` to subset the data by selecting rows 10, 15, 20, ..., 50.
+_Hint_: the `seq()` function is your friend.
+
+```{r}
+# your code here
+dat |> slice(seq(10, 50, by = 5))
+```
+
+
+### Filtering (Based on Conditions)
+
+a) Use `filter()` to subset those cars with engine displacement `displ` equal to 5.7.
+
+```{r}
+# your code here
+dat |> filter(displ == 5.7)
+```
+
+\
+
+b) Use `filter()` to subset those cars with engine displacement `displ` between 5.5 and 5.7 inclusive.
+
+```{r}
+# your code here
+dat |> filter(displ >= 5.5 & displ <= 5.7)
+```
+
+\
+
+c) Use `filter()` to subset those cars with engine displacement `displ` less than 2 or greater than 6.5.
+
+```{r}
+# your code here
+dat |> filter(displ < 2 | displ > 6.5)
+```
+
+\
+
+d) Use `filter()` to subset those cars with engine displacement `displ` greater than 6,
+and `manufacturer` chevrolet.
+
+```{r}
+# your code here
+dat |> filter(displ > 6, manufacturer == "chevrolet")
+```
+
+\
+
+### Selecting Columns
+
+a) Use `filter()` to subset cars manufactured by `"honda"`, and then `select()` 
+columns `model`, `trans` and `cty`
+
+```{r}
+# your code here
+dat |> 
+  filter(manufacturer == "honda") |> 
+  select(model, trans, cty)
+```
+
+\
+
+b) Use pipes (`|>`) to select the `manufacturer`, `model`, `hwy` and `fl`, of cars with 
+`hwy` mileage greater than or equal to 35
+
+```{r}
+# your code here
+dat |> 
+  filter(hwy >= 35) |> 
+  select(manufacturer, model, hwy, fl)
+```
+
+\
+
+c) Use pipes (`|>`) to select the `manufacturer`, `model`, and `trans`, of compact cars 
+(`class`) with 6 cylinders (`cyl`). 
+
+```{r}
+# your code here
+dat |> 
+  filter(class == "compact", cyl == 6) |> 
+  select(manufacturer, model, trans)
+```
+
+\
+
+## Grouped Operations
+
+a) Use `group_by()` to find the mean city mileage `cty` for each `manufacturer`.
+
+```{r}
+dat |> 
+  group_by(manufacturer) |> 
+  summarize(mean_cty = mean(cty, na.rm = TRUE))
+```
+
+\
+
+b) Use `mutate()` to add a new column `cmpg` combined miles per gallon using the formula below:
+
+\
+
+$$
+\text{City MPG}\times 0.55 + \text{Highway MPG} \times 0.45 = \text{Combined MPG}
+$$
+
+\
+
+```{r}
+# your code here
+dat <- dat |> 
+  mutate(cmpg = (cty * 0.55) + (hwy * 0.45))
+```
+
+\
+
+c) Use `group_by()`, `summarize()`, and `arrange()` to get the max city mileage `cty` for each `class` and order the results alphabetically by `class`.
+
+```{r}
+# your code here
+dat |> 
+  group_by(class) |> 
+  summarize(max_cty = max(cty, na.rm = TRUE)) |> 
+  arrange(class)
+```
+
+\
+
+d) Use `count()` to get the number of cars from each `class` in the dataset.
+
+```{r}
+# your code here
+dat |> count(class)
+```
+
+\
+
+## Make Your Own Functions
+
+Write a function that takes in `dat` and additional inputs and uses `dplyer` verbs to do each of the following:
+
+a) subsets `dat` and returns a dataframe of cars from a `manufacturer` of the users choosing and with engine displacement `displ` less than a number specified by the user. If the `manufacturer` is not in the dataframe your function should return a warning.
+
+```{r}
+# your code here
+filter_man_displ <- function(df, man_choice, displ_limit) {
+  if (!(man_choice %in% df$manufacturer)) {
+    warning("Manufacturer not found in dataset.")
+  }
+  
+  df |> 
+    filter(manufacturer == man_choice, displ < displ_limit)
+}
+```
+
+\
+
+b) subsets `dat` and returns a dataframe of cars from a `class` specified by the user and highway milage `hwy` between two values specified by the user. If the `class` given by the user is not in the dataframe, then your function should return a warning.
+
+```{r}
+# your code here
+filter_class_hwy <- function(df, class_choice, hwy_min, hwy_max) {
+  if (!(class_choice %in% df$class)) {
+    warning("Class not found in dataset.")
+  }
+  
+  df |> 
+    filter(class == class_choice, hwy >= hwy_min, hwy <= hwy_max)
+}
+```
+
+\
+
+c) returns the average of a column specified by the user grouped by `manufacturer` and `class`. If the column is not numeric, then your function should return a warning.
+
+```{r}
+# your code here
+avg_by_group <- function(df, target_col) {
+  # Pull the column to check if it's numeric
+  col_data <- df |> pull({{ target_col }})
+  
+  if (!is.numeric(col_data)) {
+    stop("Warning: Selected column is not numeric.")
+  }
+  
+  df |> 
+    group_by(manufacturer, class) |> 
+    summarize(avg_value = mean({{ target_col }}, na.rm = TRUE), .groups = "drop")
+}
+```

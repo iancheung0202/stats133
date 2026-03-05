@@ -1,0 +1,106 @@
+---
+title: "Title"
+subtitle: "Subtitle"
+author: "Your Name"
+format:
+  revealjs:
+    slide-number: c
+    embed-resources: true
+---
+
+```{r include = FALSE}
+library(tidyverse)
+
+# use this code chunk to import your data
+
+```
+
+
+# Title Section Slide
+
+## Subsection Slide 1
+
+- Item X
+- Item Y
+- Item Z
+
+
+## Slide with Folding Code
+
+```{r}
+#| echo: true
+#| code-fold: true
+mtcars |> 
+  group_by(cyl) |> 
+  summarize(mean_mpg = mean(mpg),
+            median_mpg = median(mpg))
+```
+
+
+## Inline Code
+
+```{r}
+#| echo: true
+#| code-fold: true
+mpg_stats = mtcars |> 
+  summarize(min_mpg = min(mpg),
+            mean_mpg = mean(mpg),
+            median_mpg = median(mpg),
+            max_mpg = max(mpg))
+```
+
+Miles per gallon (`mpg`) statistics
+
+- Min: `r pull(mpg_stats, min_mpg)`
+
+- Mean: `r pull(mpg_stats, mean_mpg)`
+
+- Median: `r pull(mpg_stats, median_mpg)`
+
+- Max: `r pull(mpg_stats, max_mpg)`
+
+
+## Plot
+
+```{r}
+#| echo: true
+#| code-fold: true
+mtcars |> 
+  mutate(cylinders = factor(cyl)) |> 
+  ggplot(aes(x = cylinders)) +
+  geom_bar() +
+  labs(title = "Distribution of Number of Cylinders")
+```
+
+
+## 2 Column Layout
+
+:::: {.columns}
+::: {.column width="50%"}
+Column 1
+
+Concepts in Computing with Data
+:::
+
+::: {.column width="50%"}
+Column 2
+
+Concepts in Computing with Data
+:::
+::::
+
+
+# One More Title Section Slide
+
+## Slide with Image {.nostretch}
+
+![](https://www.r-project.org/Rlogo.png){fig-align="center" width="20%"}
+
+
+## Slide with quote
+
+> Give a man a fish and you feed him for a day;
+>
+> teach a man to fish and you feed him for a lifetime.
+
+

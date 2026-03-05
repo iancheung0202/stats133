@@ -1,0 +1,261 @@
+---
+title: "California Crash Data Analysis (2023)"
+subtitle: "Project 2"
+author: "Ian Cheung"
+format: 
+  revealjs:
+    slide-number: c
+    embed-resources: true
+    theme: simple
+    transition: fade
+---
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+dat <- read_csv("crashes_2023.csv")
+```
+
+# Introduction
+
+## About this Project
+
+This project explores traffic crash data from the **Statewide Integrated Traffic Records System (SWITRS)**, maintained by the California Highway Patrol.
+
+# 2.2 Overall Statistics
+
+## Statewide Summary
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+overall_stats <- dat |> 
+  summarize(
+    total_crashes = n(),
+    total_injured = sum(NUMBER_INJURED, na.rm = TRUE),
+    total_fatal = sum(NUMBER_KILLED, na.rm = TRUE)
+  )
+
+```
+
+During the year 2023, California recorded the following:
+
+* **Total Crashes:** `r pull(overall_stats, total_crashes)`
+* **Total Injured Victims:** `r pull(overall_stats, total_injured)`
+* **Total Fatal Victims:** `r pull(overall_stats, total_fatal)`
+
+# 2.3 Distribution Tables
+
+## Crashes per Month
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  group_by(MONTH) |> 
+  summarize(count = n()) |> 
+  mutate(percentage = round((count / sum(count)) * 100, 2)) |> 
+  arrange(MONTH)
+
+```
+
+## Crashes per Day of Week
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  group_by(DAY_OF_WEEK) |> 
+  summarize(count = n()) |> 
+  mutate(percentage = round((count / sum(count)) * 100, 2)) |> 
+  arrange(DAY_OF_WEEK)
+
+```
+
+## Crashes per Hour
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  group_by(HOUR) |> 
+  summarize(count = n()) |> 
+  mutate(percentage = round((count / sum(count)) * 100, 2)) |> 
+  arrange(HOUR)
+
+```
+
+# 2.4 Ranking Tables
+
+## Top-10 PCF Violations
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  count(PCF_VIOL_CATEGORY, name = "count") |> 
+  slice_max(order_by = count, n = 10) |> 
+  arrange(desc(count))
+
+```
+
+## Types of Collision
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  count(TYPE_OF_COLLISION, name = "count") |> 
+  arrange(desc(count))
+
+```
+
+## Top-8 Party At Fault
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  count(STWD_VEHTYPE_AT_FAULT, name = "count") |> 
+  slice_max(order_by = count, n = 8) |> 
+  arrange(desc(count))
+
+```
+
+# 2.5 Pedestrian Involvement
+
+## Pedestrian Totals
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+ped_stats <- dat |> 
+  filter(PEDESTRIAN_ACCIDENT == "yes") |> 
+  summarize(
+    total_accidents = n(),
+    total_injured = sum(COUNT_PED_INJURED, na.rm = TRUE),
+    total_killed = sum(COUNT_PED_KILLED, na.rm = TRUE)
+  )
+
+```
+
+* **Accidents involving pedestrians:** `r pull(ped_stats, total_accidents)` 
+* **Pedestrians injured:** `r pull(ped_stats, total_injured)` 
+* **Pedestrians killed:** `r pull(ped_stats, total_killed)` 
+
+## Pedestrian Rankings 1
+### Top 5 Violation Category
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  filter(PEDESTRIAN_ACCIDENT == "yes") |> 
+  count(PCF_VIOL_CATEGORY) |> 
+  slice_max(order_by = n, n = 5)
+```
+## Pedestrian Rankings 2
+### Top 5 Collision Types
+```{r ped-rankings2}
+#| echo: true
+#| code-fold: true
+dat |> 
+  filter(PEDESTRIAN_ACCIDENT == "yes") |> 
+  count(TYPE_OF_COLLISION) |> 
+  slice_max(order_by = n, n = 5)
+```
+## Pedestrian Rankings 3
+### Top 5 Vehicle At Fault
+```{r}
+#| echo: true
+#| code-fold: true
+dat |> 
+  filter(PEDESTRIAN_ACCIDENT == "yes") |> 
+  count(STWD_VEHTYPE_AT_FAULT) |> 
+  slice_max(order_by = n, n = 5)
+
+```
+
+# 2.6 Bicyclist Involvement
+
+## Bicyclist Totals
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+bike_stats <- dat |> 
+  filter(BICYCLE_ACCIDENT == "yes") |> 
+  summarize(
+    total_accidents = n(),
+    total_injured = sum(COUNT_BICYCLIST_INJURED, na.rm = TRUE),
+    total_killed = sum(COUNT_BICYCLIST_KILLED, na.rm = TRUE)
+  )
+
+```
+
+* **Accidents involving bicyclists:** `r pull(bike_stats, total_accidents)` 
+* **Bicyclists injured:** `r pull(bike_stats, total_injured)` 
+* **Bicyclists killed:** `r pull(bike_stats, total_killed)` 
+
+
+## Bicycle Rankings 1
+### Top 5 Violation Category
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  filter(BICYCLE_ACCIDENT == "yes") |> 
+  count(PCF_VIOL_CATEGORY) |> 
+  slice_max(order_by = n, n = 5)
+```
+## Bicycle Rankings 2
+### Top 5 Collision Types
+```{r}
+#| echo: true
+#| code-fold: true
+dat |> 
+  filter(BICYCLE_ACCIDENT == "yes") |> 
+  count(TYPE_OF_COLLISION) |> 
+  slice_max(order_by = n, n = 5)
+```
+## Bicycle Rankings 3
+### Top 5 Vehicle At Fault
+```{r}
+#| echo: true
+#| code-fold: true
+dat |> 
+  filter(BICYCLE_ACCIDENT == "yes") |> 
+  count(STWD_VEHTYPE_AT_FAULT) |> 
+  slice_max(order_by = n, n = 5)
+
+```
+
+# 2.7 County Exploration
+
+## High-Crash Counties
+
+**Research Question:** Which five California counties reported the highest number of crashes in 2023?
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+dat |> 
+  count(COUNTY, name = "total_crashes") |> 
+  slice_max(order_by = total_crashes, n = 5) |> 
+  mutate(percentage = round((total_crashes / nrow(dat)) * 100, 2)) |>
+  arrange(desc(total_crashes))
+
+```

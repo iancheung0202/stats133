@@ -1,0 +1,41 @@
+---
+title: "Lab 1"
+author: "Ian Cheung"
+format: html
+---
+
+hello this is lab 01
+
+::: {.alert .alert-primary}
+**Name:** Ian Cheung
+:::
+
+::: {.alert .alert-secondary}
+**Major:** Intending Applied Math & Data Science
+:::
+
+::: {.alert .alert-info}
+**Hometown:** Palo Alto, CA / Hong Kong
+:::
+
+::: {.alert .alert-success}
+**Favorite song:** From the start, Laufey
+:::
+
+| Col1 | Col2 | Col3 |
+|------|------|------|
+| hi   | hi   | hi   |
+| hi   | hi   | hi   |
+| hi   | hi   | hi   |
+
+![](https://iancheung.dev/assets/img/favicon.png)
+
+> This is a famous quote
+
+::: {.alert .alert-danger}
+Boostrap dangerous alert box
+:::
+
+```{r}
+# this contains no code
+```

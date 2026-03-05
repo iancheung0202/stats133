@@ -1,0 +1,375 @@
+---
+title: "PS3: Control Flow and Functions"
+subtitle: "STAT 133"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+```
+
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Use the template file `ps3.qmd` to answer the questions.
+
+-   Rename `ps3.qmd` to `ps3-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps3-gaston-sanchez.qmd`).
+
+-   Submit both your qmd and HTML files to the corresponding assignment
+    submission in bCourses.
+
+:::
+
+
+# Pythagoras
+
+The Pythagoras formula is used to compute the length of the hypotenuse, $c$, of 
+a right triangle with legs of length $a$ and $b$.
+
+$$
+c = \sqrt{a^2 + b^2}
+$$
+
+
+## `pythagoras()` version 1
+
+Write a function `pythagoras()` that takes two arguments `a` and `b`, and returns the length of the hypotenuse. 
+
+```{r}
+# write your pythagoras function here
+pythagoras <- function(a, b) {
+  c <- sqrt(a^2 + b^2)
+  return(c)
+}
+```
+
+Now, add roxygen comments to document your function.
+
+```{r}
+# paste your function here and add roxygen comments
+#' @title Pythagoras Formula
+#' @description Calculates the hypotenuse of a right triangle
+#' @param a length of the first leg
+#' @param b length of the second leg
+#' @return length of the hypotenuse
+pythagoras <- function(a, b) {
+  c <- sqrt(a^2 + b^2)
+  return(c)
+}
+```
+
+Test your `pythagoras()` with two leg values: e.g. `pythagoras(3, 4)`.
+
+```{r}
+# call your function here
+pythagoras(3, 4)
+```
+
+
+## `pythagoras()` version 2
+
+Modify your function `pythagoras()` so that argument `b` takes the same value of argument `a` by default. *Your function should still allow two inputs!*
+
+```{r}
+# your modified pythagoras function here
+pythagoras <- function(a, b = a) {
+  c <- sqrt(a^2 + b^2)
+  return(c)
+}
+```
+
+Test it with just one leg value: e.g. `pythagoras(5)`.
+
+```{r}
+# call your function here
+pythagoras(5)
+```
+
+-----
+
+
+# Gaussian Function
+
+The Gaussian (Normal) function, given in the equation below, is one of the most widely used functions in science and statistics:
+
+$$
+g(x) = \frac{1}{\sigma \sqrt{2 \pi}} \ \exp \left [ - \frac{1}{2} \left (\frac{x - \mu}{\sigma} \right )^2 \right ]
+$$
+
+The parameters $\sigma$ and $\mu$ are real numbers, where $\sigma$ must be greater than zero. For more information, see the wikipedia entry: [Normal Distribution](https://en.wikipedia.org/wiki/Normal_distribution#)
+
+## Function `gaussian()`
+
+- Make a function `gaussian()` that takes three arguments: `x`, `mu`, and `sigma` and evaluates the expression above.
+
+- Use `exp()` for the exponential part.
+
+
+```{r}
+# write your function here
+gaussian <- function(x, mu, sigma) {
+  return((1 / (sigma * sqrt(2 * pi))) * (exp(-0.5 * ((x - mu) / sigma)^2)))
+}
+```
+
+Modify your function so that it raises an error message if `sigma` is not positive.
+
+```{r}
+# copy your function and add the error functionality
+gaussian <- function(x, mu, sigma) {
+  if (sigma <= 0) {
+    stop("Error! sigma must be a positive number!")
+  }
+  return((1 / (sigma * sqrt(2 * pi))) * (exp(-0.5 * ((x - mu) / sigma)^2)))
+}
+```
+
+Evaluate the function with `mu = 0`, `sigma = 2`, and `x = 1`.
+
+```{r}
+# call your function here
+gaussian(1, 0, 2)
+```
+
+
+## Graphing a Normal curve
+
+Once you have your `gaussian()` function try it with a vector `x = seq(-6, 6, by = 0.1)`, and pass the `x` and outputs to `plot()` to get a normal curve.
+
+```{r fig.align='center'}
+# plot function here
+plot(seq(-6, 6, by = 0.1), gaussian(seq(-6, 6, by = 0.1), mu = 0, sigma = 2))
+```
+
+## Compare to `d(norm)`
+
+R actually has a built-in function to calculate the density of a normal distribution. Type `help(dnorm)` in the R *console* to learn more about this function. Compare your function to the built-in `dbinom`. Notice that `dnorm` has an additional input when compared to our `gaussian` function. Describe this input. What type of object does it take? How does it affect the output of the function?
+
+:::{.callout-tip}
+## Type your answer in this callout block:
+
+The additional input is log. It takes a logical (boolean) object (TRUE or FALSE). If set to TRUE, the function returns the log-density instead of the density.
+
+:::
+
+Call `dbinom` with the inputs `x=1`, `mean = 0`, and `sd = 2`and check that it returns the same output as your `gaussian` function.
+
+```{r}
+# call dnorm here
+dnorm(x = 1, mean = 0, sd = 2)
+```
+
+-----
+
+
+# Population in Logistic Growth
+
+Consider the following formula for computing the population size at time t according to a logistic growth model:
+
+$$
+P(t) = \frac{K}{1 + \left(\frac{K - P_0}{P_0}\right)e^{-rt}}
+$$
+
+where:
+
+- $K$ = carrying capacity of the environment
+
+- $P_0$ = initial population
+
+- $r$ = intrinsic growth rate
+
+- $t$ = time (we will use years)
+
+## Function `logistic_growth()`
+
+Create a function `logistic_growth()` that allows you to compute the population at time ($t$) using the Logistic Growth model.
+
+- Use the formula of the above equation to write a function `logistic_growth()`.
+
+- Give descriptive names to the arguments of the function.
+
+- Also, give default values to the arguments.
+
+- Don't forget to include documentation comments (title, description, inputs,
+and output).
+
+```r
+# write your function here
+#' @title Logistic Growth Model
+#' @description Computes population size at time t
+#' @param t time in years (default 1)
+#' @param K carrying capacity (default 1000)
+#' @param P0 initial population (default 100)
+#' @param r intrinsic growth rate (default 0.1)
+#' @return numerical value of population at time t
+logistic_growth <- function(t = 1, K = 1000, P0 = 100, r = 0.1) {
+  return(K / (1 + ((K - P0) / P0) * exp(-r * t)))
+}
+```
+
+
+## Use `logistic_growth()` to answer the following questions
+
+a) Suppose a population of bacteria starts with an initial population of
+$P_0 = 100$ individuals and has a carrying capacity of $K = 5000$.
+If the intrinsic growth rate is $r = 0.4$, what will the population be after $10$ years?
+
+```r
+# call your function here
+logistic_growth(t = 10, K = 5000, P0 = 100, r = 0.4)
+```
+
+\
+
+b) A wildlife reserve introduces $250$ deer into an environment with a carrying capacity of $2000$ deer. Assume the intrinsic growth rate is $0.25$.
+What is the population size after $15$ years?
+
+```r
+# call your function here
+logistic_growth(t = 15, K = 2000, P0 = 250, r = 0.25)
+```
+
+\
+
+c) Consider the previous part (b); but now assume different possible growth rates
+$r = 0.15, 0.25, 0.35$. Pass a vector of growth rates to your function `logistic_growth()` and obtain the three different population values after 15 time units.
+
+```r
+# call your function here
+r <- c(0.15, 0.25, 0.35)
+logistic_growth(t = 15, K = 2000, P0 = 250, r = r)
+```
+
+
+
+-----
+
+
+# Binomial Probability
+
+The formula for the binomial probability is:
+
+$$
+Prob(X = k) = {n \choose k} p^k (1-p)^{n-k}
+$$
+
+where:
+
+- $n$ is the number of (fixed) trials
+
+- $p$ is the probability of success in each trial
+
+- $1 - p$ is the probability of failure in each trial
+
+- $k$ is a variable that represents the number of successes out of $n$ trials
+
+- the first term in parenthesis is __not__ a fraction, it is the number of 
+combinations in which $k$ success can occur in $n$ trials
+
+R provides the `choose()` function to compute the number of combinations: 
+
+$$
+{n \choose k} = \frac{n (n-1) \cdots (n - k +1)}{k (k-1) \cdots 1}
+$$
+
+For instance, the number of combinations in which $k$ = 2 
+success can occur in $n$ = 5 trials is:
+
+```{r}
+choose(n = 5, k = 2)
+```
+
+
+## Function `bin_probability`
+
+Write a function `bin_probability` that returns the binomial probability. This
+function should take the following arguments:
+
+- `n`: number of trials
+
+- `k`: number of successes
+
+- `p:` probability of success (in a single trial)
+
+Likewise, `bin_probability()` should `stop()` in the following cases:
+
+- `n < 1` (there has to be at least one trial)
+- when `k > n` (cannot have more successes than trials)
+- when `p < 0` or `p > 1` (probability `p` must be between 0 and 1)
+
+And don't forget to include documentation comments (title, description, inputs, and output)!
+
+\
+
+```{r}
+# write your function here
+#' @title Binomial Probability
+#' @description Calculates the probability of k successes in n trials
+#' @param n number of trials
+#' @param k number of successes
+#' @param p probability of success
+#' @return probability value
+bin_probability <- function(n, k, p) {
+  if (n < 1) stop("n must be at least 1")
+  if (k > n) stop("k cannot be greater than n")
+  if (p < 0 | p > 1) stop("p must be between 0 and 1")
+  return(choose(n, k) * (p^k) * (1 - p)^(n - k))
+}
+```
+
+\
+
+Use your `bin_probability()` function to obtain:
+
+a) the probability of getting 2 heads in 5 tosses of a (fair) coin
+    + $n = 5$ trials
+    + $k = 2$ successes
+    + $p = 1/2$ probability of success (getting heads)
+
+```{r}
+# call your function here
+bin_probability(n = 5, k = 2, p = 0.5)
+```
+
+\bigskip
+
+b) the probability of getting 3 sixes in 3 rolls of a (fair) die
+    + $n = 3$ trials
+    + $k = 3$ successes
+    + $p = 1/6$ probability of success (getting a six)
+
+```{r}
+# call your function here
+bin_probability(n = 3, k = 3, p = 1/6)
+```
+
+## Function `bin_tail`
+
+Your function above calculates $Prob(X = k)$. The lower tail probability for a binomial is the $Prob (X\leq k)$ and is calculated by summing (adding) the individual probabilites from $0$ to $k$. For example,
+
+$$
+  Prob(X\leq 2) = Prob(X = 0) + Prob(X = 1) + Prob(X = 2)
+$$
+
+Replace the blanks below to write a new function `bin_tail` that uses the function `bin_prob` to calculate the tail probability $P(X \leq k)$. (Hint:`seq()` will be useful here.)
+
+```{r}
+#| eval: false
+# ignore the "eval:false" that appears in the qmd template
+# and replace the blanks to complete the function below
+bin_tail <- function(n, k, p){
+  s <- 0
+  for(i in 0:k){
+    s <- s + bin_probability(n, i, p)
+  }
+  return(s)
+}
+```

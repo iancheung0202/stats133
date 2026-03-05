@@ -1,0 +1,681 @@
+---
+title: "PS5: Intro to `ggplot2`"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(tidyverse)
+```
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Download the template file `ps5.qmd` to answer the questions.
+
+-   Rename `ps5.qmd` to `ps5-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps5-gaston-sanchez.qmd`).
+
+-   Render your qmd file to an HTML file and submit both your qmd and HTML files to the corresponding assignment submission in bCourses.
+
+:::
+
+```{r}
+# load necessary library
+# do not remove
+library(tidyverse)
+```
+
+# Graphics with `"ggplot2"`
+
+In this section we'll be working with the tibble `mpg` from `"ggplot2"`. 
+These exercises are meant to help you:
+
+- gain familiarity with the `aes()` function
+- learn about the various 'geoms', or geometric objects, and recognize them
+- understand why and how to facet
+- try out different plot themes
+
+You should have already loaded the package tidyverse. Type `View(mpg)` in the
+console to take a look at `mpg`. You can also look at the documentation for 
+`mpg` by typing in `?mpg`.
+
+
+## Aesthetic Mapping Function `aes()`
+
+Let's first take a look at the relationship between engine displacement, or 
+`displ`, and highway miles per gallon, `hwy`.
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+
+### Using `aes()`
+
+Does anything happen if you don't name the arguments to `aes()`, i.e. you type 
+in `aes(displ, hwy)`? What if you type in `aes(hwy, displ)`?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(displ, hwy)) + geom_point()
+```
+```{r}
+# your code here
+ggplot(data = mpg, aes(hwy, displ)) + geom_point()
+```
+
+Let's restrict the data set to just cars manufactured by Audi.
+
+```{r}
+audi <- mpg |> filter(manufacturer == 'audi')
+
+ggplot(data = audi, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+
+### Using `geom_text()`
+
+Let's label each point using the column `model`. Add a `geom_text()` layer, and don't 
+forget to put `aes()` in its argument.
+
+```{r}
+# your code here
+ggplot(data = audi, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_text(aes(label = model))
+```
+
+The model names overlap with the points. Modify your code above by using the
+`nudge_y` argument in `geom_text()`. Does it go inside or outside of `aes()`? 
+
+```{r}
+# your code here
+ggplot(data = audi, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_text(aes(label = model), nudge_y = 0.5)
+```
+
+
+Now, replace `geom_text()` with `geom_label()`. What difference do you notice? 
+Did you have to modify the arguments to `aes()` at all?
+
+```{r}
+# your code here
+ggplot(data = audi, aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_label(aes(label = model), nudge_y = 0.5)
+```
+
+
+Next, cut and paste the `aes(x = displ, y = hwy)` from the argument of 
+`ggplot()` to the argument of `geom_point()`. Do you run into an error? What 
+if you copy the `x` and `y` arguments over to the `aes()` function in 
+`geom_text()`?
+
+```{r}
+# error
+ggplot(data = audi) +
+  geom_point(aes(x = displ, y = hwy)) +
+  geom_text(aes(label = model), nudge_y = 0.5)
+```
+```{r}
+# works
+ggplot(data = audi) +
+  geom_point(aes(x = displ, y = hwy)) +
+  geom_text(aes(x = displ, y = hwy, label = model), nudge_y = 0.5)
+```
+
+### Adding color
+
+Let's go back to the full data set.
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+First, make all the points blue. Should you use `aes()`? (is this a setting or a mapping?)
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point(color = "blue")
+```
+
+Next, let's color the points by `class`. Should you use `aes()` this time? (is this a setting or a mapping?)
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy, color = class)) +
+  geom_point()
+```
+
+Try coloring the points off of other variables. Think about which variables display a reasonable amount of colors? Which ones display far too many?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point()
+```
+
+Also try modifying the size of points, both inside and outside of `aes()`. 
+Think about for which variables does it make sense to map them to size? For which ones
+does it not make sense?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point(size = 5)
+```
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy, size = cyl)) +
+  geom_point()
+```
+
+
+### Adding smoothers
+
+Let's add a regression line to our scatter plot. This is done with `geom_smoother()` and its argument `method = "lm"` (i.e. to fit a linear model)
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+`geom_smooth()` with the argument `method = 'lm'` plots a least squares 
+regression line for highway mileage on engine displacement. The translucent 
+gray band is a confidence interval for the predictions of mileage.
+
+Modify the code above by adding a vertical line at $x=4$ using `geom_vline()`. 
+Does it require `aes()`?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  geom_vline(xintercept = 4, color = "red", size = 1)
+```
+
+Now try adding a vertical line at the mean of `displ`. Does it require `aes()` 
+this time?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  geom_vline(xintercept = mean(mpg$displ), color = "red", linewidth = 1)
+```
+
+Do the same with a horizontal line at the mean of `hwy`. Play around with color 
+and size. Should those arguments go inside or outside of `aes()`?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  geom_hline(yintercept = mean(mpg$hwy), color = "blue", linetype = "dashed")
+```
+
+
+### Using facets
+
+Let's return to the basic scatter plot again.
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+There are only two unique values for `year`, 1999 and 2008. Let's compare the relationship between `hwy` and `displ` between years using `facet_wrap()`.
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_wrap(~ year)
+```
+
+What happens when you facet (essentially, compare) using a different variable? Modify the code above and try.
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_wrap(~ model)
+```
+
+
+`facet_grid()` works slightly differently from `facet_wrap()`. The latter takes 
+in only one variable, which always goes after the `~`, and it 'wraps' the 
+plots left to right, top to bottom. `facet_grid()` allows you to facet into 
+just rows or just columns
+
+Here's an example to create facets by columns:
+
+```{r}
+# facet into columns
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(. ~ year)
+```
+
+```{r eval = FALSE}
+# facet into columns (equivalent command)
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(cols = vars(year))
+```
+
+\
+
+Here's an example to create facets by rows:
+
+```{r}
+# facet into rows
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(year ~ .)
+```
+
+```{r eval = FALSE}
+# facet into columns (equivalent command)
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(rows = vars(year))
+```
+
+
+The `.` is a placeholder for a variable. Modify either code chunk above by 
+replacing the `.` with another variable, such as `cyl`. How does the display change?
+
+```{r}
+# your code here
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(year ~ cyl)
+```
+
+
+### More `facet_grid()`
+
+Interestingly, we can use `facet_grid()` to "double facet" into rows and columns
+by providing two _faceting_ variables:
+
+```{r}
+# facet into rows and columns
+# rows: based on year
+# columns: based on cyl
+ggplot(data = mpg, aes(x = displ, y = hwy)) +
+  geom_point() +
+  facet_grid(year ~ cyl)
+```
+
+
+### More facets
+
+Finally, let's study just the distribution of highway mileage.
+
+```{r}
+ggplot(data = mpg) +
+  geom_histogram(aes(x = hwy)) +
+  facet_wrap(~ class)
+```
+
+Instead of using a histogram to study the distribution, let's try a boxplot instead.
+
+```{r}
+ggplot(data = mpg) +
+  geom_boxplot(aes(x = hwy))
+```
+
+Notice that `geom_histogram()` and `geom_boxplot()` required only an `x` 
+aesthetic. What happens if you replace `x` with `y`?
+
+Facet again by modifying the code above, this time using any variable of your choice.
+
+```{r}
+# your code here
+ggplot(data = mpg) +
+  geom_boxplot(aes(y = hwy)) +
+  facet_wrap(~ cyl)
+```
+
+
+# Iris Dataset
+
+We are going to use the famous `iris` data set which is a built-in data frame in R. This data set contains petal and sepal measurements of iris flowers from three different species (see image below).
+
+![](iris-flowers.png){width=80% fig-align="center"}
+
+It even has its own Wikipedia page: [_Iris_ flower data set](https://en.wikipedia.org/wiki/Iris_flower_data_set).
+
+```{r}
+head(iris, n = 5)
+```
+
+While we can access this dataset in R, we are going to use it to practice loading in a dataset. Go to the page on bcourses for this assignment and download the data files `iris.csv` and `iris.txt` present in the instructions: [Problem Set 5](https://bcourses.berkeley.edu/courses/1551809/assignments/9021598). Place them in the directory with your qmd and html files.
+
+## Reading in Data
+
+Open up each data file and identify the way it is stored: e.g. comma-separated, fixed width, etc.
+
+a) Using `readr` functions, read in `iris.csv` and asign it to the variable `iris_a`.
+
+```{r}
+library(readr)
+iris_a <- read_csv("iris.csv")
+```
+
+\
+
+Check using `head()` that the dataframe `iris_a` that you just made matches the one shown at the beginning of the assignment.
+
+```{r}
+# your code here
+head(iris_a)
+```
+
+\
+
+b) Using `readr` functions, read in `iris.txt` and asign it to the variable `iris_b`.
+
+```{r}
+# your code here
+iris_b <- read_csv("iris.txt")
+```
+
+\
+
+Check using `head()` that the dataframe `iris_b` that you just made matches the one shown at the beginning of the assignment.
+
+```{r}
+# your code here
+head(iris_b)
+```
+
+
+-----
+
+
+## Mappings and Geometries
+
+Fill in the code chunks and write commands to  obtain the following graphics. The first one has been completed for you.
+
+a) Histogram of `Sepal.Length`
+
+```{r}
+ggplot(data = iris, mapping = aes(x = Sepal.Length)) + geom_histogram()
+```
+
+\
+
+b) Density plot of `Sepal.Length`
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length)) + geom_density()
+```
+
+\
+
+c) Violin plot of `Sepal.Length`
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = "", y = Sepal.Length)) + geom_violin()
+```
+
+\
+
+d) Scatter plot of `Sepal.Length` (x) and `Sepal.Width` (y)
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length, y = Sepal.Width)) + geom_point()
+```
+
+\
+
+e) Scatter plot of `Sepal.Length` (x) and `Sepal.Width` (y) coloring (color) points by `Species`.
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length, y = Sepal.Width, color=Species)) + geom_point()
+```
+
+\
+
+f) Boxplots of `Sepal.Length` (x) by `Species` (y).
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length, y = Species)) + geom_boxplot()
+```
+
+\
+
+g) Density plots of `Sepal.Length`, color-filled (fill) by `Species`.
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length, fill = Species)) + geom_density(alpha = 0.5)
+```
+
+
+-----
+
+
+## Settings -vs- Mappings
+
+In the Grammar of Graphics, it is important to understand the difference between a _mapping_ and a _setting_. Recall that a __setting__ is when you set or fix the value of a visual attribute to a constant or a value that does NOT come from the data frame. Write commands that use settings to create the following graphics.
+
+a) Histogram of `Sepal.Length`, filling the bars in `"orange"` (fill) and changing the color of the bar borders to `"white"` (color).
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length)) + geom_histogram(fill = "orange", color = "white")
+```
+
+\
+
+b) Scatter plot of `Sepal.Length` (x) and `Sepal.Width` (y) coloring points in `"red"` (color), change size of points to 3 (size).
+
+```{r}
+# your code here
+ggplot(data = iris, mapping = aes(x = Sepal.Length, y = Sepal.Width)) + geom_point(color = "red", size = 3)
+```
+
+\
+
+c) Bar plot of `Species` from a random sample of 40 flowers filling color of bars to "turquoise."
+
+```{r}
+# your code here
+iris %>% 
+  slice_sample(n = 40) %>% 
+  ggplot(mapping = aes(x = Species)) +
+  geom_bar(fill = "turquoise")
+```
+
+
+-----
+
+
+## Labels, Annotations and Themes
+
+a) Choose two numerical variables from `iris` and graph a scatter plot, __set the color of points__ to `"blue"`, and add the following:
+
+    - title
+    - x-axis label
+    - y-axis label
+
+
+```{r}
+# your code here
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
+  geom_point(color = "blue") +
+  labs(title = "Iris Petal Dimensions",
+       x = "Petal Length (cm)",
+       y = "Petal Width (cm)")
+```
+
+\
+
+b) Choose a different pair of numerical variables from `iris` and graph another scatter plot, color coding points by `Species`, and add a text annotation to highlight something interesting or unusual in the plot. Your plot should still include a title, x-axis label, and y-axis label.
+
+```{r eval = FALSE, echo = TRUE}
+# your code here
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point() +
+  annotate("text", x = 5, y = 3, label = "Setosa cluster is distinct", color = "darkred", fontface = "italic") +
+  labs(title = "Sepal vs Petal Length by Species",
+       x = "Sepal Length",
+       y = "Petal Length")
+
+```
+
+\
+
+c) Choose one of your previous two scatter plots and re-graph it but this time using a ggplot __theme__ that is different from the default one. Your plot should still include a title, x-axis label, and y-axis label.
+
+```{r eval = FALSE, echo = TRUE}
+# your code here
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
+  geom_point(color = "blue") +
+  theme_minimal() +
+  labs(title = "Iris Petal Dimensions (Minimal Theme)",
+       x = "Petal Length (cm)",
+       y = "Petal Width (cm)")
+```
+
+
+-----
+
+
+## More Questions
+
+a) Are the following lines of code equivalent (i.e. give you the same plot)? If not, explain why.
+
+```{r}
+#| eval: false
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
+  geom_point()
+
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
+  geom_point(aes(color = Species))
+```
+
+:::{.callout-note}
+# Your Answer Here
+
+Yes, they are equivalent. In the first line, the mapping is defined globally in `ggplot()`, meaning all subsequent layers inherit it. In the second line, the mapping is defined locally within `geom_point()`. Since there is only one layer, the resulting plot is identical.
+
+:::
+
+\
+
+b) Are the following lines of code equivalent (i.e. give you the same plot)? If not, explain why.
+
+```{r}
+#| eval: false
+ggplot(iris, aes(Petal.Length, Petal.Width)) + 
+  geom_point(color = "blue")
+
+ggplot(iris, aes(Petal.Length, Petal.Width, color = "blue")) + 
+  geom_point()
+```
+
+:::{.callout-note}
+# Your Answer Here
+
+No, they are not. The first line **sets** the color to blue, so all points will be blue. The second line maps the string "blue" as a variable. Because it is inside `aes()`, ggplot looks for a variable named "blue" (finds none) and assigns it the default color.
+
+:::
+
+\
+
+c) Are the following lines of code equivalent?
+
+```{r}
+#| eval: false
+ggplot(iris, aes(Petal.Length, Petal.Width)) + 
+  geom_point()
+
+ggplot(iris) + 
+  geom_point(aes(Petal.Length, Petal.Width))
+```
+
+:::{.callout-note}
+# Your Answer Here
+
+Yes. The first maps the variables globally, while the second maps them locally within the geom. Both will produce a standard scatter plot of the same variables.
+
+:::
+
+\
+
+d) What is the problem with the following code? How can it be fixed?
+
+```{r}
+#| eval: false
+# scatter plot of Petal.Width, and Petal.Length
+ggplot(iris) +
+  geom_point(x = Petal.Width, y = Petal.Length)
+```
+
+:::{.callout-note}
+# Your Answer Here
+
+Missing `aes()` function. Fix: `ggplot(iris) + geom_point(aes(x = Petal.Width, y = Petal.Length))`
+
+:::
+
+\
+
+e) What is the problem with the following code? How can it be fixed?
+
+```{r}
+#| eval: false
+# scatter plot of Petal.Width, and Petal.Length
+ggplot(iris, aes(Petal.Length, Petal.Width))
+  geom_point(aes(color = Species))
+```
+
+:::{.callout-note}
+# Your Answer Here
+
+Missing `+` sign at the end of the first line. Fix: `ggplot(iris, aes(Petal.Length, Petal.Width)) + geom_point(aes(color = Species))`
+
+:::
+
+\
+
+f) What is the problem with the following code? How can it be fixed?
+
+```{r}
+#| eval: false
+# scatter plot of Petal.Width, and Petal.Length
+ggplot(iris, aes(x = Petal.Length  y = Petal.Width)) +
+  goem_point(aes(color = Species))
+```
+
+:::{.callout-note}
+# Your Answer Here
+
+Missing `,` comma between `x` and `y`, and `goem_point` is misspelled.
+
+:::

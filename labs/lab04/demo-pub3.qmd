@@ -1,0 +1,57 @@
+---
+title: "Demo Publication 3"
+subtitle: "First Contact with Quarto Slides"
+author: "Ian Cheung"
+format: 
+  revealjs:
+    code-fold: true
+    incremental: true 
+    transition: fade
+---
+
+## Slide with a Background {background-color="blue"}
+
+::: {.incremental}
+-   First bullet
+-   Second bullet
+-   Third bullet
+:::
+
+::: {#fig-logos layout-ncol=2}
+![](https://www.berkeley.edu/wp-content/themes/berkeleygateway/img/logo-berkeley-gold.svg?v=3){#fig-logo1}
+
+![](https://www.berkeley.edu/wp-content/themes/berkeleygateway/img/logo-berkeley-gold.svg?v=3){#fig-logo2}
+
+UC Berkeley
+:::
+
+## Slide with a Gradient Background {background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
+```{r}
+x <- 10
+y <- 20
+sum <- x + y
+```
+Hello world! The variable with name **sum** has a value of `r sum`.
+
+---
+
+## The Function
+
+The bear mascot belongs to the following school! Expand to see the full code!
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+college <- function(mascot) {
+  if (tolower(mascot) == "bear") {
+    return("UC Berkeley")
+  } else if (tolower(mascot) == "tree") {
+    return("Stanford")
+  } else {
+    return("Unknown School")
+  }
+}
+
+college("Bear")
+```

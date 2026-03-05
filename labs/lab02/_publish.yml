@@ -1,0 +1,4 @@
+- source: demo-pub1.qmd
+  quarto-pub:
+    - id: cc948ac5-acdf-4715-861a-e477b855ba27
+      url: https://iancheung.quarto.pub/demo-publication-1

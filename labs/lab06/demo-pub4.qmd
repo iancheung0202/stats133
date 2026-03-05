@@ -1,0 +1,67 @@
+---
+title: "My First Closeread Story"
+author: "Ian Cheung"
+format: 
+  closeread-html:
+    theme: cosmo
+    cr-style:
+      section-background-color: white
+      narrative-background-color-sidebar: black
+      narrative-text-color-sidebar: white
+      narrative-font-size: 2em
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+:::: {.cr-section}
+
+
+We look at how engine size impacts fuel economy using the `mpg` dataset. @cr-plot1
+
+
+As we look at the relationship between engine displacement and highway miles per gallon, we see larger engines (higher displacement) generally result in lower fuel efficiency. @cr-plot1
+
+
+::: {#cr-plot1}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+ggplot(data = mpg, aes(x = displ, y = hwy, color = class)) +
+  geom_point(size = 3) +
+  theme_minimal() +
+  labs(title = "Engine Size vs. Highway MPG",
+       x = "Engine Displacement (Liters)",
+       y = "Highway MPG")
+```
+
+:::
+
+As we look under the hood, we can see how mechanical design influences these numbers. @cr-engine-image
+
+::: {#cr-engine-image}
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAZpNa3oRz2qe2BO0Ur-9fpGIWs9JVck04Qg&s)
+:::
+
+Finally, let's compare the averages across different car classes. @cr-table1
+
+::: {#cr-table1}
+
+```{r}
+#| echo: false
+#| message: false
+
+mpg |>
+  group_by(class) |>
+  summarize(Avg_Hwy = round(mean(hwy), 1), Count = n()) |>
+  arrange(desc(Avg_Hwy)) |>
+  knitr::kable(format = "html")
+```
+
+:::
+::::
