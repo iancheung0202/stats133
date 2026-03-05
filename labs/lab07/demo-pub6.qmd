@@ -1,0 +1,133 @@
+---
+title: "Demo Publication 6"
+author: "Ian Cheung"
+format: 
+  closeread-html:
+    theme: cosmo
+    cr-style:
+      section-background-color: white
+      narrative-background-color-sidebar: "#1a1a2e"
+      narrative-text-color-sidebar: white
+      narrative-font-size: 1.8em
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+:::: {.cr-section}
+
+Welcome. I'm using the **mtcars** dataset. @cr-car-image
+
+::: {#cr-car-image}
+![](https://media.architecturaldigest.com/photos/66a914f1a958d12e0cc94a8e/4:3/w_2664,h_1998,c_limit/DSC_5903.jpg)
+:::
+
+This image is zoomed in. [@cr-car-image]{scale-by="1.4"}
+
+This image is moved to the right. [@cr-car-image]{pan-to="30%,0%"}
+
+And back to center. @cr-car-image
+
+---
+
+This scatterplot below shows the relationship between a car's weight (`wt`) and its fuel efficiency (`mpg`). @cr-plot1
+
+Heavier cars tend to get fewer miles per gallon. [@cr-plot1]{pan-to="-25%,-25%"}
+
+Lighter cars are generally more efficient. [@cr-plot1]{pan-to="25%,25%"}
+
+::: {#cr-plot1}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+mtcars_plot <- mtcars |>
+  mutate(cyl = factor(cyl))
+
+ggplot(mtcars_plot, aes(x = wt, y = mpg, color = cyl)) +
+  geom_point(size = 4, alpha = 0.85) +
+  theme_minimal() +
+  labs(
+    title = "Car Weight vs. Fuel Efficiency",
+    x = "Weight (1000 lbs)",
+    y = "Miles Per Gallon",
+    color = "Cylinders"
+  )
+```
+
+:::
+
+---
+
+Let's look at number of cylinders. The table below shows average horsepower, weight, and fuel efficiency for 4, 6, and 8-cylinder cars. @cr-table1
+
+::: {#cr-table1}
+
+```{r}
+#| echo: false
+#| message: false
+
+mtcars |>
+  group_by(cyl) |>
+  summarize(
+    `Average HP` = mean(hp),
+    `Average Weight (1000 lbs)` = mean(wt),
+    `Average MPG` = mean(mpg),
+    `Count` = n()
+  ) |>
+  rename(Cylinders = cyl) |>
+  knitr::kable(format = "html")
+```
+:::
+
+
+4-cylinder cars are the clear winners in fuel efficiency. @cr-table2
+
+::: {#cr-table2}
+
+```{r}
+#| echo: false
+#| message: false
+
+mtcars |>
+  group_by(cyl) |>
+  summarize(
+    `Average HP` = mean(hp),
+    `Average Weight (1000 lbs)` = mean(wt),
+    `Average MPG` = mean(mpg),
+    `Count` = n()
+  ) |>
+  rename(Cylinders = cyl) |>
+  filter(Cylinders == 4) |>
+  knitr::kable(format = "html")
+```
+:::
+
+8-cylinder cars dominate in raw horsepower. @cr-table3
+
+::: {#cr-table3}
+
+```{r}
+#| echo: false
+#| message: false
+
+mtcars |>
+  group_by(cyl) |>
+  summarize(
+    `Average HP` = mean(hp),
+    `Average Weight (1000 lbs)` = mean(wt),
+    `Average MPG` = mean(mpg),
+    `Count` = n()
+  ) |>
+  rename(Cylinders = cyl) |>
+  filter(Cylinders == 8) |>
+  knitr::kable(format = "html")
+```
+
+:::
+
+::::
