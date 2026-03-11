@@ -1,0 +1,368 @@
+---
+title: "PS6: Interacting with Data"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(tidyverse)
+library(palmerpenguins) 
+library(ggiraph)
+library(plotly)
+```
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Download the template file `ps6.qmd` to answer the questions.
+
+-   Rename `ps6.qmd` to `ps6-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps6-gaston-sanchez.qmd`).
+
+-   Render your qmd file to an HTML file and submit both your qmd and HTML files to the corresponding assignment submission in bCourses.
+
+:::
+
+:::{.callout-important}
+# Important
+
+If you haven't already, you will need to install `plotly` and `ggiraph` for this assignment. You can do so by running `install.packages(c("plotly", "ggiraph"))` in the r _console_. Do not include this command in a code cell in your qmd file.
+
+:::
+
+```{r}
+# load necessary packages
+# do not remove
+library(tidyverse)
+library(palmerpenguins) 
+library(ggiraph)
+library(plotly)
+```
+
+# Interactive Plots
+
+## Using `ggplotly`
+
+We'll be using the `penguins` dataset for this section of the problem set. We'll start with a plot you've seen before. 
+
+a) Make a plot of the `flipper_lenght_mm` vs. `bill_length_mm`, coloring the points by `Species`. This time, store it as a variable and call the variable to display the plot below.
+
+```{r}
+# your code here
+p1 <- ggplot(data = penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)) +
+  geom_point()
+
+p1
+```
+
+\
+
+Now, put the variable you stored into `ggplotly()` to create an interactive graphic:
+
+```{r}
+# your code here
+ggplotly(p1)
+```
+
+\
+
+b) Make a density plot of `flipper_length_mm` colored by `Species` and store it as a variable, then put it into `ggplotly` to make the interactive plot.
+
+```{r}
+# your code here
+p2 <- ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) +
+  geom_density(alpha = 0.5)
+
+ggplotly(p2)
+```
+
+\
+
+c) Make a bar plot of the `Species` variable from a random sample of 100 pengiuns and store it as a variable, then put it into `ggplotly` to make the interactive plot.
+
+```{r}
+# your code here
+p3 <- ggplot(data = penguins %>% sample_n(100), aes(x = species, fill = species)) +
+  geom_bar()
+
+ggplotly(p3)
+```
+
+\
+
+## Using `ggiraph`
+
+Now, make the same plots, but this time use `ggiraph`.
+
+a) Make a plot of the `flipper_lenght_mm` vs. `bill_length_mm`, coloring the points by `Species`. Set the tooltip to be `island`.
+
+```{r}
+# your code here
+p4 <- ggplot(data = penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)) +
+  geom_point_interactive(aes(tooltip = island))
+
+girafe(ggobj = p4)
+```
+
+\
+
+b) Make a density plot of `flipper_length_mm` colored by `species`. Set the tooltip to species.
+
+```{r}
+# your code here
+p5 <- ggplot(data = penguins, aes(x = flipper_length_mm, fill = species)) +
+  geom_density_interactive(aes(tooltip = species), alpha = 0.5)
+
+girafe(ggobj = p5)
+```
+
+\
+
+c) Make a bar plot of the `Species` variable from a random sample of 100 penguins. Set the tooltip to the count of the bar. You can do this with `tooltip = after_stat(count)`.
+
+\
+
+```{r}
+# your code here
+p6 <- ggplot(data = penguins_sample, aes(x = species, fill = species)) +
+  geom_bar_interactive(aes(tooltip = after_stat(count)))
+
+girafe(ggobj = p6)
+```
+
+---
+
+# Exploratory/Explanatory Data Analysis (EDA)
+
+To give you some practice exploring a more complicated dataset, we will be using the full data from the US Department of Energy (DOE) that the `mpg` dataset that you saw in lab was based on. The data is publicly available here: [Fuel Economy](https://www.fueleconomy.gov/feg/ws/).
+
+::: {.callout-important}
+# Download `vehicles.csv`
+
+Before continuing, you will need to download the `vehicles.csv` file from bcourses. It is linked in the problem set, or you can find it in the files/problem-sets/ps6 directory on bcourses.
+
+:::
+
+## Read In Data
+
+Start by reading in the data using dplyr verbs and asigning it to the variable `dat`. Think about how the data is stored and what `read_` function you will need to use.
+
+```{r}
+# your code here
+dat <- read_csv("vehicles.csv")
+```
+
+\
+
+Start by using `head()` to get a feel for what the dataset looks like. This dataset will be larger than what we have worked with so far.
+
+```{r}
+# your code here
+head(dat)
+```
+
+\
+
+Now, use the `dim` function to get a sense of the size of the dataset.
+
+```{r}
+# your code here
+dim(dat)
+```
+
+\
+
+## Variable Descriptions
+
+As you can see, this is a decently sized dataset with many different variables that have been recorded. Most of the variables have names that are not understandable at first glance: e.g. `highway08U` or `fuelType1` vs. `fuelType2`. However, just like `mpg`, each row is a type of car and each column is information about that car.
+
+The descriptions of each variable can be found on the US Department of Energy's website: [Feul Economy](https://www.fueleconomy.gov/feg/ws/). Go there, and scroll down until you see "Data Description." Choose two variables that have non-obvious names and describe them:
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+- `comb08`: This represents the combined fuel economy for the primary fuel type, expressed in miles per gallon (MPG). It is calculated as a weighted average of 55% city mileage and 45% highway mileage.
+- `phevBlended`: This is a boolean (true/false) variable indicating whether the vehicle is a Plug-in Hybrid (PHEV) that operates in a "blended" mode, meaning the gasoline engine can turn on even when the battery is charged if high power is demanded.
+
+:::
+
+\
+
+## Exploratory Analysis
+
+Now that we've learned a bit more about the data, we can start exploring it using `dplyr` and `ggplot2`. 
+
+### Using `dplyr`
+
+Fill in the code cells below that will help us explore the data.
+
+a) What are the number of cars of each `fuelType`?
+```{r}
+# your code here
+dat %>% count(fuelType, sort = TRUE)
+```
+
+\
+
+b) How far back and how current is the dataset? i.e. what are the minumum and maximum `year`?
+
+```{r}
+# your code here
+dat %>% summarize(min_year = min(year, na.rm = TRUE), max_year = max(year, na.rm = TRUE))
+```
+
+\
+
+c) Which manufacturer has the most cars in the dataset? (Note that the corresponding variable for manufacturer is `make` in this dataset. You can use `which.max()` to find the index of the largest item in a vector.)
+
+```{r}
+# your code here
+dat %>% count(make, sort = TRUE) %>% slice(1)
+
+table(dat$make)[which.max(make_counts)]
+```
+
+\
+
+d) What is the mean city fuel efficiency for each manufacturer sorted from largest to smallest? (The variable `city08` has the city miles per gallon of the vehicle using the vehicle's primary fuel type. For electric vehicles this value represents MPGe: gasoline equivalent miles per gallon.)
+
+```{r}
+# your code here
+dat %>% 
+  group_by(make) %>% 
+  summarize(mean_city_mpg = mean(city08, na.rm = TRUE)) %>% 
+  arrange(desc(mean_city_mpg))
+```
+
+\
+
+e) Choose a numeric variable in the dataset and use `summary` to display the statistics about the variable.
+
+```{r}
+# your code here
+summary(dat$co2TailpipeGpm)
+```
+
+\
+
+### Using `ggplot2`
+
+Now, let's make some plots with the data to answer some basic questions. These plots don't have to look nice.
+
+a) Has the number of vehicles that are tracked changed from year to year? Use `count()` to make a line plot showing the potential change over time. 
+
+```{r}
+# your code here
+# Count cars per year and plot
+dat %>% 
+  count(year) %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Number of Vehicles Tracked per Year",
+       y = "Count of Vehicles")
+```
+
+\
+
+b) What is the distribution of highway miles per gallon? Make a histogram of the variable `highway08U`. (This one will look a little strange.)
+
+```{r}
+# your code here
+ggplot(dat, aes(x = highway08U)) +
+  geom_histogram(bins = 50, fill = "steelblue", color = "white") +
+  labs(title = "Distribution of Unrounded Highway MPG",
+       x = "Highway MPG (Unrounded)")
+```
+
+\
+
+c) How many cars are/aren't subject to the "Gas Guzzler Tax?" Make a bar plot showing the counts. This is represented as the variable `guzzler` in the dataset that indicates if a car is subject to the tax.
+
+\
+
+```{r}
+# your code here
+ggplot(dat, aes(x = guzzler)) +
+  geom_bar(fill = "firebrick") +
+  labs(title = "Vehicles Subject to Gas Guzzler Tax",
+       x = "Guzzler Tax Status",
+       y = "Number of Cars")
+```
+
+\
+
+### Questions
+
+Some of what we saw above should have raised some red flags. Why is there a drop in cars in the dataset between 1995 and 2000? Why does the variable `highway08U` have so many 0's? What do `G`, `S`, and `T` mean in the `guzzler` variable?
+
+Go back to the [DOE's Website](https://www.fueleconomy.gov/feg/ws/) and look at the data description again or search online to _try_ and answer these questions: (Do your best, but it's ok if you can't find anything. The difficulty is part of the message of the exercise.)
+
+::: {.callout-tip}
+
+In a larger project we might spend more time generating plots or tables to try and answer these questions, but we will stop working with the data here unless you wish to continue.
+
+:::
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+Your answer here
+
+:::
+
+
+
+## Explanatory Data Analysis
+
+What separates what we did in the previous section from explanatory data analysis is that now our plots should look professional and tell some sort of story with the data. We are no longer trying to _explore_ the dataset for our own understanding, we're trying to _explain_ some facet of the data to someone else.
+
+Now, this data is fairly complex and "dirty," so what we can do with it at this stage is limited. Answer the questions below to make polished graphics from the data:
+
+a) Plot the distribution of engine displacement, faceted by whether the vehicle is "turbo charged." In the dataset, these are `displ` and `tCharger` respectively. Make sure to include a title and axis labels!
+
+```{r}
+# your code here
+dat %>%
+  filter(!is.na(displ)) %>%
+  mutate(tCharger = ifelse(is.na(tCharger), "Standard", "Turbocharged")) %>%
+  ggplot(aes(x = displ)) +
+  geom_histogram(fill = "steelblue", color = "white", bins = 30) +
+  facet_wrap(~tCharger) +
+  labs(
+    title = "Distribution of Engine Displacement",
+    subtitle = "Comparing Standard vs. Turbocharged Engines",
+    x = "Engine Displacement (Liters)",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+\
+
+b) Subset the data to just cars with `fuelType1` being `"Electricity"` or `"Regular Gasoline"`, then make a scatterplot of highway vs city miles per gallon (`highway08` and `city08`), with the color of the points being mapped to the fuel type. Experiment with the `alpha` of the points as a setting. Make sure to include a title and axis labels!
+
+```{r}
+# your code here
+dat %>%
+  filter(fuelType1 %in% c("Electricity", "Regular Gasoline")) %>%
+  ggplot(aes(x = city08, y = highway08, color = fuelType1)) +
+  geom_point(alpha = 0.4) +
+  scale_color_manual(values = c("Electricity" = "forestgreen", "Regular Gasoline" = "gray40")) +
+  labs(
+    title = "Fuel Efficiency: Electricity vs. Regular Gasoline",
+    subtitle = "Electric vehicles (MPGe) significantly outperform gas engines in city driving",
+    x = "City MPG / MPGe",
+    y = "Highway MPG / MPGe",
+    color = "Fuel Type"
+  ) +
+  theme_light()
+```
