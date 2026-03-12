@@ -1,0 +1,75 @@
+---
+title: "My First Quarto Dashboard"
+author: "Ian Cheung"
+format: 
+  dashboard:
+    orientation: columns
+embed-resources: true
+---
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(ggplot2)
+library(gt)
+
+```
+
+## Column {width=60%}
+
+### Research Question
+
+How does vehicle class affect highway fuel economy, and which classes are the most efficient?
+
+### Highway Fuel Economy by Vehicle Class
+
+```{r}
+#| label: fuel-graph
+#| title: "Highway MPG Distribution"
+ggplot(mpg, aes(x = reorder(class, hwy, FUN = median), y = hwy, fill = class)) +
+  geom_boxplot(show.legend = FALSE) +
+  labs(x = "Vehicle Class", y = "Highway MPG") +
+  theme_minimal()
+
+```
+
+## Column {width=40%}
+
+### Efficiency Leaders
+
+```{r}
+#| label: stats-value-box
+#| component: valuebox
+# Find the highest highway MPG in the dataset
+max_hwy <- max(mpg$hwy)
+list(
+  icon = "fuel-pump",
+  color = "success",
+  value = paste(max_hwy, "MPG")
+)
+
+```
+
+### Summary of Top Performers
+
+```{r}
+#| label: top-table
+#| title: "Top 5 Most Efficient Models"
+mpg %>%
+  select(manufacturer, model, class, hwy) %>%
+  arrange(desc(hwy)) %>%
+  slice(1:5) %>%
+  gt() %>%
+  cols_label(
+    manufacturer = "Make",
+    model = "Model",
+    class = "Type",
+    hwy = "HWY MPG"
+  )
+
+```
+
+### Report Summary
+
+This dashboard analyzes the `mpg` dataset to determine the fuel efficiency for the vehicle classes. As shown in the boxplot, **subcompact**, **compact**, and **midsize** cars significantly outperform SUVs and pickups. The value box highlights the peak efficiency recorded in this dataset ($44$ MPG), while the table identifies the top 5 most efficient models.
