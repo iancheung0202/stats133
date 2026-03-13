@@ -1,5 +1,5 @@
 ---
-title: "The Economics of the NBA: 2024-2025 Salary Analysis"
+title: "NBA 2024-2025 Salary Analysis"
 author: "Ian Cheung"
 format: 
   closeread-html:
