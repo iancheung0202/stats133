@@ -1,0 +1,182 @@
+---
+title: "The Economics of the NBA: 2024-2025 Salary Analysis"
+author: "Ian Cheung"
+format: 
+  closeread-html:
+    theme: cosmo
+    cr-style:
+      section-background-color: white
+      narrative-background-color-sidebar: "#1a1a1a"
+      narrative-text-color-sidebar: "#ffffff"
+      narrative-font-size: 1.2em
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(scales)
+library(knitr)
+
+nba_data <- read_csv("nba2025-clean.csv")
+```
+
+:::: {.cr-section}
+
+# Introduction to NBA Salaries
+
+The 2024-2025 NBA season shows a wide variety of salaries. Let's look at the overall distribution of salaries across the league. @cr-dist
+
+::: {#cr-dist}
+
+```{r}
+#| echo: false
+#| warning: false
+ggplot(nba_data, aes(x = salary)) +
+  geom_histogram(fill = "#1d428a", color = "white", bins = 30) +
+  scale_x_continuous(labels = label_comma()) +
+  theme_minimal() +
+  labs(
+    title = "Distribution of NBA Salaries (2024-2025)",
+    subtitle = "Most players earn significantly less than the league stars",
+    x = "Salary ($)",
+    y = "Number of Players"
+  )
+
+```
+
+:::
+
+The histogram reveals a "long tail" distribution. While a small number of elite players earn upwards of $40 million, the vast majority of the league's players falls into the lower salary brackets @cr-dist.
+
+Let's look at the summary statistics for the entire league. The discrepancy between the mean and the median (the mean being significantly higher) confirms the influence of high-earning outliers on the league's average. @cr-stats
+
+::: {#cr-stats}
+
+```{r}
+#| echo: false
+nba_data %>%
+  summarize(
+    Min = min(salary),
+    `1st Quartile` = quantile(salary, 0.25),
+    Median = median(salary),
+    Mean = mean(salary),
+    `3rd Quartile` = quantile(salary, 0.75),
+    Max = max(salary),
+    SD = sd(salary)
+  ) %>%
+  pivot_longer(everything(), names_to = "Statistic", values_to = "Value") %>%
+  mutate(Value = label_comma()(Value)) %>%
+  kable(format = "html", caption = "NBA Salary Summary Statistics ($)")
+
+```
+
+:::
+
+# The Top 10
+
+These are the highest earners in the league. They consistently cross the $50 million annual threshold. @cr-top10
+
+::: {#cr-top10}
+
+```{r}
+#| echo: false
+nba_data %>%
+  arrange(desc(salary)) %>%
+  slice(1:10) %>%
+  ggplot(aes(x = reorder(player, salary), y = salary, fill = team)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = label_comma()) +
+  theme_minimal() +
+  labs(
+    title = "Top 10 Highest Paid Players",
+    subtitle = "2024-2025 Regular Season",
+    x = "Player Name",
+    y = "Salary ($)",
+    fill = "Team"
+  )
+
+```
+
+:::
+
+# Experience and Earning Power
+
+Does staying in the league longer guarantee a higher salary? In this section, we explore the relationship between a player's years of experience and their annual earnings. @cr-experience
+
+::: {#cr-experience}
+
+```{r}
+#| echo: false
+#| warning: false
+ggplot(nba_data, aes(x = experience, y = salary)) +
+  geom_jitter(alpha = 0.5, color = "#c8102e") +
+  geom_smooth(method = "lm", color = "black") +
+  scale_y_continuous(labels = label_comma()) +
+  theme_minimal() +
+  labs(
+    title = "Experience vs. Salary",
+    subtitle = "General trend showing earnings growth with years in the league",
+    x = "Years of Experience",
+    y = "Salary ($)"
+  )
+
+```
+
+:::
+
+The scatter plot indicates a general positive correlation between experience and salary. However, the high density of points at low experience and low salary represents the influx of rookie talent on fixed-scale contracts @cr-experience.
+
+# Team Payroll Rankings
+
+Total payroll is a key indicator of a team's championship aspirations. Here is how the 30 NBA teams rank in total player spending. This chart highlights the significant spending gaps between teams. @cr-payroll
+
+::: {#cr-payroll}
+
+```{r}
+#| echo: false
+nba_data %>%
+  group_by(team) %>%
+  summarize(total_payroll = sum(salary)) %>%
+  arrange(desc(total_payroll)) %>%
+  ggplot(aes(x = reorder(team, total_payroll), y = total_payroll)) +
+  geom_col(fill = "#002d62") +
+  coord_flip() +
+  scale_y_continuous(labels = label_comma()) +
+  theme_minimal() +
+  labs(
+    title = "NBA Team Total Payrolls",
+    subtitle = "Ranking the highest spending franchises",
+    x = "Team",
+    y = "Total Payroll ($)"
+  )
+
+```
+
+:::
+
+# Exploratory Analysis: Pay by Position
+
+Finally, we look at whether certain positions are valued more highly than others in today's NBA. The boxplot reveals that while the median salary is relatively consistent across positions, the "Center" (C) and "Point Guard" (PG) positions often see the widest range of high-end salaries. @cr-position
+
+::: {#cr-position}
+
+```{r}
+#| echo: false
+ggplot(nba_data, aes(x = position, y = salary, fill = position)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = label_comma()) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(
+    title = "Salary Distribution by Position",
+    subtitle = "Comparing financial value across player roles",
+    x = "Position",
+    y = "Salary ($)"
+  )
+
+```
+
+:::
+
+::::
