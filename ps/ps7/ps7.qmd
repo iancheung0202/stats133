@@ -1,0 +1,578 @@
+---
+title: "PS7: Joins, Pivots, and Strings"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(tidyverse)
+```
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Download the template file `ps7.qmd` to answer the questions.
+
+-   Rename `ps7.qmd` to `ps7-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps7-gaston-sanchez.qmd`).
+
+-   Render your qmd file to an HTML file and submit both your qmd and HTML files to the corresponding assignment submission in bCourses.
+
+:::
+
+```{r}
+#| echo: false
+# This cell is to create the dataframes you will be 
+# working with in the questions. Do not change the
+# contents of this cell.
+planes <- data.frame(
+  tailnum = c("N8907A","N77296","N456AA","N821AY","N508MJ",
+              "N250WN","N589AS","N787UA","N39418","N725UW"),
+  
+  year = c(2004,2005,1988,2005,2003,2006,2007,1997,2008,1999),
+    
+  manufacturer = c("BOMBARDIER INC","BOEING","MCDONNELL DOUGLAS","BOMBARDIER INC",
+                   "BOMBARDIER INC","BOEING","BOEING","BOEING","BOEING","AIRBUS INDUSTRIE"),
+  
+  model = c("CL-600-2B19","737-824","DC-9-82(MD-82)","CL-600-2B19",
+            "CL-600-2C10","737-7H4","737-890","777-222","737-924ER","A319-112"),
+  
+  engines = c(2,2,3,2,1,2,2,2,2,2),
+  
+  seats = c(55,149,172,55,80,140,149,400,191,179),
+      
+  stringsAsFactors = FALSE
+)
+
+flights <- data.frame(
+  time_hour = as.POSIXct(c(
+    "2013-10-25 20:00:00",
+    "2013-02-25 13:00:00",
+    "2013-05-19 15:00:00",
+    "2013-06-13 13:00:00",
+    "2013-03-31 08:00:00",
+    "2013-03-20 11:00:00",
+    "2013-04-27 19:00:00",
+    "2013-03-04 09:00:00",
+    "2013-08-01 13:00:00",
+    "2013-08-06 06:00:00"
+  )),
+  
+  flight = c(1049, 4270, 1636, 331, 3635,
+             1143, 3798, 3739, 1601, 1701),
+  
+  tailnum = c("N77296","N8907A","N77296","N456AA","N821AY",
+              "N39418","N821AY","N8907A","N39418","N39418"),
+  
+  origin = c("EWR","EWR","EWR","LGA","JFK",
+             "EWR","JFK","JFK","EWR","EWR"),
+  
+  dep_delay = c(10, -15, 17, 74, -5,
+                3, 57, -7, -1, -2),
+  
+  stringsAsFactors = FALSE
+)
+
+airports <- data.frame(
+  faa = c("ICT","BGM","KLN","INW","HOP",
+          "EWR","IRK","LGA","JFK","2J9"),
+  
+  name = c("Wichita Mid Continent",
+           "Greater Binghamton Edwin A Link Fld",
+           "Larsen Bay Airport",
+           "Winslow-Lindbergh Regional Airport",
+           "Campbell Aaf",
+           "Newark Liberty Intl",
+           "Kirksville Regional Airport",
+           "La Guardia",
+           "John F Kennedy Intl",
+           "Quincy Municipal Airport"),
+  
+  lat = c(37.6, 42.2, 57.5, 35.0, 36.7,
+          40.7, 40.1, 40.8, 40.6, 30.6),
+  
+  lon = c(-97.4, -76.0, -154.0, -111.0, -87.5,
+          -74.2, -92.5, -73.9, -73.8, -84.6),
+  
+  tzone = c("America/Chicago",
+            "America/New_York",
+            "America/Anchorage",
+            "America/Phoenix",
+            "America/Chicago",
+            "America/New_York",
+            "America/Chicago",
+            "America/New_York",
+            "America/New_York",
+            "America/New_York"),
+  
+  stringsAsFactors = FALSE
+)
+```
+
+# Joins with Airplane Data
+
+To give you practice doing joins, we are going to be using subsets of data from the package `nycflights13`. You don't need to install this package. All of the dataframes have been created in the code cell above that is hidden in the html document. The dataframes are called `flights`, `planes`, and `airports`. You can look at them below.
+
+```{r}
+flights
+```
+
+```{r}
+planes
+```
+
+```{r}
+airports
+```
+
+## Identifying Keys
+
+Recall that in order to join two tables, the tables must have a common __key__. A column that we join the tables `by`.
+
+
+a) Can we join the `flights` dataframe with the `planes` dataframe? If so, what is the common key?
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+Yes, we can join them. The common key is `tailnum`, which identifies the specific aircraft in both datasets.
+
+:::
+\
+
+
+b) Can we join the `flights` dataframe with the `airports` dataframe? If so, what is the common key?
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+Yes, we can join them. However, the keys have different names: `origin` in the `flights` table matches with `faa` in the `airports` table.
+
+:::
+\
+
+c) Can we join the `airports` dataframe with the `planes` dataframe? If so, what is the common key?
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+No, there is no direct common key between `airports` and `planes`. To link them, you would typically have to go through the `flights` table as an intermediary.
+
+:::
+\
+
+## Left/Right Joins
+
+Recall that a `left_join()` tries to match every entry in the left table with an entry in the right table. For each entry in the left table that has no entry in the right, it fills it in with a `NA`. If you need a visual, please refer to the lecture slides: [Lecture 17: Joins and Pivots](https://stat133.berkeley.edu/spring-2026/lectures/17-joins-pivots/slides.html#/section-4)
+
+a) Use `left_join()` to join `planes` with `flights`.
+
+```{r}
+# Your code here
+left_join(planes, flights, by = "tailnum")
+```
+
+\
+
+b) Copy your code from (a) and change it to `right_join()`.
+
+```{r}
+# Your code here
+right_join(planes, flights, by = "tailnum")
+```
+
+\
+
+What is different about the two tables that were generated in (a) and (b)? Why does one contain missing values and the other doesn't? Type your answer in the callout block below.
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+The `left_join` in (a) keeps all rows from `planes`. Some planes exist in the `planes` table but did not perform any flights in the `flights` subset, resulting in `NA` values for flight data. The `right_join` in (b) keeps all rows from `flights`. Since every flight in this specific subset happens to have a corresponding entry in the `planes` table, no `NA` values are introduced from the join.
+
+:::
+
+\
+
+c) Use `left_join()` to generate the same table from part (b). It's ok that the columns may not be in the same order.
+
+```{r}
+# Your code here
+left_join(flights, planes, by = "tailnum")
+```
+
+\
+
+## Inner/Full Joins
+
+Recall that an `inner_join()` only returns a table with entries that match the key in both tables. While an outer join returns a table containing all entries of both tables, using `NA` to fill in missing information. If you need a visual, please refer to the lecture slides: [Lecture 17: Joins and Pivots](https://stat133.berkeley.edu/spring-2026/lectures/17-joins-pivots/slides.html#/section-4)
+
+a) Use `inner_join()` to join `flights` with `airports`.
+
+```{r}
+# Your code here
+inner_join(flights, airports, by = c("origin" = "faa"))
+```
+
+\
+
+b) Use `inner_join()` to join `flights` with `planes`.
+
+```{r}
+# Your code here
+inner_join(flights, planes, by = "tailnum")
+```
+
+\
+
+c) Use `inner_join()` to make a table containing values from `flights`, `airports`, and `planes`.
+
+```{r}
+# Your code here
+flights %>%
+  inner_join(airports, by = c("origin" = "faa")) %>%
+  inner_join(planes, by = "tailnum")
+```
+
+\
+
+d) Join the three tables together again, but with `full_join()` instead of `inner_join()`.
+
+```{r}
+# Your code here
+flights %>%
+  full_join(airports, by = c("origin" = "faa")) %>%
+  full_join(planes, by = "tailnum")
+```
+
+Why are there so many `NA` values in the table from (d)? Choose a row with `NA` values in it and explain why it contains `NA`.
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+`full_join` keeps all observations from all tables. There are many `NA`s because several airports in the `airports` table are not present as an `origin` in the `flights` table because no flights in our data departed from that `origin`.
+
+:::
+
+e) Why might we want to do a `full_join()` over an `inner_join()` if the result might have many missing values in the table?
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+A `full_join` is useful when you want to identify "missingness" or perform an audit. It ensures you don't lose data from either side, allowing you to see which entities (like airports or planes) are inactive or unrepresented in your primary dataset.
+
+:::
+
+## Anti Joins
+
+Anti joins are used to return only values that are exclusive to the left table. If you need a visual, please refer to the lecture slides: [Lecture 17: Joins and Pivots](https://stat133.berkeley.edu/spring-2026/lectures/17-joins-pivots/slides.html#/section-4)
+
+a) Use `anti_join()` to return a table of airports that do not appear in the `flights` table.
+
+```{r}
+# Your code here
+anti_join(airports, flights, by = c("faa" = "origin"))
+```
+
+\
+
+b) Use `anti_join()` and `count()` to get a table that shows the number of airplanes from each manufacturer for which we don't have `flight` data.
+
+```{r}
+# Your code here
+planes %>%
+  anti_join(flights, by = "tailnum") %>%
+  count(manufacturer)
+```
+
+\
+
+# Pivots
+
+## `pivot_longer()` with `world_bank_pop`
+
+`tidyverse` comes with the tibble `world_bank_pop`, we're going to be using a subset of that data to practice pivots.
+
+```{r}
+bank_pop_slice <-  world_bank_pop |> 
+    select("country", "indicator", "2005", "2006", "2007") |>
+    slice_head(n = 10)
+head(bank_pop_slice)
+```
+
+a) Use `pivot_longer()` to reshape the data `bank_pop_slice` into long format, with a new column `year` and the values stored in the original three columns placed in a table with a name of your choosing.
+
+```{r}
+# Your code here
+pop_long <- bank_pop_slice |> 
+  pivot_longer(
+    cols = c("2005", "2006", "2007"), 
+    names_to = "year", 
+    values_to = "value"
+  )
+pop_long
+```
+
+Why does it not make sense to reformat the data in this manner?
+
+::: {.callout-note}
+# Type Your Answer in this Callout Block
+
+In this specific long format, the `value` column contains mixed data types (units). For some rows, the value represents a total population count, while for others, it represents a percentage growth rate. Since these numbers aren't comparable, putting them in the same column makes analysis difficult without further filtering.
+
+:::
+
+\
+
+b) Filter `bank_pop_slice` to only contain `indicator == "SP.URB.TOTL"`, then convert the data to long format using `values_to = "pop"` and only keep the `country`, `year`, and `pop`.
+
+```{r}
+# Your code here
+bank_pop_slice |> 
+  filter(indicator == "SP.URB.TOTL") |> 
+  pivot_longer(
+    cols = c("2005", "2006", "2007"), 
+    names_to = "year", 
+    values_to = "pop"
+  ) |> 
+  select(country, year, pop)
+```
+
+## `pivot_wider()` with `fish_encounters`
+
+The dataset `fish_encounters` that comes with `tidyr` records when fish were seen by automatic monitoring stations.
+
+```{r}
+head(fish_encounters)
+```
+
+a) Use `pivot_wider()` to convert the table into wide format, with a column for each monitoring station.
+
+```{r}
+# Your code here
+fish_encounters |> 
+  pivot_wider(names_from = station, values_from = seen)
+```
+
+b) Since some fish were not seen at certain stations, there are a lot of missing values in the previous table. Run the same code, but add `values_fill = 0` to replace all missing values `NA` with `0` in the wide table.
+
+```{r}
+# Your code here
+fish_encounters |> 
+  pivot_wider(
+    names_from = station, 
+    values_from = seen, 
+    values_fill = 0
+  )
+```
+
+# Regular Expressions with `"stringr"`
+
+Consider the following character with the names of some animals:
+
+```{r echo=TRUE}
+animals = c(
+  'dog', 'cat', 'bird', 'dolphin', 'lion', 'zebra', 'tiger', 
+  'wolf', 'whale', 'eagle', 'pig', 'osprey', 'kangaroo', 'koala')
+```
+
+Let's match the pattern `dog` with `str_match()`
+
+```{r echo=TRUE}
+str_match(animals, pattern = 'dog')
+```
+
+As you can tell, the output of `str_match()` is an array with as many rows as
+elements in the input vector. If there is a match, the matched string pattern 
+is displayed. If there is no match, then you get a missing value `NA`
+
+You can use `str_detect()` to check if there is a match:
+
+```{r echo=TRUE}
+str_detect(animals, 'dog')
+```
+
+
+To _extract_ the matched pattern, you can use `str_extract()`:
+
+```{r echo=TRUE}
+str_extract(animals, pattern = 'dog')
+```
+
+Sometimes you may want to extract the elements of the input vector associated to
+a match. For instance, say we are interested in those animals that contain the
+letter `"a"`. We can use the output of `str_detect()` to do logical subsetting
+
+```{r}
+animals[str_detect(animals, 'a')]
+```
+
+## Subsetting with `str_detect()`
+
+Use logical subsetting with `str_detect()`, to find the names of animals with:
+
+a) zero or more `o` 
+
+```{r}
+# Your code here
+animals[str_detect(animals, 'o*')]
+```
+
+
+b) zero or one `o`
+
+```{r}
+# Your code here
+animals[str_detect(animals, 'o?')]
+```
+
+
+c) at least 1 `o`: `"dog" "dolphin" "lion" "wolf" "osprey" "kangaroo" "koala"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, 'o+')]
+```
+
+
+d) exactly 2 `o`'s together: `"kangaroo"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, 'oo')]
+```
+
+
+e) one `o`, but not two `o`'s together: `"dog" "dolphin" "lion" "wolf" "osprey" "koala"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, 'o') & !str_detect(animals, 'oo')]
+```
+
+
+f) two vowels together: `"lion" "eagle" "kangaroo" "koala"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, '[aeiou]{2}')]
+```
+
+
+g) two or more consonants together: `"bird" "dolphin"  "zebra" "wolf" "whale" "eagle" "osprey" "kangaroo"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, '[^aeiou]{2,}')]
+```
+
+
+h) three consonants together: `"dolphin" "osprey"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, '[^aeiou]{3}')]
+```
+
+
+i) three letters only: `"dog" "cat" "pig"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, '^[a-z]{3}$')]
+```
+
+
+j) four letters only: `"bird" "lion" "wolf"`
+
+```{r}
+# Your code here
+animals[str_detect(animals, '^[a-z]{4}$')]
+```
+
+
+## File Names
+
+Here's another character vector with some file names and their extensions:
+
+```{r}
+files <- c(
+  'sales1.csv', 'orders.csv', 'sales2.csv',
+  'sales3.csv', 'europe.csv', 'usa.csv', 'mex.csv',
+  'CA.csv', 'FL.csv', 'NY.csv', 'TX.csv',
+  'sales-europe.csv', 'sales-usa.csv', 'sales-mex.csv')
+```
+
+
+## Your turn
+
+a) Find the file names containing numbers
+
+```{r}
+# Your code here
+files[str_detect(files, '[0-9]')]
+```
+
+
+b) Find the file names containing no numbers
+
+```{r}
+# Your code here
+files[!str_detect(files, '[0-9]')]
+```
+
+
+c) Find the file names containing lower case letters (including file extension)
+
+```{r}
+# Your code here
+files[str_detect(files, '[a-z]')]
+```
+
+
+d) Find the file names containing lower case letters (just the name, not the file extension)
+
+```{r}
+# Your code here
+files[str_detect(files, '[a-z].*\\.')]
+```
+
+
+e) Find the file names containing a dash
+
+```{r}
+# Your code here
+files[str_detect(files, '-')]
+```
+
+
+f) Find the file names containing no dash
+
+```{r}
+# Your code here
+files[!str_detect(files, '-')]
+```
+
+
+g) Create a vector of files by replacing the 'csv' extension into 'txt' extension
+
+```{r}
+# Your code here
+str_replace(files, 'csv$', 'txt')
+```
+
+
+h) Extract just the file name (without the extension)
+
+```{r}
+# Your code here
+str_remove(files, '\\.csv$')
+```
