@@ -1,0 +1,252 @@
+---
+title: "California Bicyclist Collisions (2014-2023)"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  dashboard:
+    orientation: columns
+embed-resources: true
+---
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(knitr)
+library(kableExtra)
+
+alpha <- read_csv("bicyclist_alpha_2014_2023.csv")
+beta <- read_csv("bicyclist_beta_2014_2023.csv")
+
+alpha_clean <- alpha %>%
+  mutate(
+    YEAR = year(COLLISION_DATE),
+    MONTH = month(COLLISION_DATE),
+    DAY_OF_WEEK = wday(COLLISION_DATE, label = TRUE, abbr = TRUE),
+    DAY_OF_WEEK = factor(DAY_OF_WEEK, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")),
+    HOUR = case_when(
+      COLLISION_TIME >= 2300 ~ 23,
+      COLLISION_TIME >= 2200 ~ 22,
+      COLLISION_TIME >= 2100 ~ 21,
+      COLLISION_TIME >= 2000 ~ 20,
+      COLLISION_TIME >= 1900 ~ 19,
+      COLLISION_TIME >= 1800 ~ 18,
+      COLLISION_TIME >= 1700 ~ 17,
+      COLLISION_TIME >= 1600 ~ 16,
+      COLLISION_TIME >= 1500 ~ 15,
+      COLLISION_TIME >= 1400 ~ 14,
+      COLLISION_TIME >= 1300 ~ 13,
+      COLLISION_TIME >= 1200 ~ 12,
+      COLLISION_TIME >= 1100 ~ 11,
+      COLLISION_TIME >= 1000 ~ 10,
+      COLLISION_TIME >= 900 ~ 9,
+      COLLISION_TIME >= 800 ~ 8,
+      COLLISION_TIME >= 700 ~ 7,
+      COLLISION_TIME >= 600 ~ 6,
+      COLLISION_TIME >= 500 ~ 5,
+      COLLISION_TIME >= 400 ~ 4,
+      COLLISION_TIME >= 300 ~ 3,
+      COLLISION_TIME >= 200 ~ 2,
+      COLLISION_TIME >= 100 ~ 1,
+      COLLISION_TIME >= 0 ~ 0 
+    )
+  )
+
+collisions <- left_join(alpha_clean, beta, by = "CASE_ID")
+```
+
+# Trend Analysis
+
+## Column {width=35%}
+
+### { .valuebox }
+```{r}
+#| title: "Total Collisions"
+list(
+  icon = "bicycle",
+  color = "primary",
+  value = nrow(collisions)
+)
+```
+
+### { .valuebox }
+```{r}
+#| title: "Fatal Collisions"
+list(
+  icon = "exclamation-triangle",
+  color = "danger",
+  value = sum(collisions$NUMBER_KILLED > 0, na.rm = TRUE)
+)
+```
+
+## Column {width=65%}
+
+### Long-term Trends
+
+```{r}
+trend_plot <- collisions %>%
+  group_by(YEAR) %>%
+  summarise(
+    Total = n(),
+    Fatal = sum(NUMBER_KILLED > 0, na.rm = TRUE)
+  ) %>%
+  ggplot(aes(x = YEAR)) +
+  geom_line(aes(y = Total, color = "All Collisions"), size = 1.2) +
+  geom_line(aes(y = Fatal, color = "Fatal Collisions"), size = 1.2) +
+  geom_point(aes(y = Total, color = "All Collisions"), size = 2) +
+  geom_point(aes(y = Fatal, color = "Fatal Collisions"), size = 2) +
+  scale_color_manual(values = c("All Collisions" = "#1f77b4", "Fatal Collisions" = "#d62728")) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 11),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(title = "Bicyclist Collisions Over Time (2014-2023)",
+       y = "Count",
+       x = "Year",
+       color = "Outcome")
+
+ggplotly(trend_plot)
+```
+
+### Killed-to-Injured Ratio Over Time
+
+```{r}
+ratio_plot <- collisions %>%
+  group_by(YEAR) %>%
+  summarise(
+    Total_Killed = sum(NUMBER_KILLED, na.rm = TRUE),
+    Total_Injured = sum(NUMBER_INJURED, na.rm = TRUE)
+  ) %>%
+  mutate(Ratio = Total_Killed / Total_Injured) %>%
+  ggplot(aes(x = YEAR, y = Ratio)) +
+  geom_line(color = "#ff7f0e", size = 1.2) +
+  geom_point(color = "#d62728", size = 2.5) +
+  geom_smooth(method = "loess", se = TRUE, color = "#ff7f0e", alpha = 0.2) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 11),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(title = "Ratio of Killed to Injured Bicyclists (2014-2023)",
+       y = "Killed/Injured Ratio",
+       x = "Year")
+
+ggplotly(ratio_plot)
+```
+
+# Comparison & Details
+
+## Row
+
+### Collision Types by Severity
+
+```{r}
+severity_facet_plot <- collisions %>%
+  mutate(Severity = ifelse(NUMBER_KILLED > 0, "Fatal", "Non-Fatal")) %>%
+  group_by(Severity, TYPE_OF_COLLISION) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  ggplot(aes(x = reorder(TYPE_OF_COLLISION, Count), y = Count, fill = Severity)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~Severity, scales = "free_x") +
+  scale_fill_manual(values = c("Fatal" = "#d62728", "Non-Fatal" = "#1f77b4")) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 11),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(title = "Collision Types by Outcome Severity", x = "Collision Type", y = "Count", fill = "Outcome")
+
+ggplotly(severity_facet_plot)
+```
+
+## Row
+
+### Collision Types: Injured Bicyclists Ranking
+
+```{r}
+injury_ranking <- collisions %>%
+  group_by(TYPE_OF_COLLISION) %>%
+  summarise(
+    Total_Injured = sum(NUMBER_INJURED, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(Total_Injured))
+
+injury_plot <- injury_ranking %>%
+  ggplot(aes(x = reorder(TYPE_OF_COLLISION, Total_Injured), y = Total_Injured, fill = Total_Injured)) +
+  geom_col() +
+  scale_fill_gradient(low = "#fee5d9", high = "#a1d99b") +
+  coord_flip() +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 11),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(title = "Collision Types: Total Injured Bicyclists", x = "Collision Type", y = "Total Injured")
+
+ggplotly(injury_plot)
+```
+
+### Collision Types: Deaths Ranking
+
+```{r}
+killed_ranking <- collisions %>%
+  group_by(TYPE_OF_COLLISION) %>%
+  summarise(
+    Total_Killed = sum(NUMBER_KILLED, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(Total_Killed))
+
+killed_plot <- killed_ranking %>%
+  ggplot(aes(x = reorder(TYPE_OF_COLLISION, Total_Killed), y = Total_Killed, fill = Total_Killed)) +
+  geom_col() +
+  scale_fill_gradient(low = "#fee0b6", high = "#d62728") +
+  coord_flip() +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(size = 11),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  ) +
+  labs(title = "Collision Types: Total Deaths", x = "Collision Type", y = "Total Killed")
+
+ggplotly(killed_plot)
+```
+
+## Row
+
+### Summary Statistics by Collision Type
+
+```{r}
+summary_table <- collisions %>%
+  group_by(TYPE_OF_COLLISION) %>%
+  summarise(
+    Total_Collisions = n(),
+    Total_Killed = sum(NUMBER_KILLED, na.rm = TRUE),
+    Total_Injured = sum(NUMBER_INJURED, na.rm = TRUE),
+    Avg_Killed_Per_Collision = round(mean(NUMBER_KILLED, na.rm = TRUE), 3),
+    Avg_Injured_Per_Collision = round(mean(NUMBER_INJURED, na.rm = TRUE), 3),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(Total_Collisions))
+
+kable(summary_table, format = "html", digits = 3) %>%
+  kableExtra::kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    font_size = 11,
+    full_width = TRUE
+  ) %>%
+  kableExtra::column_spec(1, bold = TRUE) %>%
+  kableExtra::row_spec(0, bold = TRUE, background = "#1f77b4", color = "white")
+```
