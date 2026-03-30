@@ -1,0 +1,278 @@
+---
+title: "PS8: Strings and Date-Times"
+subtitle: "STAT 133"
+author: "Ian Cheung"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    theme: simplex
+embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+library(tidyverse)
+```
+
+::: {.callout-note icon=false}
+
+## General Instructions
+
+-   Download the template file `ps8.qmd` to answer the questions.
+
+-   Rename `ps8.qmd` to `ps8-first-last.qmd`, where `first` and `last`
+    are your first and last names (e.g. `ps8-gaston-sanchez.qmd`).
+
+-   Render your qmd file to an HTML file and submit both your qmd and HTML files to the corresponding assignment submission in bCourses.
+
+:::
+
+# Strings
+
+## _Wicked_ String Matches
+
+Below is a dataframe named `users` that contains the user's name, email address, and country of origin.
+
+```{r}
+#| echo: false
+# This cell creates the dataframe for this part of the 
+# assignment. Do not edit the contents of this
+# cell.
+names <- c(
+  "Glinda Upland",
+  NA,
+  "Dorothy Gale",
+  "Oscar Diggs",
+  "Lion",
+  "Emily Gale",
+  "Elphaba Thropp",
+  "Boq Woodman",
+  "Henry Gale",
+  "Nessarose Thropp",
+  "Fiyero Tigelaar"
+)
+
+emails <- c(
+  "popular.witch@emeraldcity.gov",
+  "munchkin1@yellowbrick.org",
+  "dorothy_gale@ozmail.com",
+  "wizard101@emeraldcity.gov",
+  "very_brave_lion67@ozmail.com",
+  "emily_gale@ozmail.com",
+  "wwwest@ozmail.com",
+  "tin.man@yellowbrick.org",
+  NA,
+  "wweast@ozmail.com",
+  "brainiac@emeraldcity.gov"
+)
+
+country <- c(
+  "Gillikin (GLK)",
+  "Munchkinland (MKL)",
+  "United States (USA)",
+  NA,
+  NA,
+  "United States (USA)",
+  "Munchkinland (MKL)",
+  "Munchkinland (MKL)",
+  "United States (USA)",
+  "Munchkinland (MKL)",
+  "Vinkus (VKS)"
+)
+
+users <- data.frame(
+  name = names,
+  email = emails,
+  country = country,
+  stringsAsFactors = FALSE
+)
+
+users
+```
+
+Answer the following questions using `stringr` and regex patterns.
+
+a) Get the number of users whose name begins with the letter `"E"`. You may want to use `sum()` for this.
+
+```{r}
+# Your code here
+sum(str_detect(users$name, "^E"), na.rm = TRUE)
+```
+
+\
+
+b) Get the number of users whose emails do not contain a number. You will need to account for the presence of `NA`.
+
+```{r}
+# Your code here
+sum(!str_detect(users$email, "\\d") & !is.na(users$email))
+```
+
+\
+
+c) Extract the users' emails that contain at least one underscore: `"_"`.
+
+```{r}
+# Your code here
+str_subset(users$email, "_")
+```
+
+\
+
+d) Use lookaheads/behinds to extract the country abbreviation (e.g. `VKS`) from the `country` column.
+
+```{r}
+# Your code here
+str_extract(users$country, "(?<=\\()[A-Z]{3}(?=\\))")
+```
+
+\
+
+e) Use lookaheads/behinds to extract the users' last names from the `name` column.
+
+```{r}
+# Your code here
+str_extract(users$name, "(?<=\\s)[A-Za-z]+$")
+```
+
+\
+
+f) Use lookaheads/behinds to exctract the "local part" of users' email addresses: e.g. `"munchkin1"` from `"munchkin1@yellowbrick.org"`
+
+```{r}
+# Your code here
+str_extract(users$email, "^.+(?=@)")
+```
+
+\
+
+g) Use lookaheads/behinds to extract the domain of users' email addresses: e.g. `"yellowbrick.org"` from `"munchkin1@yellowbrick.org"`
+
+```{r}
+# Your code here
+str_extract(users$email, "(?<=@).+$")
+```
+
+\
+
+h) Use lookaheads/behinds and to get the number of users with a ".gov" email address.
+
+```{r}
+# Your code here
+sum(str_detect(users$email, "(?<=\\.)gov$"), na.rm = TRUE)
+```
+
+\
+
+# Dates and Times
+
+## You in Date-Time
+
+We will be using your birthdate to practice storing date-time objects in different forms. If you are not sure of the exact hour-minute-second of your birth (likely), you are welcome to use your best guess. If you are uncomfortable using your actual birthdate, you may use the date July 31st, 1980, 5:31:07 AM UTC (Harry Potter's birthday) instead.
+
+### Different Formats
+
+a) Use `as.POSIXct()` to represent your birthdate as a `POSIXct` vector of the form `"YYYY-MM-DD HH:MM:SS"`. Don't forget to specify the timezone!
+
+```{r}
+# Your code here
+hp_birth <- as.POSIXct("1980-07-31 05:31:07", tz = "UTC")
+hp_birth
+```
+
+\
+
+b) Now use `as.POSIXct()` to input your birthday using `format = "%b %d, %Y %I:%M %p"`.
+
+```{r}
+# Your code here
+as.POSIXct("Jul 31, 1980 05:31 AM", format = "%b %d, %Y %I:%M %p", tz = "UTC")
+```
+
+\
+
+c) Store your birthday as a `POSIXct` vector, and then use `unclass` to find the Unix timestamp associated with your birthday.
+
+```{r}
+# Your code here
+unclass(hp_birth)
+```
+
+\
+
+d) Use `lubridate` and a string that expresses your birthday in a format similar to `"DD-MM-YYYY HH:MM"`.
+
+```{r}
+# Your code here
+dmy_hm("31-07-1980 05:31", tz = "UTC")
+```
+
+\
+
+e) Use `lubridate` and a string that expresses your birthday in a format similar to `"Oct 10, 2025 1:00 pm"`.
+
+```{r}
+# Your code here
+mdy_hm("Jul 31, 1980 5:31 am", tz = "UTC")
+```
+
+\
+
+### Extracting Information
+
+Now recall if we have a date-time object, we can extract components using `year()`, `month()`, `day()`, etc. Answer the following questions using `lubridate` and R commands.
+
+a) What day of the week were you born on? Express your answer as the name of the day: e.g. Thursday.
+
+```{r}
+# Your code here
+wday(hp_birth, label = TRUE, abbr = FALSE)
+```
+
+\
+
+b) The first day of classes this semester fell on which week of the current year?
+
+```{r}
+# Your code here
+week(ymd("2026-01-12"))
+```
+
+\
+
+c) In which year did the Unix timestamp `-1103932800` occur? Recall that negative Unix timestamps mean the date was before $1970$.
+
+```{r}
+# Your code here
+year(as.POSIXct(-1103932800, origin = "1970-01-01", tz = "UTC"))
+```
+
+\
+
+## The End of an Epoch
+
+Recall that Unix Time is represented by the number of seconds since `"1970-01-01 00:00:00 UTC"`. This represents the start of the Unix Epoch. However, many older systems store Unix integers as 32 bit integers. i.e. They use 32 zeros/ones to represent the number. You don't have to fully understand this, but that means that the largest Unix timestamp in this form is $2^{31} - 1 = 2,147,483,647$.
+
+a) Use `as.POSIXct()` to store the unix timestamp of `0` (The beginning of the Unix Epoch) as a `POSIXct` vector named `epoch`.
+
+```{r}
+# Your code here
+epoch <- as.POSIXct(0, origin = "1970-01-01", tz = "UTC")
+epoch
+```
+
+\
+
+b) Recall that these `POSIXct` vectors respect arithmetic using Unix timestamps. Add the largest possible Unix timestamp to `epoch`. The rusult will be the largest date-time that can be represented on systems using 32-bit Unix timestamps.
+
+```{r}
+# Your code here
+max_time <- epoch + (2^31 - 1)
+max_time
+```
+
+\
+
+This is known as the "Year 2038 Problem" and it has it's own Wikipedia page: [Year 2038 Problem](https://en.wikipedia.org/wiki/Year_2038_problem). The use of 32-bit integers creates a similar problem in older video games, such as _Old School Runescape_, where the maximum number of a singular item a player can hold is $2,147,483,647$.
+
