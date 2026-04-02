@@ -1,0 +1,50 @@
+---
+title: "Palmer Penguins"
+format: dashboard
+server: shiny
+---
+
+```{r}
+#| context: setup
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## {.sidebar}
+
+```{r}
+# select variable
+selectInput(
+  inputId = 'variable', 
+  label = 'Select variable:',
+  choices = colnames(penguins)[3:6],
+  selected = "bill_length_m")
+
+# choose transparency value
+sliderInput(
+  inputId = "alpha", 
+  label = "Opacity (alpha):",
+  min = 0,
+  max = 1,
+  value = 0.5)
+```
+
+## Row
+
+```{r}
+#| title: "Distributions"
+plotOutput(outputId = 'plot')
+```
+
+
+```{r}
+#| context: server
+output$plot <- renderPlot({
+  ggplot(data = penguins, 
+         aes(x = .data[[input$variable]], 
+             fill = species)) +
+    geom_density(alpha = input$alpha) +
+    theme_minimal()
+})
+```
+

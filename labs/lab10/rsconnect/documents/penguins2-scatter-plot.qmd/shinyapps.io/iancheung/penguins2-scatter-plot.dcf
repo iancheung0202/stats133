@@ -1,0 +1,13 @@
+name: penguins2-scatter-plot
+title:
+username: iancheung
+account: iancheung
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17047863
+bundleId: 11797605
+url: https://iancheung.shinyapps.io/penguins2-scatter-plot/
+version: 1
+quarto_version: 1.8.27
+quarto_engines: knitr
+serverRender: FALSE
