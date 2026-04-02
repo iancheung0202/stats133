@@ -1,0 +1,107 @@
+---
+title: "Savings and Investment Calculator"
+author: "Ian Cheung"
+format: dashboard
+server: shiny
+---
+
+```{r}
+#| context: setup
+library(tidyverse)
+library(plotly)
+
+calculate_fv <- function(P, PMT, r, n) {
+  if (r == 0) {
+    return(P + (PMT * n))
+  }
+  
+  fv_lump_sum <- P * (1 + r)^n
+  fv_annuity <- PMT * (((1 + r)^n - 1) / r)
+  return(fv_lump_sum + fv_annuity)
+}
+```
+
+## {.sidebar}
+
+```{r}
+numericInput(
+  inputId = "principal", 
+  label = "Initial Amount (Principal)", 
+  value = 5000
+)
+
+numericInput(
+  inputId = "contribution", 
+  label = "Annual Contribution", 
+  value = 1000
+)
+
+sliderInput(
+  inputId = "years", 
+  label = "Number of Years", 
+  min = 1, 
+  max = 50, 
+  value = 20
+)
+
+numericInput(
+  inputId = "return_rate", 
+  label = "Annual Rate of Return (as decimal)", 
+  value = 0.08,
+  step = 0.01
+)
+```
+
+
+# Timeline
+
+```{r}
+plotlyOutput(outputId = 'plot')
+```
+
+
+# Table
+
+```{r}
+tableOutput(outputId = 'table')
+```
+
+
+```{r}
+#| context: server
+
+tbl = reactive({
+  years_seq <- 0:input$years
+  amounts <- sapply(years_seq, function(y) {
+    calculate_fv(
+      P = input$principal, 
+      PMT = input$contribution, 
+      r = input$return_rate, 
+      n = y
+    )
+  })
+  
+  data.frame(
+    year = years_seq,
+    amount = amounts
+  )
+})
+
+
+output$plot <- renderPlotly({
+  p <- ggplot(data = tbl(), aes(x = year, y = amount)) +
+    geom_area(fill = "#A1E3F588") +
+    geom_point() +
+    geom_line() +
+    scale_y_continuous(labels = scales::comma) +
+    theme_minimal() +
+    labs(x = "Year", y = "Amount ($)")
+  
+  ggplotly(p)
+})
+
+
+output$table <- renderTable({
+  tbl()
+}, digits = 2)
+```
