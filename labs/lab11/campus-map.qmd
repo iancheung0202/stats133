@@ -1,0 +1,68 @@
+---
+title: "UC Berkeley Interactive Map"
+author: "Ian Cheung"
+format: 
+  html:
+    page-layout: full
+server: shiny
+---
+
+## Campus Favorites
+
+Use the dropdown menu to filter by the type of location.
+
+```{r}
+#| label: setup
+#| include: false
+library(leaflet)
+library(shiny)
+library(tidyverse)
+
+# Create the dataset for the three locations
+campus_data <- data.frame(
+  name = c("Main Stacks", "Li's Knife Cut Noodle", "Caffè Strada"),
+  type = c("Study Spot", "Restaurant", "Cafe"),
+  lat = c(37.872373, 37.8702811, 37.8688412),
+  lng = c(-122.2590795, -122.2671166, -122.2551327),
+  stringsAsFactors = FALSE
+)
+```
+
+```{r}
+#| panel: sidebar
+selectInput(
+  "location_type", 
+  label = "Select Location Type:",
+  choices = c("All", unique(campus_data$type)),
+  selected = "All"
+)
+
+helpText("Selecting a type will filter the markers shown on the map.")
+```
+
+```{r}
+#| panel: fill
+leafletOutput("map")
+```
+
+```{r}
+#| context: server
+
+output$map <- renderLeaflet({
+  # Filter data based on input
+  filtered_data <- if (input$location_type == "All") {
+    campus_data
+  } else {
+    campus_data %>% filter(type == input$location_type)
+  }
+
+  leaflet(data = filtered_data) %>%
+    addProviderTiles("CyclOSM") %>% 
+    setView(lng = -122.259, lat = 37.872, zoom = 15) %>%
+    addMarkers(
+      lng = ~lng, 
+      lat = ~lat, 
+      popup = ~paste0("<b>", name, "</b><br>", type)
+    )
+})
+```
