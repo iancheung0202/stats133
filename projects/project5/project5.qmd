@@ -1,0 +1,282 @@
+---
+title: "California Crash Data Dashboard - 2019"
+format: dashboard
+server: shiny
+---
+
+```{r}
+#| context: setup
+#| 
+library(tidyverse)
+library(leaflet)
+library(sf)
+library(plotly)
+library(ggiraph)
+library(RColorBrewer)
+library(lubridate)
+
+crashes <- read_csv("crashes_geospatial_2019.csv") %>%
+  mutate(
+    datetime = parse_date_time(DATETIME, orders = "YmdHMS"),
+    date = as_date(datetime),
+    month = month(datetime),
+    day_of_week = wday(datetime, label = TRUE),
+    hour = hour(datetime),
+    month_name = month(datetime, label = TRUE),
+    county = str_extract(LOCATION, "(?<=, )[A-Z ]+$"),
+    latitude = POINT_Y,
+    longitude = POINT_X
+  )
+
+counties <- crashes %>% 
+  pull(county) %>% 
+  unique() %>% 
+  sort()
+
+violation_categories <- crashes %>% 
+  pull(PCF_VIOL_CATEGORY) %>% 
+  unique() %>% 
+  sort()
+
+collision_types <- crashes %>% 
+  pull(TYPE_OF_COLLISION) %>% 
+  unique() %>% 
+  sort()
+
+severity_colors <- c(
+  "fatal injury" = "#8b0000",
+  "severe injury" = "#e74c3c",
+  "minor injury" = "#e67e22",
+  "possible injury" = "#f39c12"
+)
+
+tile_providers <- list(
+  "OpenStreetMap" = "OpenStreetMap",
+  "Satellite (Esri)" = "Esri.WorldImagery",
+  "Terrain (Esri)" = "Esri.WorldTopoMap",
+  "Dark (CartoDB)" = "CartoDB.Positron",
+  "Light (CartoDB)" = "CartoDB.Voyager"
+)
+```
+
+# {.sidebar width="300px"}
+
+## Filters
+
+```{r}
+selectInput(
+  inputId = "county_select",
+  label = "Select County:",
+  choices = counties,
+  selected = "ALAMEDA"
+)
+```
+
+```{r}
+selectInput(
+  inputId = "violation_select",
+  label = "Select Violation Category:",
+  choices = violation_categories,
+  selected = "DUI"
+)
+```
+
+```{r}
+checkboxGroupInput(
+  inputId = "collision_type_select",
+  label = "Select Collision Type(s):",
+  choices = collision_types,
+  selected = collision_types
+)
+```
+
+```{r}
+radioButtons(
+  inputId = "color_by_severity",
+  label = "Color code by severity?",
+  choices = c("Yes" = "yes", "No" = "no"),
+  selected = "yes"
+)
+```
+
+```{r}
+dateRangeInput(
+  inputId = "date_range",
+  label = "Select Date Range:",
+  start = "2019-01-01",
+  end = "2019-12-31",
+  min = "2019-01-01",
+  max = "2019-12-31"
+)
+```
+
+```{r}
+selectInput(
+  inputId = "tile_provider",
+  label = "Select Map Tiles:",
+  choices = names(tile_providers),
+  selected = "OpenStreetMap"
+)
+```
+
+
+# Tab 1: Crash Locations
+
+## Row
+
+```{r}
+leafletOutput(outputId = "crash_map", height = "800px")
+```
+
+
+# Tab 2: Time Trends
+
+## Row
+
+```{r}
+plotlyOutput(outputId = "crashes_by_month", height = "400px")
+```
+
+## Row
+
+```{r}
+plotlyOutput(outputId = "crashes_by_hour", height = "400px")
+```
+
+
+```{r}
+#| context: server
+
+filtered_crashes <- reactive({
+  crashes %>%
+    filter(
+      county == input$county_select,
+      PCF_VIOL_CATEGORY == input$violation_select,
+      TYPE_OF_COLLISION %in% input$collision_type_select,
+      date >= input$date_range[1],
+      date <= input$date_range[2]
+    )
+})
+
+output$crash_map <- renderLeaflet({
+  data <- filtered_crashes()
+  
+  if (input$color_by_severity == "yes") {
+    pal <- colorFactor(
+      palette = severity_colors,
+      domain = data$COLLISION_SEVERITY
+    )
+    
+    popup_text <- paste0(
+      "<b>", data$LOCATION, "</b><br>",
+      "Severity: ", data$COLLISION_SEVERITY, "<br>",
+      "Violation: ", data$PCF_VIOL_CATEGORY, "<br>",
+      "Collision Type: ", data$TYPE_OF_COLLISION, "<br>",
+      "Date: ", data$date
+    )
+    
+    map <- leaflet(data = data) %>%
+      addProviderTiles(tile_providers[[input$tile_provider]]) %>%
+      setView(lng = mean(data$longitude, na.rm = TRUE),
+              lat = mean(data$latitude, na.rm = TRUE),
+              zoom = 9) %>%
+      addCircleMarkers(
+        lng = ~longitude,
+        lat = ~latitude,
+        radius = 5,
+        color = ~pal(COLLISION_SEVERITY),
+        stroke = FALSE,
+        fillOpacity = 0.7,
+        popup = popup_text
+      ) %>%
+      addLegend(
+        pal = pal,
+        values = ~COLLISION_SEVERITY,
+        opacity = 0.7,
+        title = "Collision Severity",
+        position = "bottomright"
+      )
+  } else {
+    popup_text <- paste0(
+      "<b>", data$LOCATION, "</b><br>",
+      "Severity: ", data$COLLISION_SEVERITY, "<br>",
+      "Violation: ", data$PCF_VIOL_CATEGORY, "<br>",
+      "Collision Type: ", data$TYPE_OF_COLLISION, "<br>",
+      "Date: ", data$date
+    )
+    
+    map <- leaflet(data = data) %>%
+      addProviderTiles(tile_providers[[input$tile_provider]]) %>%
+      setView(lng = mean(data$longitude, na.rm = TRUE),
+              lat = mean(data$latitude, na.rm = TRUE),
+              zoom = 9) %>%
+      addCircleMarkers(
+        lng = ~longitude,
+        lat = ~latitude,
+        radius = 5,
+        color = "#3388ff",
+        stroke = FALSE,
+        fillOpacity = 0.7,
+        popup = popup_text
+      )
+  }
+  
+  map
+})
+
+output$crashes_by_month <- renderPlotly({
+  data <- filtered_crashes() %>%
+    group_by(month_name) %>%
+    summarise(count = n(), .groups = "drop") %>%
+    arrange(factor(month_name, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")))
+  
+  plot_ly(
+    data = data,
+    x = ~month_name,
+    y = ~count,
+    type = "bar",
+    marker = list(color = "#3498db"),
+    hovertemplate = "<b>%{x}</b><br>Crashes: %{y}<extra></extra>"
+  ) %>%
+    layout(
+      title = "Crashes by Month",
+      xaxis = list(title = "Month"),
+      yaxis = list(title = "Number of Crashes"),
+      hovermode = "x unified",
+      plot_bgcolor = "rgba(240, 240, 240, 1)",
+      paper_bgcolor = "white"
+    )
+})
+
+output$crashes_by_hour <- renderPlotly({
+  data <- filtered_crashes() %>%
+    group_by(hour) %>%
+    summarise(count = n(), .groups = "drop") %>%
+    arrange(hour)
+  
+  plot_ly(
+    data = data,
+    x = ~hour,
+    y = ~count,
+    type = "scatter",
+    mode = "lines+markers",
+    line = list(color = "#e74c3c", width = 3),
+    marker = list(color = "#e74c3c", size = 8),
+    hovertemplate = "<b>Hour %{x}:00</b><br>Crashes: %{y}<extra></extra>"
+  ) %>%
+    layout(
+      title = "Crashes by Hour of Day",
+      xaxis = list(
+        title = "Hour of Day (24-hour format)",
+        tickmode = "linear",
+        tick0 = 0,
+        dtick = 1
+      ),
+      yaxis = list(title = "Number of Crashes"),
+      hovermode = "x unified",
+      plot_bgcolor = "rgba(240, 240, 240, 1)",
+      paper_bgcolor = "white"
+    )
+})
+```
