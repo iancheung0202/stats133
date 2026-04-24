@@ -1,0 +1,15 @@
+---
+title: "About Me"
+---
+
+## Background
+I am currently a student studying Applied Math and Data Science at UC Berkeley.
+
+## Interests
+- Programming
+- Data Science
+- Web Development
+
+## Fun Facts
+- I enjoy biking 🚴
+- I build Discord bots

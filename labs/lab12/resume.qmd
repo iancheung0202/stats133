@@ -1,0 +1,12 @@
+---
+title: "Resume"
+---
+
+## Education
+**University of California, Berkeley**  
+Degree, Expected Graduation: 2029
+
+## Skills
+- Python, R, JavaScript
+- Data Analysis
+- Web Development

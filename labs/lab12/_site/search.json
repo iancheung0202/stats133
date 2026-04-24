@@ -1,0 +1,86 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Hi, I’m Ian Cheung.\nWelcome to my personal website! This site highlights my background, experience, and projects.\n\n\n\nLearn more about me\nView my resume\nExplore my projects\n\nFeel free to look around!"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About Me",
+    "section": "",
+    "text": "I am currently a student studying Applied Math and Data Science at UC Berkeley."
+  },
+  {
+    "objectID": "index.html#what-youll-find-here",
+    "href": "index.html#what-youll-find-here",
+    "title": "Home",
+    "section": "",
+    "text": "Learn more about me\nView my resume\nExplore my projects\n\nFeel free to look around!"
+  },
+  {
+    "objectID": "resume.html",
+    "href": "resume.html",
+    "title": "Resume",
+    "section": "",
+    "text": "University of California, Berkeley\nDegree, Expected Graduation: 2029"
+  },
+  {
+    "objectID": "resume.html#education",
+    "href": "resume.html#education",
+    "title": "Resume",
+    "section": "",
+    "text": "University of California, Berkeley\nDegree, Expected Graduation: 2029"
+  },
+  {
+    "objectID": "resume.html#skills",
+    "href": "resume.html#skills",
+    "title": "Resume",
+    "section": "Skills",
+    "text": "Skills\n\nPython, R, JavaScript\nData Analysis\nWeb Development"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Projects",
+    "section": "",
+    "text": "Here is my interactive dashboard:"
+  },
+  {
+    "objectID": "projects.html#dashboard-project-pub-7",
+    "href": "projects.html#dashboard-project-pub-7",
+    "title": "Projects",
+    "section": "",
+    "text": "Here is my interactive dashboard:"
+  },
+  {
+    "objectID": "projects.html#dashboard-project-5",
+    "href": "projects.html#dashboard-project-5",
+    "title": "Projects",
+    "section": "",
+    "text": "Here is my interactive dashboard:"
+  },
+  {
+    "objectID": "about.html#background",
+    "href": "about.html#background",
+    "title": "About Me",
+    "section": "",
+    "text": "I am currently a student studying Applied Math and Data Science at UC Berkeley."
+  },
+  {
+    "objectID": "about.html#interests",
+    "href": "about.html#interests",
+    "title": "About Me",
+    "section": "Interests",
+    "text": "Interests\n\nProgramming\nData Science\nWeb Development"
+  },
+  {
+    "objectID": "about.html#fun-facts",
+    "href": "about.html#fun-facts",
+    "title": "About Me",
+    "section": "Fun Facts",
+    "text": "Fun Facts\n\nI enjoy biking 🚴\nI build Discord bots"
+  }
+]

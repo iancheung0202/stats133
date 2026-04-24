@@ -1,0 +1,16 @@
+---
+title: "Home"
+---
+
+# Welcome 👋
+
+Hi, I’m **Ian Cheung**.
+
+Welcome to my personal website! This site highlights my background, experience, and projects.
+
+## What you'll find here:
+- Learn more about me
+- View my resume
+- Explore my projects
+
+Feel free to look around!
