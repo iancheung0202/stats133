@@ -1,0 +1,200 @@
+---
+title: "Sentiment Analysis"
+---
+
+## Introduction
+
+Sentiment analysis examines the emotional tone of text. Rather than just counting words, sentiment analysis assigns emotional values to words and aggregates them to understand the overall emotional trajectory. 
+
+This analysis uses these three approaches:
+
+1. **Dictionary Comparison**: Comparing multiple sentiment lexicons to understand nuances
+2. **Sentiment Trajectory**: Tracking how sentiment evolves across the series
+3. **Contribution Analysis**: Identifying which words have the greatest impact on sentiment
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytext)
+library(plotly)
+
+got <- read_csv("game-of-thrones.csv")
+bing <- read_csv("bing.csv")
+nrc <- read_csv("nrc.csv")
+
+got_tokens <- got %>%
+  unnest_tokens(word, Sentence)
+
+got_tokens <- got_tokens %>%
+  group_by(Season, Episode) %>%
+  mutate(episode_id = cur_group_id()) %>%
+  ungroup()
+```
+
+## Part 1: Dictionary Comparison - Bing vs NRC
+
+Different sentiment lexicons capture emotion in different ways. **Bing** provides binary sentiment (positive/negative), while **NRC** provides multiple emotion categories (joy, fear, anger, anticipation, etc.).
+
+### Plot 1: Binary Sentiment Comparison (Bing Lexicon)
+
+The Bing lexicon classifies words as either positive or negative. 
+
+```{r plot1, warning=FALSE}
+bing_sentiment <- got_tokens %>%
+  inner_join(bing, by = "word") %>%
+  count(Season, sentiment) %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>%
+  mutate(net_sentiment = positive - negative,
+         Season = as.factor(Season))
+
+bing_plot <- bing_sentiment %>%
+  pivot_longer(cols = c(positive, negative), names_to = "sentiment", values_to = "count") %>%
+  ggplot(aes(x = Season, y = count, fill = sentiment)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("positive" = "green", "negative" = "red")) +
+  labs(title = "Positive vs Negative Words by Season", x = "Season", y = "Word Count", fill = "Sentiment") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+
+ggplotly(bing_plot, tooltip = c("x", "y", "fill"))
+```
+
+### Plot 2: Emotion Categories (NRC Lexicon)
+
+The NRC lexicon provides a richer emotional picture by categorizing words into specific emotions beyond just positive/negative.
+
+```{r plot2, warning=FALSE}
+nrc_sentiment <- got_tokens %>%
+  inner_join(nrc, by = "word") %>%
+  count(Season, sentiment) %>%
+  mutate(Season = as.factor(Season))
+
+nrc_plot <- nrc_sentiment %>%
+  ggplot(aes(x = Season, y = n, fill = sentiment)) +
+  geom_col() +
+  facet_wrap(~sentiment, scales = "free_y") +
+  scale_fill_viridis_d() +
+  labs(title = "Emotion Distribution by Season", x = "Season", y = "Word Count", fill = "Emotion") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12), legend.position = "bottom", strip.text = element_text(face = "bold", size = 9))
+
+ggplotly(nrc_plot, tooltip = c("x", "y", "fill"))
+```
+
+### Lexicon Comparison Summary
+
+- **Bing Lexicon** reveals an overall balance between positive and negative sentiment across the series, with notable variation by season.
+- **NRC Lexicon** shows that emotions like positive, negative, trust are most prevalent in Game of Thrones dialogue, reflecting the show's dramatic and often dark narrative.
+
+## Part 2: Sentiment Trajectory
+
+How does emotional tone shift throughout the series? 
+
+### Plot 3: Net Sentiment Over Time (by Episode)
+
+This visualization tracks the cumulative sentiment trajectory across all episodes.
+
+```{r plot3, warning=FALSE}
+sentiment_trajectory <- got_tokens %>%
+  inner_join(bing, by = "word") %>%
+  mutate(sentiment_value = ifelse(sentiment == "positive", 1, -1)) %>%
+  group_by(Season, Episode, episode_id) %>%
+  summarise(net_sentiment = sum(sentiment_value), total_words = n(), sentiment_score = net_sentiment / total_words, .groups = 'drop') %>%
+  arrange(Season, Episode) %>%
+  mutate(episode_num = row_number())
+
+trajectory_plot <- sentiment_trajectory %>%
+  ggplot(aes(x = episode_num, y = sentiment_score, color = as.factor(Season), group = 1)) +
+  geom_line(alpha = 0.6) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_smooth(se = TRUE, color = "black", alpha = 0.1, method = "loess", span = 0.3) +
+  scale_color_viridis_d(name = "Season") +
+  labs(title = "Sentiment Score Trajectory Across All Episodes", x = "Episode Number (Chronological)", y = "Sentiment Score (positive - negative) / total words", color = "Season") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+
+ggplotly(trajectory_plot, tooltip = c("x", "y", "color"))
+```
+
+### Plot 4: Average Sentiment by Season
+
+Which seasons are emotionally the most intense?
+
+```{r plot4, warning=FALSE}
+season_sentiment <- sentiment_trajectory %>%
+  group_by(Season) %>%
+  summarise(avg_sentiment = mean(sentiment_score), min_sentiment = min(sentiment_score), max_sentiment = max(sentiment_score), .groups = 'drop') %>%
+  mutate(Season = as.factor(Season))
+
+season_plot <- season_sentiment %>%
+  ggplot(aes(x = Season, y = avg_sentiment, fill = avg_sentiment)) +
+  geom_col(show.legend = FALSE) +
+  geom_errorbar(aes(ymin = min_sentiment, ymax = max_sentiment), width = 0.3, alpha = 0.6) +
+  scale_fill_gradient2(low = "red", mid = "gray", high = "green", midpoint = 0) +
+  labs(title = "Average Sentiment Score by Season", subtitle = "Error bars show min-max range", x = "Season", y = "Average Sentiment Score") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12), plot.subtitle = element_text(face = "italic",  size = 10))
+
+ggplotly(season_plot, tooltip = c("x", "y"))
+```
+
+## Part 3: Contribution Analysis
+
+Which specific words contribute the most to the overall sentiment? 
+
+### Plot 5: Top Positive Word Contributions
+
+Words with the highest positive contribution (frequency × positive sentiment value).
+
+```{r plot5, warning=FALSE}
+positive_contributions <- got_tokens %>%
+  inner_join(bing, by = "word") %>%
+  filter(sentiment == "positive") %>%
+  count(word, sort = TRUE) %>%
+  head(15) %>%
+  mutate(word = reorder(word, n),
+         contribution = n)
+
+positive_plot <- positive_contributions %>%
+  ggplot(aes(contribution, word, fill = contribution)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_gradient(low = "lightgreen", high = "darkgreen") +
+  labs(title = "Top 15 Positive Words Contribution",
+       x = "Frequency",
+       y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+
+ggplotly(positive_plot, tooltip = c("x", "y"))
+```
+
+### Plot 6: Top Negative Word Contributions
+
+Words with the highest negative contribution (frequency × negative sentiment value).
+
+```{r plot6, warning=FALSE}
+negative_contributions <- got_tokens %>%
+  inner_join(bing, by = "word") %>%
+  filter(sentiment == "negative") %>%
+  count(word, sort = TRUE) %>%
+  head(15) %>%
+  mutate(word = reorder(word, n),
+         contribution = n)
+
+negative_plot <- negative_contributions %>%
+  ggplot(aes(contribution, word, fill = contribution)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_gradient(low = "lightcoral", high = "darkred") +
+  labs(title = "Top 15 Negative Words Contribution",
+       x = "Frequency",
+       y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+
+ggplotly(negative_plot, tooltip = c("x", "y"))
+```
+
+## Summary 
+
+- The Bing lexicon captures a binary view of sentiment, which is useful for quick assessment. NRC provides emotional granularity that reveals specific emotional tones shown in the series.
+- The series shows a most upward but mixed trajectory, withthe first season being most negative and last season being most positive. 
+- The sentiment is driven primarily by recurring words that appear throughout the series, such as "good", "well", "right" for positive sentiment and "stark", "dead", "kill" for negative sentiment.

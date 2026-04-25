@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Frequency Analysis – Game of Thrones Text Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-158031087360bce0ff56dc785ce39e06.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.12.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Game of Thrones Text Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./frequency.html" aria-current="page"> 
+<span class="menu-text">Frequency Analysis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./sentiment.html"> 
+<span class="menu-text">Sentiment Analysis</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#plot-1-most-common-words-overall" id="toc-plot-1-most-common-words-overall" class="nav-link" data-scroll-target="#plot-1-most-common-words-overall">Plot 1: Most Common Words Overall</a></li>
+  <li><a href="#plot-2-word-frequency-trends-by-season" id="toc-plot-2-word-frequency-trends-by-season" class="nav-link" data-scroll-target="#plot-2-word-frequency-trends-by-season">Plot 2: Word Frequency Trends by Season</a></li>
+  <li><a href="#plot-3-most-frequent-characters-speaking" id="toc-plot-3-most-frequent-characters-speaking" class="nav-link" data-scroll-target="#plot-3-most-frequent-characters-speaking">Plot 3: Most Frequent Characters Speaking</a></li>
+  <li><a href="#plot-4-top-words-used-by-top-characters" id="toc-plot-4-top-words-used-by-top-characters" class="nav-link" data-scroll-target="#plot-4-top-words-used-by-top-characters">Plot 4: Top Words Used by Top Characters</a></li>
+  <li><a href="#plot-5-vocabulary-number-by-season" id="toc-plot-5-vocabulary-number-by-season" class="nav-link" data-scroll-target="#plot-5-vocabulary-number-by-season">Plot 5: Vocabulary Number by Season</a></li>
+  <li><a href="#plot-6-words-distinctive-to-seasons-tf-idf-analysis" id="toc-plot-6-words-distinctive-to-seasons-tf-idf-analysis" class="nav-link" data-scroll-target="#plot-6-words-distinctive-to-seasons-tf-idf-analysis">Plot 6: Words Distinctive to Seasons (TF-IDF Analysis)</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Frequency Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Frequency analysis shows the most important topics in a text by examining word occurrence patterns. After removing common stop words (the, and, of, etc.), we can identify which topic dominate the Game of Thrones dialogue.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>got <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"game-of-thrones.csv"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>got_tokens <span class="ot">&lt;-</span> got <span class="sc">%&gt;%</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, Sentence) <span class="sc">%&gt;%</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(stop_words)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>got_tokens <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Season =</span> <span class="fu">as.factor</span>(Season))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="plot-1-most-common-words-overall" class="level2">
+<h2 class="anchored" data-anchor-id="plot-1-most-common-words-overall">Plot 1: Most Common Words Overall</h2>
+<p>The most frequently occurring words in the entire series.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>top_words_plot <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">word =</span> <span class="fu">reorder</span>(word, n)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, word, <span class="at">fill =</span> n)) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"steelblue"</span>, <span class="at">high =</span> <span class="st">"darkblue"</span>) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 20 Most Frequent Words in Game of Thrones"</span>, <span class="at">x =</span> <span class="st">"Frequency Count"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(top_words_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-3979720b67344b631404" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-3979720b67344b631404">{"x":{"data":[{"orientation":"v","width":[301,301],"base":[0.55000000000000004,1.55],"x":[150.5,150.5],"y":[0.89999999999999991,0.90000000000000013],"text":["n:  301<br />word: girl","n:  301<br />word: told"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,130,180,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":305,"base":2.5499999999999998,"x":[152.5],"y":[0.90000000000000036],"text":"n:  305<br />word: die","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,129,180,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":322,"base":3.5499999999999998,"x":[161],"y":[0.90000000000000036],"text":"n:  322<br />word: fight","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,127,179,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":346,"base":4.5499999999999998,"x":[173],"y":[0.90000000000000036],"text":"n:  346<br />word: boy","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(69,123,178,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":353,"base":5.5499999999999998,"x":[176.5],"y":[0.90000000000000036],"text":"n:  353<br />word: mother","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(69,122,177,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":355,"base":6.5499999999999998,"x":[177.5],"y":[0.90000000000000036],"text":"n:  355<br />word: kill","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(69,122,177,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":380,"base":7.5499999999999998,"x":[190],"y":[0.89999999999999947],"text":"n:  380<br />word: ser","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,118,176,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":381,"base":8.5500000000000007,"x":[190.5],"y":[0.89999999999999858],"text":"n:  381<br />word: dead","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,118,176,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":389,"base":9.5500000000000007,"x":[194.5],"y":[0.89999999999999858],"text":"n:  389<br />word: stark","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,117,176,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":398,"base":10.550000000000001,"x":[199],"y":[0.89999999999999858],"text":"n:  398<br />word: brother","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,116,175,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":418,"base":11.550000000000001,"x":[209],"y":[0.89999999999999858],"text":"n:  418<br />word: people","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(67,113,174,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":419,"base":12.550000000000001,"x":[209.5],"y":[0.89999999999999858],"text":"n:  419<br />word: north","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(67,113,174,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":446,"base":13.550000000000001,"x":[223],"y":[0.89999999999999858],"text":"n:  446<br />word: queen","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(66,109,173,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":493,"base":14.550000000000001,"x":[246.5],"y":[0.89999999999999858],"text":"n:  493<br />word: lady","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(65,102,171,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":523,"base":15.550000000000001,"x":[261.5],"y":[0.89999999999999858],"text":"n:  523<br />word: time","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(64,98,169,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":531,"base":16.550000000000001,"x":[265.5],"y":[0.89999999999999858],"text":"n:  531<br />word: grace","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(63,96,169,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":668,"base":17.550000000000001,"x":[334],"y":[0.89999999999999858],"text":"n:  668<br />word: father","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(57,76,162,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":812,"base":18.550000000000001,"x":[406],"y":[0.89999999999999858],"text":"n:  812<br />word: king","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(47,55,155,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":1112,"base":19.550000000000001,"x":[556],"y":[0.89999999999999858],"text":"n: 1112<br />word: lord","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,0,139,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":51.872146118721474},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Top 20 Most Frequent Words in Game of Thrones <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-55.600000000000001,1167.5999999999999],"tickmode":"array","ticktext":["0","300","600","900"],"tickvals":[0,299.99999999999994,600,900],"categoryorder":"array","categoryarray":["0","300","600","900"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Frequency Count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,20.600000000000001],"tickmode":"array","ticktext":["girl","told","die","fight","boy","mother","kill","ser","dead","stark","brother","people","north","queen","lady","time","grace","father","king","lord"],"tickvals":[1,2,3,4.0000000000000009,5,6.0000000000000009,7,8,9,10,11,12.000000000000002,13,14.000000000000002,15,16,17,18,19,20],"categoryorder":"array","categoryarray":["girl","told","die","fight","boy","mother","kill","ser","dead","stark","brother","people","north","queen","lady","time","grace","father","king","lord"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"60e434832331":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"60e434832331","visdat":{"60e434832331":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-2-word-frequency-trends-by-season" class="level2">
+<h2 class="anchored" data-anchor-id="plot-2-word-frequency-trends-by-season">Plot 2: Word Frequency Trends by Season</h2>
+<p>How do the most common themes shift as the series progresses?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>top_10_words <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(word)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>season_trends <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(word <span class="sc">%in%</span> top_10_words) <span class="sc">%&gt;%</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Season, word) <span class="sc">%&gt;%</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(Season, n, <span class="at">color =</span> word, <span class="at">group =</span> word)) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 10 Words: Frequency Trends Across Seasons"</span>, <span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Frequency"</span>, <span class="at">color =</span> <span class="st">"Word"</span>) <span class="sc">+</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>), <span class="at">legend.position =</span> <span class="st">"right"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(season_trends, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"color"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-cafdff46b92aab988507" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-cafdff46b92aab988507">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8],"y":[82,78,29,67,52,45,24,21],"text":["Season: Season 1<br />n:  82<br />word: brother","Season: Season 2<br />n:  78<br />word: brother","Season: Season 3<br />n:  29<br />word: brother","Season: Season 4<br />n:  67<br />word: brother","Season: Season 5<br />n:  52<br />word: brother","Season: Season 6<br />n:  45<br />word: brother","Season: Season 7<br />n:  24<br />word: brother","Season: Season 8<br />n:  21<br />word: brother"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"brother","legendgroup":"brother","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(248,118,109,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[111,113,102,90,81,75,77,19],"text":["Season: Season 1<br />n: 111<br />word: father","Season: Season 2<br />n: 113<br />word: father","Season: Season 3<br />n: 102<br />word: father","Season: Season 4<br />n:  90<br />word: father","Season: Season 5<br />n:  81<br />word: father","Season: Season 6<br />n:  75<br />word: father","Season: Season 7<br />n:  77<br />word: father","Season: Season 8<br />n:  19<br />word: father"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(216,144,0,1)","dash":"solid"},"hoveron":"points","name":"father","legendgroup":"father","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(216,144,0,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(216,144,0,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[59,115,72,83,93,28,46,35],"text":["Season: Season 1<br />n:  59<br />word: grace","Season: Season 2<br />n: 115<br />word: grace","Season: Season 3<br />n:  72<br />word: grace","Season: Season 4<br />n:  83<br />word: grace","Season: Season 5<br />n:  93<br />word: grace","Season: Season 6<br />n:  28<br />word: grace","Season: Season 7<br />n:  46<br />word: grace","Season: Season 8<br />n:  35<br />word: grace"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(163,165,0,1)","dash":"solid"},"hoveron":"points","name":"grace","legendgroup":"grace","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(163,165,0,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(163,165,0,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[159,173,100,107,93,73,71,36],"text":["Season: Season 1<br />n: 159<br />word: king","Season: Season 2<br />n: 173<br />word: king","Season: Season 3<br />n: 100<br />word: king","Season: Season 4<br />n: 107<br />word: king","Season: Season 5<br />n:  93<br />word: king","Season: Season 6<br />n:  73<br />word: king","Season: Season 7<br />n:  71<br />word: king","Season: Season 8<br />n:  36<br />word: king"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(57,182,0,1)","dash":"solid"},"hoveron":"points","name":"king","legendgroup":"king","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(57,182,0,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(57,182,0,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[84,76,79,77,58,57,42,20],"text":["Season: Season 1<br />n:  84<br />word: lady","Season: Season 2<br />n:  76<br />word: lady","Season: Season 3<br />n:  79<br />word: lady","Season: Season 4<br />n:  77<br />word: lady","Season: Season 5<br />n:  58<br />word: lady","Season: Season 6<br />n:  57<br />word: lady","Season: Season 7<br />n:  42<br />word: lady","Season: Season 8<br />n:  20<br />word: lady"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(0,191,125,1)","dash":"solid"},"hoveron":"points","name":"lady","legendgroup":"lady","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(0,191,125,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,191,125,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[239,205,177,154,118,121,65,33],"text":["Season: Season 1<br />n: 239<br />word: lord","Season: Season 2<br />n: 205<br />word: lord","Season: Season 3<br />n: 177<br />word: lord","Season: Season 4<br />n: 154<br />word: lord","Season: Season 5<br />n: 118<br />word: lord","Season: Season 6<br />n: 121<br />word: lord","Season: Season 7<br />n:  65<br />word: lord","Season: Season 8<br />n:  33<br />word: lord"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"lord","legendgroup":"lord","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,191,196,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[41,52,54,41,49,66,84,32],"text":["Season: Season 1<br />n:  41<br />word: north","Season: Season 2<br />n:  52<br />word: north","Season: Season 3<br />n:  54<br />word: north","Season: Season 4<br />n:  41<br />word: north","Season: Season 5<br />n:  49<br />word: north","Season: Season 6<br />n:  66<br />word: north","Season: Season 7<br />n:  84<br />word: north","Season: Season 8<br />n:  32<br />word: north"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(0,176,246,1)","dash":"solid"},"hoveron":"points","name":"north","legendgroup":"north","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(0,176,246,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,176,246,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[27,64,52,45,78,60,61,31],"text":["Season: Season 1<br />n:  27<br />word: people","Season: Season 2<br />n:  64<br />word: people","Season: Season 3<br />n:  52<br />word: people","Season: Season 4<br />n:  45<br />word: people","Season: Season 5<br />n:  78<br />word: people","Season: Season 6<br />n:  60<br />word: people","Season: Season 7<br />n:  61<br />word: people","Season: Season 8<br />n:  31<br />word: people"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(149,144,255,1)","dash":"solid"},"hoveron":"points","name":"people","legendgroup":"people","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(149,144,255,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(149,144,255,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[35,48,22,49,90,68,72,62],"text":["Season: Season 1<br />n:  35<br />word: queen","Season: Season 2<br />n:  48<br />word: queen","Season: Season 3<br />n:  22<br />word: queen","Season: Season 4<br />n:  49<br />word: queen","Season: Season 5<br />n:  90<br />word: queen","Season: Season 6<br />n:  68<br />word: queen","Season: Season 7<br />n:  72<br />word: queen","Season: Season 8<br />n:  62<br />word: queen"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(231,107,243,1)","dash":"solid"},"hoveron":"points","name":"queen","legendgroup":"queen","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(231,107,243,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(231,107,243,1)"}},"frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[72,88,76,77,65,77,38,30],"text":["Season: Season 1<br />n:  72<br />word: time","Season: Season 2<br />n:  88<br />word: time","Season: Season 3<br />n:  76<br />word: time","Season: Season 4<br />n:  77<br />word: time","Season: Season 5<br />n:  65<br />word: time","Season: Season 6<br />n:  77<br />word: time","Season: Season 7<br />n:  38<br />word: time","Season: Season 8<br />n:  30<br />word: time"],"type":"scatter","mode":"lines+markers","line":{"width":3.7795275590551185,"color":"rgba(255,98,188,1)","dash":"solid"},"hoveron":"points","name":"time","legendgroup":"time","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(255,98,188,1)","opacity":1,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(255,98,188,1)"}},"frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":43.105022831050235},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Top 10 Words: Frequency Trends Across Seasons <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Season","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[8,250],"tickmode":"array","ticktext":["50","100","150","200","250"],"tickvals":[50,100,150,200,250],"categoryorder":"array","categoryarray":["50","100","150","200","250"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Frequency","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Word","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"60e46d10b7e1":{"x":{},"y":{},"colour":{},"type":"scatter"},"60e464984cb7":{"x":{},"y":{},"colour":{}}},"cur_data":"60e46d10b7e1","visdat":{"60e46d10b7e1":["function (y) ","x"],"60e464984cb7":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-3-most-frequent-characters-speaking" class="level2">
+<h2 class="anchored" data-anchor-id="plot-3-most-frequent-characters-speaking">Plot 3: Most Frequent Characters Speaking</h2>
+<p>Who speaks the most in Game of Thrones?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>character_freq <span class="ot">&lt;-</span> got <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Name, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Name =</span> <span class="fu">reorder</span>(Name, n)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, Name, <span class="at">fill =</span> n)) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"coral"</span>, <span class="at">high =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 15 Characters by Number of Sentences Spoken"</span>, <span class="at">x =</span> <span class="st">"Number of Sentences"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(character_freq, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-f386862e38183fcee554" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-f386862e38183fcee554">{"x":{"data":[{"orientation":"v","width":[381,381],"base":[0.55000000000000004,1.55],"x":[190.5,190.5],"y":[0.89999999999999991,0.90000000000000013],"text":["n:  381<br />Name: jorah mormont","n:  381<br />Name: man"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(255,127,80,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":393,"base":2.5499999999999998,"x":[196.5],"y":[0.90000000000000036],"text":"n:  393<br />Name: bronn","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(254,126,79,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[399,399],"base":[3.5499999999999998,4.5499999999999998],"x":[199.5,199.5],"y":[0.90000000000000036,0.90000000000000036],"text":["n:  399<br />Name: bran stark","n:  399<br />Name: sam"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,126,79,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":449,"base":5.5499999999999998,"x":[224.5],"y":[0.90000000000000036],"text":"n:  449<br />Name: petyr baelish","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(249,122,76,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":455,"base":6.5499999999999998,"x":[227.5],"y":[0.90000000000000036],"text":"n:  455<br />Name: theon greyjoy","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(249,121,76,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":528,"base":7.5499999999999998,"x":[264],"y":[0.89999999999999947],"text":"n:  528<br />Name: davos","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(242,115,71,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":783,"base":8.5500000000000007,"x":[391.5],"y":[0.89999999999999858],"text":"n:  783<br />Name: arya stark","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(221,95,56,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":784,"base":9.5500000000000007,"x":[392],"y":[0.89999999999999858],"text":"n:  784<br />Name: sansa stark","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(221,95,56,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":945,"base":10.550000000000001,"x":[472.5],"y":[0.89999999999999858],"text":"n:  945<br />Name: jaime lannister","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(207,82,47,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":1005,"base":11.550000000000001,"x":[502.5],"y":[0.89999999999999858],"text":"n: 1005<br />Name: cersei lannister","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(202,77,43,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":1048,"base":12.550000000000001,"x":[524],"y":[0.89999999999999858],"text":"n: 1048<br />Name: daenerys targaryen","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(198,74,41,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":1133,"base":13.550000000000001,"x":[566.5],"y":[0.89999999999999858],"text":"n: 1133<br />Name: jon snow","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(191,67,36,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":1760,"base":14.550000000000001,"x":[880],"y":[0.89999999999999858],"text":"n: 1760<br />Name: tyrion lannister","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(139,0,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":116.16438356164386},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Top 15 Characters by Number of Sentences Spoken <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-88,1848],"tickmode":"array","ticktext":["0","500","1000","1500"],"tickvals":[0,500,1000,1500],"categoryorder":"array","categoryarray":["0","500","1000","1500"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Number of Sentences","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,15.6],"tickmode":"array","ticktext":["jorah mormont","man","bronn","bran stark","sam","petyr baelish","theon greyjoy","davos","arya stark","sansa stark","jaime lannister","cersei lannister","daenerys targaryen","jon snow","tyrion lannister"],"tickvals":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"categoryorder":"array","categoryarray":["jorah mormont","man","bronn","bran stark","sam","petyr baelish","theon greyjoy","davos","arya stark","sansa stark","jaime lannister","cersei lannister","daenerys targaryen","jon snow","tyrion lannister"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"60e474ccc134":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"60e474ccc134","visdat":{"60e474ccc134":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-4-top-words-used-by-top-characters" class="level2">
+<h2 class="anchored" data-anchor-id="plot-4-top-words-used-by-top-characters">Plot 4: Top Words Used by Top Characters</h2>
+<p>What words are most commonly spoken by the major characters?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>top_characters <span class="ot">&lt;-</span> got <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Name, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(Name)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>character_words <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Name <span class="sc">%in%</span> top_characters) <span class="sc">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Name, word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Name) <span class="sc">%&gt;%</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">8</span>, n) <span class="sc">%&gt;%</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">word =</span> <span class="fu">reorder_within</span>(word, n, Name)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, word, <span class="at">fill =</span> Name)) <span class="sc">+</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Name, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reordered</span>() <span class="sc">+</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Most Common Words by Top 5 Characters"</span>, <span class="at">x =</span> <span class="st">"Frequency"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>), <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>))</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(character_words, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-105ee0377a49e9336668" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-105ee0377a49e9336668">{"x":{"data":[{"orientation":"v","width":[54,40,37,36,34,32,30,29],"base":[7.5499999999999998,6.5499999999999998,5.5499999999999998,4.5499999999999998,3.5499999999999998,2.5499999999999998,1.55,0.55000000000000004],"x":[27,20,18.5,18,17,16,15,14.5],"y":[0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.89999999999999991],"text":["n: 54<br />word: father___cersei lannister","n: 40<br />word: king___cersei lannister","n: 37<br />word: son___cersei lannister","n: 36<br />word: brother___cersei lannister","n: 34<br />word: love___cersei lannister","n: 32<br />word: queen___cersei lannister","n: 30<br />word: ser___cersei lannister","n: 29<br />word: jaime___cersei lannister"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"cersei lannister","legendgroup":"cersei lannister","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[40,32,30,28,26,24,23,22,22],"base":[8.5500000000000007,7.5499999999999998,6.5499999999999998,5.5499999999999998,4.5499999999999998,3.5499999999999998,2.5499999999999998,0.55000000000000004,1.55],"x":[20,16,15,14,13,12,11.5,11,11],"y":[0.89999999999999858,0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999991,0.90000000000000013],"text":["n: 40<br />word: people___daenerys targaryen","n: 32<br />word: dragons___daenerys targaryen","n: 30<br />word: queen___daenerys targaryen","n: 28<br />word: ser___daenerys targaryen","n: 26<br />word: jon___daenerys targaryen","n: 24<br />word: brother___daenerys targaryen","n: 23<br />word: jorah___daenerys targaryen","n: 22<br />word: kill___daenerys targaryen","n: 22<br />word: world___daenerys targaryen"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(163,165,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"daenerys targaryen","legendgroup":"daenerys targaryen","showlegend":true,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null},{"orientation":"v","width":[32,30,30,29,24,23,23,20],"base":[7.5499999999999998,5.5499999999999998,6.5499999999999998,4.5499999999999998,3.5499999999999998,1.55,2.5499999999999998,0.55000000000000004],"x":[16,15,15,14.5,12,11.5,11.5,10],"y":[0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.90000000000000036,0.89999999999999991],"text":["n: 32<br />word: stark___jaime lannister","n: 30<br />word: father___jaime lannister","n: 30<br />word: king___jaime lannister","n: 29<br />word: lord___jaime lannister","n: 24<br />word: cersei___jaime lannister","n: 23<br />word: dead___jaime lannister","n: 23<br />word: kill___jaime lannister","n: 20<br />word: war___jaime lannister"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,191,125,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"jaime lannister","legendgroup":"jaime lannister","showlegend":true,"xaxis":"x3","yaxis":"y3","hoverinfo":"text","frame":null},{"orientation":"v","width":[44,43,40,39,36,36,34,32],"base":[7.5499999999999998,6.5499999999999998,5.5499999999999998,4.5499999999999998,2.5499999999999998,3.5499999999999998,1.55,0.55000000000000004],"x":[22,21.5,20,19.5,18,18,17,16],"y":[0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.89999999999999991],"text":["n: 44<br />word: wall___jon snow","n: 43<br />word: watch___jon snow","n: 40<br />word: lord___jon snow","n: 39<br />word: north___jon snow","n: 36<br />word: father___jon snow","n: 36<br />word: king___jon snow","n: 34<br />word: army___jon snow","n: 32<br />word: night's___jon snow"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,176,246,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"jon snow","legendgroup":"jon snow","showlegend":true,"xaxis":"x4","yaxis":"y4","hoverinfo":"text","frame":null},{"orientation":"v","width":[83,57,55,53,51,42,41,39],"base":[7.5499999999999998,6.5499999999999998,5.5499999999999998,4.5499999999999998,3.5499999999999998,2.5499999999999998,1.55,0.55000000000000004],"x":[41.5,28.5,27.5,26.5,25.5,21,20.5,19.5],"y":[0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.89999999999999991],"text":["n: 83<br />word: father___tyrion lannister","n: 57<br />word: time___tyrion lannister","n: 55<br />word: king___tyrion lannister","n: 53<br />word: people___tyrion lannister","n: 51<br />word: queen___tyrion lannister","n: 42<br />word: lady___tyrion lannister","n: 41<br />word: city___tyrion lannister","n: 39<br />word: lord___tyrion lannister"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(231,107,243,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"tyrion lannister","legendgroup":"tyrion lannister","showlegend":true,"xaxis":"x5","yaxis":"y5","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":50.935657949356582,"r":7.3059360730593621,"b":37.260273972602747,"l":51.872146118721474},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Most Common Words by Top 5 Characters <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,0.26157860404435745],"automargin":true,"type":"linear","autorange":false,"range":[-2.7000000000000002,56.700000000000003],"tickmode":"array","ticktext":["0","20","40"],"tickvals":[0,20,40],"categoryorder":"array","categoryarray":["0","20","40"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"annotations":[{"text":"Frequency","x":0.5,"y":0,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"top","annotationType":"axis","yshift":-21.917808219178081},{"text":"cersei lannister","x":0.13078930202217873,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"daenerys targaryen","x":0.5,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"jaime lannister","x":0.86921069797782124,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"jon snow","x":0.13078930202217873,"y":0.4360730593607306,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"tyrion lannister","x":0.5,"y":0.4360730593607306,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"yaxis":{"domain":[0.5639269406392694,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["jaime","ser","queen","love","brother","son","king","father"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["jaime","ser","queen","love","brother","son","king","father"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.26157860404435745,"y0":0,"y1":23.37899543378996,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.40508806262230918,"x1":0.59491193737769077,"y0":0,"y1":23.37899543378996,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.73842139595564249,"x1":1,"y0":0,"y1":23.37899543378996,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.26157860404435745,"y0":0,"y1":23.37899543378996,"yanchor":0.4360730593607306,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.40508806262230918,"x1":0.59491193737769077,"y0":0,"y1":23.37899543378996,"yanchor":0.4360730593607306,"ysizemode":"pixel"}],"xaxis2":{"type":"linear","autorange":false,"range":[-2,42],"tickmode":"array","ticktext":["0","10","20","30","40"],"tickvals":[0,10,20,30,40],"categoryorder":"array","categoryarray":["0","10","20","30","40"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.40508806262230918,0.59491193737769077],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y2","title":"","hoverformat":".2f"},"yaxis2":{"type":"linear","autorange":false,"range":[0.40000000000000002,9.5999999999999996],"tickmode":"array","ticktext":["kill","world","jorah","brother","jon","ser","queen","dragons","people"],"tickvals":[1,2,3,4,5,6,6.9999999999999991,8,9],"categoryorder":"array","categoryarray":["kill","world","jorah","brother","jon","ser","queen","dragons","people"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.5639269406392694,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x2","title":"","hoverformat":".2f"},"xaxis3":{"type":"linear","autorange":false,"range":[-1.6000000000000001,33.600000000000001],"tickmode":"array","ticktext":["0","10","20","30"],"tickvals":[0,10,20,30],"categoryorder":"array","categoryarray":["0","10","20","30"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.73842139595564249,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y3","title":"","hoverformat":".2f"},"yaxis3":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["war","dead","kill","cersei","lord","father","king","stark"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["war","dead","kill","cersei","lord","father","king","stark"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.5639269406392694,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x3","title":"","hoverformat":".2f"},"xaxis4":{"type":"linear","autorange":false,"range":[-2.2000000000000002,46.200000000000003],"tickmode":"array","ticktext":["0","10","20","30","40"],"tickvals":[0,10,20,30.000000000000004,40],"categoryorder":"array","categoryarray":["0","10","20","30","40"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.26157860404435745],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y4","title":"","hoverformat":".2f"},"yaxis4":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["night's","army","father","king","north","lord","watch","wall"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["night's","army","father","king","north","lord","watch","wall"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.4360730593607306],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x4","title":"","hoverformat":".2f"},"xaxis5":{"type":"linear","autorange":false,"range":[-4.1500000000000004,87.150000000000006],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60.000000000000007,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.40508806262230918,0.59491193737769077],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y5","title":"","hoverformat":".2f"},"yaxis5":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["lord","city","lady","queen","people","king","time","father"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["lord","city","lady","queen","people","king","time","father"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.4360730593607306],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x5","title":"","hoverformat":".2f"},"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Name","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"60e437446ce1":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"60e437446ce1","visdat":{"60e437446ce1":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-5-vocabulary-number-by-season" class="level2">
+<h2 class="anchored" data-anchor-id="plot-5-vocabulary-number-by-season">Plot 5: Vocabulary Number by Season</h2>
+<p>How diverse is the vocabulary in each season? A larger vocabulary might indicate more varied dialogue.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>vocab_diversity <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Season) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">unique_words =</span> <span class="fu">n_distinct</span>(word), <span class="at">total_words =</span> <span class="fu">n</span>(), <span class="at">avg_word_length =</span> <span class="fu">mean</span>(<span class="fu">nchar</span>(word))) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Season, <span class="at">y =</span> unique_words, <span class="at">fill =</span> Season)) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>() <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Vocabulary Diversity by Season"</span>, <span class="at">subtitle =</span> <span class="st">"Number of Unique Words Used"</span>, <span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Number of Unique Words"</span>) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>), <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(vocab_diversity, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-caa74781054571eca944" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-caa74781054571eca944">{"x":{"data":[{"orientation":"v","width":0.89999999999999991,"base":0,"x":[1],"y":[3117],"text":"Season: Season 1<br />unique_words: 3117","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 1","legendgroup":"Season 1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000013,"base":0,"x":[2],"y":[3604],"text":"Season: Season 2<br />unique_words: 3604","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,51,126,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 2","legendgroup":"Season 2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[3],"y":[3477],"text":"Season: Season 3<br />unique_words: 3477","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(54,92,141,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 3","legendgroup":"Season 3","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[4],"y":[3588],"text":"Season: Season 4<br />unique_words: 3588","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(39,127,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 4","legendgroup":"Season 4","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[5],"y":[3280],"text":"Season: Season 5<br />unique_words: 3280","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(31,161,135,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 5","legendgroup":"Season 5","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[6],"y":[3048],"text":"Season: Season 6<br />unique_words: 3048","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(74,193,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 6","legendgroup":"Season 6","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[7],"y":[2962],"text":"Season: Season 7<br />unique_words: 2962","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(159,218,58,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 7","legendgroup":"Season 7","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.89999999999999947,"base":0,"x":[8],"y":[1429],"text":"Season: Season 8<br />unique_words: 1429","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 8","legendgroup":"Season 8","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1],"y":[3117],"text":"Season: Season 1<br />unique_words: 3117","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 1","legendgroup":"Season 1","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2],"y":[3604],"text":"Season: Season 2<br />unique_words: 3604","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 2","legendgroup":"Season 2","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[3],"y":[3477],"text":"Season: Season 3<br />unique_words: 3477","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 3","legendgroup":"Season 3","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[4],"y":[3588],"text":"Season: Season 4<br />unique_words: 3588","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 4","legendgroup":"Season 4","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[5],"y":[3280],"text":"Season: Season 5<br />unique_words: 3280","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 5","legendgroup":"Season 5","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[6],"y":[3048],"text":"Season: Season 6<br />unique_words: 3048","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 6","legendgroup":"Season 6","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[7],"y":[2962],"text":"Season: Season 7<br />unique_words: 2962","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 7","legendgroup":"Season 7","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[8],"y":[1429],"text":"Season: Season 8<br />unique_words: 1429","type":"scatter","mode":"lines","line":{"width":3.0236220472440949,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","name":"Season 8","legendgroup":"Season 8","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":38.854296388542977,"l":48.949771689497723},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Vocabulary Diversity by Season <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":13.283520132835205},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Season","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-180.20000000000002,3784.1999999999998],"tickmode":"array","ticktext":["0","1000","2000","3000"],"tickvals":[0,1000,1999.9999999999998,3000],"categoryorder":"array","categoryarray":["0","1000","2000","3000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Number of Unique Words","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"60e4278c9745":{"x":{},"y":{},"fill":{},"type":"bar"},"60e47f1f474b":{"x":{},"y":{},"fill":{}}},"cur_data":"60e4278c9745","visdat":{"60e4278c9745":["function (y) ","x"],"60e47f1f474b":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-6-words-distinctive-to-seasons-tf-idf-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="plot-6-words-distinctive-to-seasons-tf-idf-analysis">Plot 6: Words Distinctive to Seasons (TF-IDF Analysis)</h2>
+<p>TF-IDF (Term Frequency-Inverse Document Frequency) identifies words that are uniquely important to each season. High TF-IDF scores indicate words that appear frequently in one season but rarely in others.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tfidf_data <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Season, word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(word, Season, n) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Season) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">8</span>, tf_idf) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">word =</span> <span class="fu">reorder_within</span>(word, tf_idf, Season))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>tfidf_plot <span class="ot">&lt;-</span> tfidf_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(tf_idf, word, <span class="at">fill =</span> Season)) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Season, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reordered</span>() <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>() <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Most Distinctive Words by Season (TF-IDF Analysis)"</span>, <span class="at">x =</span> <span class="st">"TF-IDF Score"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>), <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(tfidf_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"fill"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-c77cab235ffeff3c5ded" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-c77cab235ffeff3c5ded">{"x":{"data":[{"orientation":"v","width":[0.0061345628758255437,0.0033301912754481523,0.0031549180504245652,0.0031549180504245652,0.0026290983753538047,0.0019280054752594566,0.0017527322502358695,0.0017527322502358695,0.0017527322502358695],"base":[8.5500000000000007,7.5499999999999998,5.5499999999999998,6.5499999999999998,4.5499999999999998,3.5499999999999998,0.55000000000000004,1.55,2.5499999999999998],"x":[0.0030672814379127718,0.0016650956377240761,0.0015774590252122826,0.0015774590252122826,0.0013145491876769024,0.00096400273762972828,0.00087636612511793474,0.00087636612511793474,0.00087636612511793474],"y":[0.89999999999999858,0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999991,0.90000000000000013,0.90000000000000036],"text":["tf_idf: 0.0061345629<br />word: l'm___Season 1<br />Season: Season 1","tf_idf: 0.0033301913<br />word: l'll___Season 1<br />Season: Season 1","tf_idf: 0.0031549181<br />word: lf___Season 1<br />Season: Season 1","tf_idf: 0.0031549181<br />word: lt___Season 1<br />Season: Season 1","tf_idf: 0.0026290984<br />word: lt's___Season 1<br />Season: Season 1","tf_idf: 0.0019280055<br />word: ls___Season 1<br />Season: Season 1","tf_idf: 0.0017527323<br />word: hugh___Season 1<br />Season: Season 1","tf_idf: 0.0017527323<br />word: l've___Season 1<br />Season: Season 1","tf_idf: 0.0017527323<br />word: mord___Season 1<br />Season: Season 1"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 1","legendgroup":"Season 1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.00085240613562982193,0.00077360176401779603,0.00077360176401779603,0.001160402646026694,0.0008703019845200205,0.0007252516537666838,0.0007252516537666838,0.0007252516537666838,0.0007252516537666838,0.0007252516537666838,0.0007252516537666838],"base":[8.5500000000000007,6.5499999999999998,7.5499999999999998,10.550000000000001,9.5500000000000007,0.55000000000000004,1.55,2.5499999999999998,3.5499999999999998,4.5499999999999998,5.5499999999999998],"x":[0.00042620306781491097,0.00038680088200889802,0.00038680088200889802,0.000580201323013347,0.00043515099226001025,0.0003626258268833419,0.0003626258268833419,0.0003626258268833419,0.0003626258268833419,0.0003626258268833419,0.0003626258268833419],"y":[0.89999999999999858,0.90000000000000036,0.89999999999999947,0.89999999999999858,0.89999999999999858,0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036],"text":["tf_idf: 0.0008524061<br />word: qarth___Season 2<br />Season: Season 2","tf_idf: 0.0007736018<br />word: llyn___Season 2<br />Season: Season 2","tf_idf: 0.0007736018<br />word: willem___Season 2<br />Season: Season 2","tf_idf: 0.0011604026<br />word: xaro___Season 2<br />Season: Season 2","tf_idf: 0.0008703020<br />word: torrhen's___Season 2<br />Season: Season 2","tf_idf: 0.0007252517<br />word: crag___Season 2<br />Season: Season 2","tf_idf: 0.0007252517<br />word: daxos___Season 2<br />Season: Season 2","tf_idf: 0.0007252517<br />word: nock___Season 2<br />Season: Season 2","tf_idf: 0.0007252517<br />word: scent___Season 2<br />Season: Season 2","tf_idf: 0.0007252517<br />word: talisa___Season 2<br />Season: Season 2","tf_idf: 0.0007252517<br />word: xhoan___Season 2<br />Season: Season 2"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,51,126,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 2","legendgroup":"Season 2","showlegend":true,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.00076331790512382865,0.00069436508118504963,0.00076331790512382865,0.00065427249010613885,0.00081784061263267356,0.00081784061263267356,0.00081784061263267356,0.00065427249010613885,0.00065427249010613885,0.00065427249010613885,0.00065427249010613885,0.00065427249010613885],"base":[8.5500000000000007,6.5499999999999998,7.5499999999999998,2.5499999999999998,9.5500000000000007,10.550000000000001,11.550000000000001,0.55000000000000004,1.55,3.5499999999999998,4.5499999999999998,5.5499999999999998],"x":[0.00038165895256191433,0.00034718254059252482,0.00038165895256191433,0.00032713624505306942,0.00040892030631633678,0.00040892030631633678,0.00040892030631633678,0.00032713624505306942,0.00032713624505306942,0.00032713624505306942,0.00032713624505306942,0.00032713624505306942],"y":[0.89999999999999858,0.90000000000000036,0.89999999999999947,0.90000000000000036,0.89999999999999858,0.89999999999999858,0.89999999999999858,0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"text":["tf_idf: 0.0007633179<br />word: mhysa___Season 3<br />Season: Season 3","tf_idf: 0.0006943651<br />word: kraznys___Season 3<br />Season: Season 3","tf_idf: 0.0007633179<br />word: aim___Season 3<br />Season: Season 3","tf_idf: 0.0006542725<br />word: edmure___Season 3<br />Season: Season 3","tf_idf: 0.0008178406<br />word: martyn___Season 3<br />Season: Season 3","tf_idf: 0.0008178406<br />word: mill___Season 3<br />Season: Season 3","tf_idf: 0.0008178406<br />word: sapphires___Season 3<br />Season: Season 3","tf_idf: 0.0006542725<br />word: crakehall___Season 3<br />Season: Season 3","tf_idf: 0.0006542725<br />word: desmond___Season 3<br />Season: Season 3","tf_idf: 0.0006542725<br />word: reyne___Season 3<br />Season: Season 3","tf_idf: 0.0006542725<br />word: wa___Season 3<br />Season: Season 3","tf_idf: 0.0006542725<br />word: yunkish___Season 3<br />Season: Season 3"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(54,92,141,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 3","legendgroup":"Season 3","showlegend":true,"xaxis":"x3","yaxis":"y3","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.0020393030826518256,0.00094102066536186097,0.0011209064216663215,0.0020816833545231682,0.0009063569256230335,0.0017614243769042196,0.0011209064216663215,0.00096077693285684688],"base":[6.5499999999999998,1.55,4.5499999999999998,7.5499999999999998,0.55000000000000004,5.5499999999999998,3.5499999999999998,2.5499999999999998],"x":[0.0010196515413259128,0.00047051033268093049,0.00056045321083316075,0.0010408416772615841,0.00045317846281151675,0.00088071218845210979,0.00056045321083316075,0.00048038846642842344],"y":[0.90000000000000036,0.90000000000000013,0.90000000000000036,0.89999999999999947,0.89999999999999991,0.90000000000000036,0.90000000000000036,0.90000000000000036],"text":["tf_idf: 0.0020393031<br />word: reek___Season 4<br />Season: Season 4","tf_idf: 0.0009410207<br />word: trial___Season 4<br />Season: Season 4","tf_idf: 0.0011209064<br />word: oberyn___Season 4<br />Season: Season 4","tf_idf: 0.0020816834<br />word: khuu___Season 4<br />Season: Season 4","tf_idf: 0.0009063569<br />word: craster's___Season 4<br />Season: Season 4","tf_idf: 0.0017614244<br />word: tansy___Season 4<br />Season: Season 4","tf_idf: 0.0011209064<br />word: beetles___Season 4<br />Season: Season 4","tf_idf: 0.0009607769<br />word: orson___Season 4<br />Season: Season 4"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(39,127,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 4","legendgroup":"Season 4","showlegend":true,"xaxis":"x4","yaxis":"y4","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.0017937311080071627,0.0016901611996584926,0.0023541530995243288,0.0011104049716234817,0.0013279837997316726,0.0012072579997560659,0.0016297982996706891,0.0014487095997072791],"base":[6.5499999999999998,5.5499999999999998,7.5499999999999998,0.55000000000000004,2.5499999999999998,1.55,4.5499999999999998,3.5499999999999998],"x":[0.00089686555400358135,0.00084508059982924628,0.0011770765497621644,0.00055520248581174085,0.00066399189986583631,0.00060362899987803295,0.00081489914983534455,0.00072435479985363956],"y":[0.90000000000000036,0.90000000000000036,0.89999999999999947,0.89999999999999991,0.90000000000000036,0.90000000000000013,0.90000000000000036,0.90000000000000036],"text":["tf_idf: 0.0017937311<br />word: reek___Season 5<br />Season: Season 5","tf_idf: 0.0016901612<br />word: sinner___Season 5<br />Season: Season 5","tf_idf: 0.0023541531<br />word: oysters___Season 5<br />Season: Season 5","tf_idf: 0.0011104050<br />word: sparrow___Season 5<br />Season: Season 5","tf_idf: 0.0013279838<br />word: trystane___Season 5<br />Season: Season 5","tf_idf: 0.0012072580<br />word: harpy___Season 5<br />Season: Season 5","tf_idf: 0.0016297983<br />word: clams___Season 5<br />Season: Season 5","tf_idf: 0.0014487096<br />word: episode___Season 5<br />Season: Season 5"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(31,161,135,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 5","legendgroup":"Season 5","showlegend":true,"xaxis":"x5","yaxis":"y5","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.0011997539993509525,0.0026540415337330389,0.0015201109764973421,0.0020853183479331017,0.0020853183479331017,0.0011374463715998738,0.0013270207668665194,0.0011374463715998738],"base":[2.5499999999999998,7.5499999999999998,4.5499999999999998,5.5499999999999998,6.5499999999999998,1.55,3.5499999999999998,0.55000000000000004],"x":[0.00059987699967547624,0.0013270207668665194,0.00076005548824867103,0.0010426591739665508,0.0010426591739665508,0.00056872318579993689,0.00066351038343325972,0.00056872318579993689],"y":[0.90000000000000036,0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.90000000000000036,0.89999999999999991],"text":["tf_idf: 0.0011997540<br />word: ramsay___Season 6<br />Season: Season 6","tf_idf: 0.0026540415<br />word: blackfish___Season 6<br />Season: Season 6","tf_idf: 0.0015201110<br />word: sparrow___Season 6<br />Season: Season 6","tf_idf: 0.0020853183<br />word: dosh___Season 6<br />Season: Season 6","tf_idf: 0.0020853183<br />word: khaleen___Season 6<br />Season: Season 6","tf_idf: 0.0011374464<br />word: edmure___Season 6<br />Season: Season 6","tf_idf: 0.0013270208<br />word: crane___Season 6<br />Season: Season 6","tf_idf: 0.0011374464<br />word: actress___Season 6<br />Season: Season 6"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(74,193,109,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 6","legendgroup":"Season 6","showlegend":true,"xaxis":"x6","yaxis":"y6","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.003314572159448722,0.0012715840910146722,0.0034131994021972781,0.0015152329871765589,0.0032124229667739087,0.0013258288637794889,0.0017400624403358671,0.0014054350479635852],"base":[6.5499999999999998,0.55000000000000004,7.5499999999999998,3.5499999999999998,5.5499999999999998,1.55,4.5499999999999998,2.5499999999999998],"x":[0.001657286079724361,0.00063579204550733611,0.001706599701098639,0.00075761649358827943,0.0016062114833869543,0.00066291443188974447,0.00087003122016793353,0.00070271752398179258],"y":[0.90000000000000036,0.89999999999999991,0.89999999999999947,0.90000000000000036,0.90000000000000036,0.90000000000000013,0.90000000000000036,0.90000000000000036],"text":["tf_idf: 0.0033145722<br />word: walks___Season 7<br />Season: Season 7","tf_idf: 0.0012715841<br />word: drogon___Season 7<br />Season: Season 7","tf_idf: 0.0034131994<br />word: tarley___Season 7<br />Season: Season 7","tf_idf: 0.0015152330<br />word: nods___Season 7<br />Season: Season 7","tf_idf: 0.0032124230<br />word: pauses___Season 7<br />Season: Season 7","tf_idf: 0.0013258289<br />word: euron___Season 7<br />Season: Season 7","tf_idf: 0.0017400624<br />word: dickon___Season 7<br />Season: Season 7","tf_idf: 0.0014054350<br />word: momma___Season 7<br />Season: Season 7"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(159,218,58,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 7","legendgroup":"Season 7","showlegend":true,"xaxis":"x7","yaxis":"y7","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.0014510016853482963,0.0019615690728478001,0.0015140147975483296,0.0017832446116798179,0.0014265956893438547,0.0021398935340157816,0.0014265956893438547,0.0021398935340157816,0.0016049201505118362],"base":[2.5499999999999998,6.5499999999999998,3.5499999999999998,5.5499999999999998,0.55000000000000004,7.5499999999999998,1.55,8.5500000000000007,4.5499999999999998],"x":[0.00072550084267414814,0.00098078453642390004,0.00075700739877416481,0.00089162230583990896,0.00071329784467192734,0.0010699467670078908,0.00071329784467192734,0.0010699467670078908,0.0008024600752559181],"y":[0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999991,0.89999999999999947,0.90000000000000013,0.89999999999999858,0.90000000000000036],"text":["tf_idf: 0.0014510017<br />word: bells___Season 8<br />Season: Season 8","tf_idf: 0.0019615691<br />word: crypt___Season 8<br />Season: Season 8","tf_idf: 0.0015140148<br />word: mama___Season 8<br />Season: Season 8","tf_idf: 0.0017832446<br />word: trench___Season 8<br />Season: Season 8","tf_idf: 0.0014265957<br />word: dany___Season 8<br />Season: Season 8","tf_idf: 0.0021398935<br />word: elephants___Season 8<br />Season: Season 8","tf_idf: 0.0014265957<br />word: retreat___Season 8<br />Season: Season 8","tf_idf: 0.0021398935<br />word: tyrant___Season 8<br />Season: Season 8","tf_idf: 0.0016049202<br />word: william___Season 8<br />Season: Season 8"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"Season 8","legendgroup":"Season 8","showlegend":true,"xaxis":"x8","yaxis":"y8","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":50.935657949356582,"r":7.3059360730593621,"b":37.260273972602747,"l":34.337899543379002},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Most Distinctive Words by Season (TF-IDF Analysis) <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,0.24418351815612088],"automargin":true,"type":"linear","autorange":false,"range":[-0.00030672814379127721,0.0064412910196168212],"tickmode":"array","ticktext":["0.000","0.002","0.004","0.006"],"tickvals":[0,0.002,0.0040000000000000001,0.0060000000000000001],"categoryorder":"array","categoryarray":["0.000","0.002","0.004","0.006"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"annotations":[{"text":"TF-IDF Score","x":0.5,"y":0,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"top","annotationType":"axis","yshift":-21.917808219178081},{"text":"Season 1","x":0.12209175907806044,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 2","x":0.5,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 3","x":0.87790824092193953,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 4","x":0.12209175907806044,"y":0.60273972602739734,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 5","x":0.5,"y":0.60273972602739734,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 6","x":0.87790824092193953,"y":0.60273972602739734,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 7","x":0.12209175907806044,"y":0.26940639269406397,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Season 8","x":0.5,"y":0.26940639269406397,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.68949771689498},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"yaxis":{"domain":[0.73059360730593614,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,9.5999999999999996],"tickmode":"array","ticktext":["hugh","l've","mord","ls","lt's","lf","lt","l'll","l'm"],"tickvals":[1,2,3,4,5,6,6.9999999999999991,8,9],"categoryorder":"array","categoryarray":["hugh","l've","mord","ls","lt's","lf","lt","l'll","l'm"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.24418351815612088,"y0":0,"y1":23.37899543378996,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.42248314851054575,"x1":0.5775168514894542,"y0":0,"y1":23.37899543378996,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.75581648184387906,"x1":1,"y0":0,"y1":23.37899543378996,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.24418351815612088,"y0":0,"y1":23.37899543378996,"yanchor":0.60273972602739734,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.42248314851054575,"x1":0.5775168514894542,"y0":0,"y1":23.37899543378996,"yanchor":0.60273972602739734,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.75581648184387906,"x1":1,"y0":0,"y1":23.37899543378996,"yanchor":0.60273972602739734,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.24418351815612088,"y0":0,"y1":23.37899543378996,"yanchor":0.26940639269406397,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.42248314851054575,"x1":0.5775168514894542,"y0":0,"y1":23.37899543378996,"yanchor":0.26940639269406397,"ysizemode":"pixel"}],"xaxis2":{"type":"linear","autorange":false,"range":[-5.80201323013347e-05,0.0012184227783280286],"tickmode":"array","ticktext":["0.0000","0.0003","0.0006","0.0009","0.0012"],"tickvals":[0,0.00030000000000000003,0.00060000000000000016,0.00090000000000000008,0.0012000000000000001],"categoryorder":"array","categoryarray":["0.0000","0.0003","0.0006","0.0009","0.0012"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.42248314851054575,0.5775168514894542],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y2","title":"","hoverformat":".2f"},"yaxis2":{"type":"linear","autorange":false,"range":[0.40000000000000002,11.6],"tickmode":"array","ticktext":["crag","daxos","nock","scent","talisa","xhoan","llyn","willem","qarth","torrhen's","xaro"],"tickvals":[1,2,3,4,5,6,7,8,9,10,11],"categoryorder":"array","categoryarray":["crag","daxos","nock","scent","talisa","xhoan","llyn","willem","qarth","torrhen's","xaro"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.73059360730593614,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x2","title":"","hoverformat":".2f"},"xaxis3":{"type":"linear","autorange":false,"range":[-4.0892030631633678e-05,0.00085873264326430724],"tickmode":"array","ticktext":["0e+00","2e-04","4e-04","6e-04","8e-04"],"tickvals":[0,0.00020000000000000004,0.00040000000000000002,0.00060000000000000006,0.00080000000000000004],"categoryorder":"array","categoryarray":["0e+00","2e-04","4e-04","6e-04","8e-04"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.75581648184387906,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y3","title":"","hoverformat":".2f"},"yaxis3":{"type":"linear","autorange":false,"range":[0.40000000000000002,12.6],"tickmode":"array","ticktext":["crakehall","desmond","edmure","reyne","wa","yunkish","kraznys","aim","mhysa","martyn","mill","sapphires"],"tickvals":[1,2,3,4.0000000000000009,5,6,7.0000000000000009,8,9,10,11,12],"categoryorder":"array","categoryarray":["crakehall","desmond","edmure","reyne","wa","yunkish","kraznys","aim","mhysa","martyn","mill","sapphires"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.73059360730593614,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x3","title":"","hoverformat":".2f"},"xaxis4":{"type":"linear","autorange":false,"range":[-0.00010408416772615842,0.0021857675222493266],"tickmode":"array","ticktext":["0.0000","0.0005","0.0010","0.0015","0.0020"],"tickvals":[0,0.00050000000000000001,0.001,0.0015000000000000002,0.002],"categoryorder":"array","categoryarray":["0.0000","0.0005","0.0010","0.0015","0.0020"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.24418351815612088],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y4","title":"","hoverformat":".2f"},"yaxis4":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["craster's","trial","orson","beetles","oberyn","tansy","reek","khuu"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["craster's","trial","orson","beetles","oberyn","tansy","reek","khuu"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.39726027397260277,0.60273972602739734],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x4","title":"","hoverformat":".2f"},"xaxis5":{"type":"linear","autorange":false,"range":[-0.00011770765497621644,0.0024718607545005451],"tickmode":"array","ticktext":["0.0000","0.0005","0.0010","0.0015","0.0020"],"tickvals":[0,0.00050000000000000001,0.001,0.0015,0.002],"categoryorder":"array","categoryarray":["0.0000","0.0005","0.0010","0.0015","0.0020"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.42248314851054575,0.5775168514894542],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y5","title":"","hoverformat":".2f"},"yaxis5":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["sparrow","harpy","trystane","episode","clams","sinner","reek","oysters"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["sparrow","harpy","trystane","episode","clams","sinner","reek","oysters"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.39726027397260277,0.60273972602739734],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x5","title":"","hoverformat":".2f"},"xaxis6":{"type":"linear","autorange":false,"range":[-0.00013270207668665196,0.0027867436104196909],"tickmode":"array","ticktext":["0.000","0.001","0.002"],"tickvals":[0,0.001,0.002],"categoryorder":"array","categoryarray":["0.000","0.001","0.002"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.75581648184387906,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y6","title":"","hoverformat":".2f"},"yaxis6":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["actress","edmure","ramsay","crane","sparrow","dosh","khaleen","blackfish"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["actress","edmure","ramsay","crane","sparrow","dosh","khaleen","blackfish"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.39726027397260277,0.60273972602739734],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x6","title":"","hoverformat":".2f"},"xaxis7":{"type":"linear","autorange":false,"range":[-0.00017065997010986392,0.0035838593723071421],"tickmode":"array","ticktext":["0.000","0.001","0.002","0.003"],"tickvals":[0,0.001,0.002,0.0030000000000000001],"categoryorder":"array","categoryarray":["0.000","0.001","0.002","0.003"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.24418351815612088],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y7","title":"","hoverformat":".2f"},"yaxis7":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["drogon","euron","momma","nods","dickon","pauses","walks","tarley"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["drogon","euron","momma","nods","dickon","pauses","walks","tarley"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.26940639269406397],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x7","title":"","hoverformat":".2f"},"xaxis8":{"type":"linear","autorange":false,"range":[-0.00010699467670078909,0.0022468882107165708],"tickmode":"array","ticktext":["0.0000","0.0005","0.0010","0.0015","0.0020"],"tickvals":[0,0.00050000000000000001,0.001,0.0015,0.002],"categoryorder":"array","categoryarray":["0.0000","0.0005","0.0010","0.0015","0.0020"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.42248314851054575,0.5775168514894542],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y8","title":"","hoverformat":".2f"},"yaxis8":{"type":"linear","autorange":false,"range":[0.40000000000000002,9.5999999999999996],"tickmode":"array","ticktext":["dany","retreat","bells","mama","william","trench","crypt","elephants","tyrant"],"tickvals":[1,2,3,4,5,6,6.9999999999999991,8,9],"categoryorder":"array","categoryarray":["dany","retreat","bells","mama","william","trench","crypt","elephants","tyrant"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.26940639269406397],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x8","title":"","hoverformat":".2f"},"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Season","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"60e43eedcf2f":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"60e43eedcf2f","visdat":{"60e43eedcf2f":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<ul>
+<li>Words like “lord,” “king,” and “father” dominate the dialogue, which matches the show’s focus on power and relationships.</li>
+<li>A small group of characters dominates the dialogue, with Jon Snow, Daenerys, and Tyrion among the most frequently speaking characters.</li>
+<li>The series have a relatively consistent vocabulary richness across seasons but eventually dies down (with Season 8 having half the number of unique words)</li>
+<li>Certain seasons emphasize particular distinctive words shows how the movie plot focuses shift across time.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

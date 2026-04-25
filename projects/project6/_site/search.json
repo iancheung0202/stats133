@@ -1,0 +1,184 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Game of Thrones Text Analysis",
+    "section": "",
+    "text": "This project is a text mining analysis of the HBO series Game of Thrones:\n\nFrequency Analysis: Understanding the most common words and topics discussed throughout the series.\nSentiment Analysis: Tracking how the emotional tone shifts across episodes and seasons."
+  },
+  {
+    "objectID": "index.html#purpose-and-scope",
+    "href": "index.html#purpose-and-scope",
+    "title": "Game of Thrones Text Analysis",
+    "section": "",
+    "text": "This project is a text mining analysis of the HBO series Game of Thrones:\n\nFrequency Analysis: Understanding the most common words and topics discussed throughout the series.\nSentiment Analysis: Tracking how the emotional tone shifts across episodes and seasons."
+  },
+  {
+    "objectID": "index.html#the-dataset",
+    "href": "index.html#the-dataset",
+    "title": "Game of Thrones Text Analysis",
+    "section": "The Dataset",
+    "text": "The Dataset\nThe game-of-thrones.csv dataset contains the complete scripts from all seasons of the HBO television series.\nDataset Structure:\n\nDate: Original air date of each episode\nSeason: Season number (1-8)\nEpisode: Episode number within each season\nTitle: Episode title\nName: Character name\nSentence: The dialogue spoken in the episode"
+  },
+  {
+    "objectID": "index.html#analysis-methodology",
+    "href": "index.html#analysis-methodology",
+    "title": "Game of Thrones Text Analysis",
+    "section": "Analysis Methodology",
+    "text": "Analysis Methodology\nBoth analyses uses a “tidy text” approach, where raw dialogue is tokenized into individual words, processed to remove noise, and then aggregated for insights. Multiple sentiment lexicons are compared to provide a nuanced view of emotional content."
+  },
+  {
+    "objectID": "index.html#navigation",
+    "href": "index.html#navigation",
+    "title": "Game of Thrones Text Analysis",
+    "section": "Navigation",
+    "text": "Navigation\n\nFrequency Analysis: Explore the most frequent words, characters, and topics in Game of Thrones dialogue\nSentiment Analysis: Discover how emotional tone evolves across seasons and episodes"
+  },
+  {
+    "objectID": "sentiment.html",
+    "href": "sentiment.html",
+    "title": "Sentiment Analysis",
+    "section": "",
+    "text": "Sentiment analysis examines the emotional tone of text. Rather than just counting words, sentiment analysis assigns emotional values to words and aggregates them to understand the overall emotional trajectory.\nThis analysis uses these three approaches:\n\nDictionary Comparison: Comparing multiple sentiment lexicons to understand nuances\nSentiment Trajectory: Tracking how sentiment evolves across the series\nContribution Analysis: Identifying which words have the greatest impact on sentiment\n\n\n\nCode\nlibrary(tidyverse)\nlibrary(tidytext)\nlibrary(plotly)\n\ngot &lt;- read_csv(\"game-of-thrones.csv\")\nbing &lt;- read_csv(\"bing.csv\")\nnrc &lt;- read_csv(\"nrc.csv\")\n\ngot_tokens &lt;- got %&gt;%\n  unnest_tokens(word, Sentence)\n\ngot_tokens &lt;- got_tokens %&gt;%\n  group_by(Season, Episode) %&gt;%\n  mutate(episode_id = cur_group_id()) %&gt;%\n  ungroup()"
+  },
+  {
+    "objectID": "sentiment.html#introduction",
+    "href": "sentiment.html#introduction",
+    "title": "Sentiment Analysis",
+    "section": "",
+    "text": "Sentiment analysis examines the emotional tone of text. Rather than just counting words, sentiment analysis assigns emotional values to words and aggregates them to understand the overall emotional trajectory.\nThis analysis uses these three approaches:\n\nDictionary Comparison: Comparing multiple sentiment lexicons to understand nuances\nSentiment Trajectory: Tracking how sentiment evolves across the series\nContribution Analysis: Identifying which words have the greatest impact on sentiment\n\n\n\nCode\nlibrary(tidyverse)\nlibrary(tidytext)\nlibrary(plotly)\n\ngot &lt;- read_csv(\"game-of-thrones.csv\")\nbing &lt;- read_csv(\"bing.csv\")\nnrc &lt;- read_csv(\"nrc.csv\")\n\ngot_tokens &lt;- got %&gt;%\n  unnest_tokens(word, Sentence)\n\ngot_tokens &lt;- got_tokens %&gt;%\n  group_by(Season, Episode) %&gt;%\n  mutate(episode_id = cur_group_id()) %&gt;%\n  ungroup()"
+  },
+  {
+    "objectID": "sentiment.html#part-1-dictionary-comparison---bing-vs-nrc",
+    "href": "sentiment.html#part-1-dictionary-comparison---bing-vs-nrc",
+    "title": "Sentiment Analysis",
+    "section": "Part 1: Dictionary Comparison - Bing vs NRC",
+    "text": "Part 1: Dictionary Comparison - Bing vs NRC\nDifferent sentiment lexicons capture emotion in different ways. Bing provides binary sentiment (positive/negative), while NRC provides multiple emotion categories (joy, fear, anger, anticipation, etc.).\n\nPlot 1: Binary Sentiment Comparison (Bing Lexicon)\nThe Bing lexicon classifies words as either positive or negative.\n\n\nCode\nbing_sentiment &lt;- got_tokens %&gt;%\n  inner_join(bing, by = \"word\") %&gt;%\n  count(Season, sentiment) %&gt;%\n  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %&gt;%\n  mutate(net_sentiment = positive - negative,\n         Season = as.factor(Season))\n\nbing_plot &lt;- bing_sentiment %&gt;%\n  pivot_longer(cols = c(positive, negative), names_to = \"sentiment\", values_to = \"count\") %&gt;%\n  ggplot(aes(x = Season, y = count, fill = sentiment)) +\n  geom_col(position = \"dodge\") +\n  scale_fill_manual(values = c(\"positive\" = \"green\", \"negative\" = \"red\")) +\n  labs(title = \"Positive vs Negative Words by Season\", x = \"Season\", y = \"Word Count\", fill = \"Sentiment\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(bing_plot, tooltip = c(\"x\", \"y\", \"fill\"))\n\n\n\n\n\n\n\n\nPlot 2: Emotion Categories (NRC Lexicon)\nThe NRC lexicon provides a richer emotional picture by categorizing words into specific emotions beyond just positive/negative.\n\n\nCode\nnrc_sentiment &lt;- got_tokens %&gt;%\n  inner_join(nrc, by = \"word\") %&gt;%\n  count(Season, sentiment) %&gt;%\n  mutate(Season = as.factor(Season))\n\nnrc_plot &lt;- nrc_sentiment %&gt;%\n  ggplot(aes(x = Season, y = n, fill = sentiment)) +\n  geom_col() +\n  facet_wrap(~sentiment, scales = \"free_y\") +\n  scale_fill_viridis_d() +\n  labs(title = \"Emotion Distribution by Season\", x = \"Season\", y = \"Word Count\", fill = \"Emotion\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12), legend.position = \"bottom\", strip.text = element_text(face = \"bold\", size = 9))\n\nggplotly(nrc_plot, tooltip = c(\"x\", \"y\", \"fill\"))\n\n\n\n\n\n\n\n\nLexicon Comparison Summary\n\nBing Lexicon reveals an overall balance between positive and negative sentiment across the series, with notable variation by season.\nNRC Lexicon shows that emotions like positive, negative, trust are most prevalent in Game of Thrones dialogue, reflecting the show’s dramatic and often dark narrative."
+  },
+  {
+    "objectID": "sentiment.html#part-2-sentiment-trajectory",
+    "href": "sentiment.html#part-2-sentiment-trajectory",
+    "title": "Sentiment Analysis",
+    "section": "Part 2: Sentiment Trajectory",
+    "text": "Part 2: Sentiment Trajectory\nHow does emotional tone shift throughout the series?\n\nPlot 3: Net Sentiment Over Time (by Episode)\nThis visualization tracks the cumulative sentiment trajectory across all episodes.\n\n\nCode\nsentiment_trajectory &lt;- got_tokens %&gt;%\n  inner_join(bing, by = \"word\") %&gt;%\n  mutate(sentiment_value = ifelse(sentiment == \"positive\", 1, -1)) %&gt;%\n  group_by(Season, Episode, episode_id) %&gt;%\n  summarise(net_sentiment = sum(sentiment_value), total_words = n(), sentiment_score = net_sentiment / total_words, .groups = 'drop') %&gt;%\n  arrange(Season, Episode) %&gt;%\n  mutate(episode_num = row_number())\n\ntrajectory_plot &lt;- sentiment_trajectory %&gt;%\n  ggplot(aes(x = episode_num, y = sentiment_score, color = as.factor(Season), group = 1)) +\n  geom_line(alpha = 0.6) +\n  geom_point(alpha = 0.5, size = 2) +\n  geom_smooth(se = TRUE, color = \"black\", alpha = 0.1, method = \"loess\", span = 0.3) +\n  scale_color_viridis_d(name = \"Season\") +\n  labs(title = \"Sentiment Score Trajectory Across All Episodes\", x = \"Episode Number (Chronological)\", y = \"Sentiment Score (positive - negative) / total words\", color = \"Season\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(trajectory_plot, tooltip = c(\"x\", \"y\", \"color\"))\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\n\n\n\nPlot 4: Average Sentiment by Season\nWhich seasons are emotionally the most intense?\n\n\nCode\nseason_sentiment &lt;- sentiment_trajectory %&gt;%\n  group_by(Season) %&gt;%\n  summarise(avg_sentiment = mean(sentiment_score), min_sentiment = min(sentiment_score), max_sentiment = max(sentiment_score), .groups = 'drop') %&gt;%\n  mutate(Season = as.factor(Season))\n\nseason_plot &lt;- season_sentiment %&gt;%\n  ggplot(aes(x = Season, y = avg_sentiment, fill = avg_sentiment)) +\n  geom_col(show.legend = FALSE) +\n  geom_errorbar(aes(ymin = min_sentiment, ymax = max_sentiment), width = 0.3, alpha = 0.6) +\n  scale_fill_gradient2(low = \"red\", mid = \"gray\", high = \"green\", midpoint = 0) +\n  labs(title = \"Average Sentiment Score by Season\", subtitle = \"Error bars show min-max range\", x = \"Season\", y = \"Average Sentiment Score\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12), plot.subtitle = element_text(face = \"italic\",  size = 10))\n\nggplotly(season_plot, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "sentiment.html#part-3-contribution-analysis",
+    "href": "sentiment.html#part-3-contribution-analysis",
+    "title": "Sentiment Analysis",
+    "section": "Part 3: Contribution Analysis",
+    "text": "Part 3: Contribution Analysis\nWhich specific words contribute the most to the overall sentiment?\n\nPlot 5: Top Positive Word Contributions\nWords with the highest positive contribution (frequency × positive sentiment value).\n\n\nCode\npositive_contributions &lt;- got_tokens %&gt;%\n  inner_join(bing, by = \"word\") %&gt;%\n  filter(sentiment == \"positive\") %&gt;%\n  count(word, sort = TRUE) %&gt;%\n  head(15) %&gt;%\n  mutate(word = reorder(word, n),\n         contribution = n)\n\npositive_plot &lt;- positive_contributions %&gt;%\n  ggplot(aes(contribution, word, fill = contribution)) +\n  geom_col(show.legend = FALSE) +\n  scale_fill_gradient(low = \"lightgreen\", high = \"darkgreen\") +\n  labs(title = \"Top 15 Positive Words Contribution\",\n       x = \"Frequency\",\n       y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(positive_plot, tooltip = c(\"x\", \"y\"))\n\n\n\n\n\n\n\n\nPlot 6: Top Negative Word Contributions\nWords with the highest negative contribution (frequency × negative sentiment value).\n\n\nCode\nnegative_contributions &lt;- got_tokens %&gt;%\n  inner_join(bing, by = \"word\") %&gt;%\n  filter(sentiment == \"negative\") %&gt;%\n  count(word, sort = TRUE) %&gt;%\n  head(15) %&gt;%\n  mutate(word = reorder(word, n),\n         contribution = n)\n\nnegative_plot &lt;- negative_contributions %&gt;%\n  ggplot(aes(contribution, word, fill = contribution)) +\n  geom_col(show.legend = FALSE) +\n  scale_fill_gradient(low = \"lightcoral\", high = \"darkred\") +\n  labs(title = \"Top 15 Negative Words Contribution\",\n       x = \"Frequency\",\n       y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(negative_plot, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "sentiment.html#summary-of-sentiment-findings",
+    "href": "sentiment.html#summary-of-sentiment-findings",
+    "title": "Sentiment Analysis",
+    "section": "Summary of Sentiment Findings",
+    "text": "Summary of Sentiment Findings\nKey Insights:\n\nDictionary Differences: The Bing lexicon captures a binary view of sentiment, useful for quick assessment, while NRC provides emotional granularity that reveals specific emotional tones (fear, anger, joy) prevalent in the series.\nSentiment Arc: The series shows a [INSERT DESCRIPTION: varies/generally negative/mixed] trajectory, with [INSERT SPECIFIC OBSERVATIONS BASED ON PLOT 3]. This aligns with the narrative arc of Game of Thrones.\nDominant Emotional Drivers: The sentiment is driven primarily by recurring words that appear throughout the series, such as [INSERT TOP POSITIVE WORDS] for positive sentiment and [INSERT TOP NEGATIVE WORDS] for negative sentiment.\nSeasonal Patterns: [DESCRIBE OBSERVATIONS FROM PLOT 4 - which seasons are more positive/negative and why that makes narrative sense].\n\nThis multi-faceted analysis demonstrates that understanding text requires multiple analytical lenses. Frequency and sentiment analysis together reveal not just what Game of Thrones characters discuss, but the emotional context in which those discussions occur."
+  },
+  {
+    "objectID": "frequency.html",
+    "href": "frequency.html",
+    "title": "Frequency Analysis",
+    "section": "",
+    "text": "Frequency analysis shows the most important topics in a text by examining word occurrence patterns. After removing common stop words (the, and, of, etc.), we can identify which topic dominate the Game of Thrones dialogue.\n\n\nCode\nlibrary(tidyverse)\nlibrary(tidytext)\nlibrary(plotly)\n\ngot &lt;- read_csv(\"game-of-thrones.csv\")\n\ngot_tokens &lt;- got %&gt;%\n  unnest_tokens(word, Sentence) %&gt;%\n  anti_join(stop_words)\n\ngot_tokens &lt;- got_tokens %&gt;%\n  mutate(Season = as.factor(Season))"
+  },
+  {
+    "objectID": "frequency.html#introduction",
+    "href": "frequency.html#introduction",
+    "title": "Frequency Analysis",
+    "section": "",
+    "text": "Frequency analysis shows the most important topics in a text by examining word occurrence patterns. After removing common stop words (the, and, of, etc.), we can identify which topic dominate the Game of Thrones dialogue.\n\n\nCode\nlibrary(tidyverse)\nlibrary(tidytext)\nlibrary(plotly)\n\ngot &lt;- read_csv(\"game-of-thrones.csv\")\n\ngot_tokens &lt;- got %&gt;%\n  unnest_tokens(word, Sentence) %&gt;%\n  anti_join(stop_words)\n\ngot_tokens &lt;- got_tokens %&gt;%\n  mutate(Season = as.factor(Season))"
+  },
+  {
+    "objectID": "frequency.html#plot-1-most-common-words-overall-interactive",
+    "href": "frequency.html#plot-1-most-common-words-overall-interactive",
+    "title": "Frequency Analysis",
+    "section": "Plot 1: Most Common Words Overall (Interactive)",
+    "text": "Plot 1: Most Common Words Overall (Interactive)\nThe most frequently occurring words in the entire series provide a high-level summary of the dominant themes and concepts in Game of Thrones dialogue.\n\n\nCode\ntop_words_plot &lt;- got_tokens %&gt;%\n  count(word, sort = TRUE) %&gt;%\n  head(20) %&gt;%\n  mutate(word = reorder(word, n)) %&gt;%\n  ggplot(aes(n, word, fill = n)) +\n  geom_col(show.legend = FALSE) +\n  scale_fill_gradient(low = \"steelblue\", high = \"darkblue\") +\n  labs(title = \"Top 20 Most Frequent Words in Game of Thrones\", \n       x = \"Frequency Count\", \n       y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(top_words_plot, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-2-word-frequency-trends-by-season",
+    "href": "frequency.html#plot-2-word-frequency-trends-by-season",
+    "title": "Frequency Analysis",
+    "section": "Plot 2: Word Frequency Trends by Season",
+    "text": "Plot 2: Word Frequency Trends by Season\nHow do the most common themes shift as the series progresses?\n\n\nCode\ntop_10_words &lt;- got_tokens %&gt;%\n  count(word, sort = TRUE) %&gt;%\n  head(10) %&gt;%\n  pull(word)\n\nseason_trends &lt;- got_tokens %&gt;%\n  filter(word %in% top_10_words) %&gt;%\n  count(Season, word) %&gt;%\n  ggplot(aes(Season, n, color = word, group = word)) +\n  geom_line(size = 1) +\n  geom_point(size = 2) +\n  labs(title = \"Top 10 Words: Frequency Trends Across Seasons\", x = \"Season\", y = \"Frequency\", color = \"Word\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12), legend.position = \"right\")\n\nggplotly(season_trends, tooltip = c(\"x\", \"y\", \"color\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-3-most-frequent-characters-speaking",
+    "href": "frequency.html#plot-3-most-frequent-characters-speaking",
+    "title": "Frequency Analysis",
+    "section": "Plot 3: Most Frequent Characters Speaking",
+    "text": "Plot 3: Most Frequent Characters Speaking\nWho speaks the most in Game of Thrones?\n\n\nCode\ncharacter_freq &lt;- got %&gt;%\n  count(Name, sort = TRUE) %&gt;%\n  head(15) %&gt;%\n  mutate(Name = reorder(Name, n)) %&gt;%\n  ggplot(aes(n, Name, fill = n)) +\n  geom_col(show.legend = FALSE) +\n  scale_fill_gradient(low = \"coral\", high = \"darkred\") +\n  labs(title = \"Top 15 Characters by Number of Sentences Spoken\", x = \"Number of Sentences\", y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(character_freq, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-4-top-words-used-by-top-characters",
+    "href": "frequency.html#plot-4-top-words-used-by-top-characters",
+    "title": "Frequency Analysis",
+    "section": "Plot 4: Top Words Used by Top Characters",
+    "text": "Plot 4: Top Words Used by Top Characters\nWhat words are most commonly spoken by the major characters?\n\n\nCode\ntop_characters &lt;- got %&gt;%\n  count(Name, sort = TRUE) %&gt;%\n  head(5) %&gt;%\n  pull(Name)\n\ncharacter_words &lt;- got_tokens %&gt;%\n  filter(Name %in% top_characters) %&gt;%\n  count(Name, word, sort = TRUE) %&gt;%\n  group_by(Name) %&gt;%\n  top_n(8, n) %&gt;%\n  ungroup() %&gt;%\n  mutate(word = reorder_within(word, n, Name)) %&gt;%\n  ggplot(aes(n, word, fill = Name)) +\n  geom_col(show.legend = TRUE) +\n  facet_wrap(~Name, scales = \"free\") +\n  scale_y_reordered() +\n  labs(title = \"Most Common Words by Top 5 Characters\", x = \"Frequency\", y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12), strip.text = element_text(face = \"bold\"))\n\nggplotly(character_words, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-5-vocabulary-richness-by-season",
+    "href": "frequency.html#plot-5-vocabulary-richness-by-season",
+    "title": "Frequency Analysis",
+    "section": "Plot 5: Vocabulary Richness by Season",
+    "text": "Plot 5: Vocabulary Richness by Season\nHow diverse is the vocabulary in each season? A larger vocabulary might indicate more varied dialogue.\n\n\nCode\nvocab_diversity &lt;- got_tokens %&gt;%\n  group_by(Season) %&gt;%\n  summarise(unique_words = n_distinct(word),\n            total_words = n(),\n            avg_word_length = mean(nchar(word))) %&gt;%\n  ggplot(aes(x = Season, y = unique_words, fill = Season)) +\n  geom_col(show.legend = FALSE) +\n  geom_line(aes(group = 1), color = \"black\", size = 0.8) +\n  scale_fill_viridis_d() +\n  labs(title = \"Vocabulary Diversity by Season\",\n       subtitle = \"Number of Unique Words Used\",\n       x = \"Season\",\n       y = \"Number of Unique Words\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12),\n        axis.text.x = element_text(size = 10))\n\nggplotly(vocab_diversity, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-6-tf-idf-analysis---words-distinctive-to-each-season",
+    "href": "frequency.html#plot-6-tf-idf-analysis---words-distinctive-to-each-season",
+    "title": "Frequency Analysis",
+    "section": "Plot 6: TF-IDF Analysis - Words Distinctive to Each Season",
+    "text": "Plot 6: TF-IDF Analysis - Words Distinctive to Each Season\nTF-IDF (Term Frequency-Inverse Document Frequency) identifies words that are uniquely important to each season. High TF-IDF scores indicate words that appear frequently in one season but rarely in others.\n\n\nCode\ntfidf_data &lt;- got_tokens %&gt;%\n  count(Season, word, sort = TRUE) %&gt;%\n  bind_tf_idf(word, Season, n) %&gt;%\n  group_by(Season) %&gt;%\n  top_n(8, tf_idf) %&gt;%\n  ungroup() %&gt;%\n  mutate(word = reorder_within(word, tf_idf, Season))\n\ntfidf_plot &lt;- tfidf_data %&gt;%\n  ggplot(aes(tf_idf, word, fill = Season)) +\n  geom_col(show.legend = TRUE) +\n  facet_wrap(~Season, scales = \"free\") +\n  scale_y_reordered() +\n  scale_fill_viridis_d() +\n  labs(title = \"Most Distinctive Words by Season (TF-IDF Analysis)\",\n       x = \"TF-IDF Score\",\n       y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12),\n        strip.text = element_text(face = \"bold\"))\n\nggplotly(tfidf_plot, tooltip = c(\"x\", \"y\", \"fill\"))"
+  },
+  {
+    "objectID": "frequency.html#summary-of-key-findings",
+    "href": "frequency.html#summary-of-key-findings",
+    "title": "Frequency Analysis",
+    "section": "Summary of Key Findings",
+    "text": "Summary of Key Findings\nThe frequency analysis reveals:\n\nDominant Themes: Words like “lord,” “king,” and “know” dominate the dialogue, reflecting the show’s focus on politics, power, and relationships.\nCharacter Focus: A small group of characters dominates the dialogue, with Jon Snow, Daenerys, and Tyrion among the most frequently speaking characters.\nVocabulary Consistency: The series maintains relatively consistent vocabulary richness across seasons, suggesting sustained narrative complexity.\nSeasonal Variation: Certain seasons emphasize particular themes—identifying distinctive words shows how plot focuses shift throughout the series."
+  },
+  {
+    "objectID": "frequency.html#most-common-words-overall",
+    "href": "frequency.html#most-common-words-overall",
+    "title": "Frequency Analysis",
+    "section": "1) Most Common Words Overall",
+    "text": "1) Most Common Words Overall\nThe most frequently occurring words in the entire series.\n\n\nCode\ntop_words_plot &lt;- got_tokens %&gt;%\n  count(word, sort = TRUE) %&gt;%\n  head(20) %&gt;%\n  mutate(word = reorder(word, n)) %&gt;%\n  ggplot(aes(n, word, fill = n)) +\n  geom_col(show.legend = FALSE) +\n  labs(title = \"Top 20 Most Frequent Words in Game of Thrones\", \n       x = \"Frequency Count\", \n       y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(top_words_plot, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "sentiment.html#summary",
+    "href": "sentiment.html#summary",
+    "title": "Sentiment Analysis",
+    "section": "Summary",
+    "text": "Summary\n\nThe Bing lexicon captures a binary view of sentiment, which is useful for quick assessment. NRC provides emotional granularity that reveals specific emotional tones shown in the series.\nThe series shows a most upward but mixed trajectory, withthe first season being most negative and last season being most positive.\nThe sentiment is driven primarily by recurring words that appear throughout the series, such as “good”, “well”, “right” for positive sentiment and “stark”, “dead”, “kill” for negative sentiment."
+  },
+  {
+    "objectID": "frequency.html#plot-1-most-common-words-overall",
+    "href": "frequency.html#plot-1-most-common-words-overall",
+    "title": "Frequency Analysis",
+    "section": "Plot 1: Most Common Words Overall",
+    "text": "Plot 1: Most Common Words Overall\nThe most frequently occurring words in the entire series.\n\n\nCode\ntop_words_plot &lt;- got_tokens %&gt;%\n  count(word, sort = TRUE) %&gt;%\n  head(20) %&gt;%\n  mutate(word = reorder(word, n)) %&gt;%\n  ggplot(aes(n, word, fill = n)) +\n  geom_col(show.legend = FALSE) +\n  scale_fill_gradient(low = \"steelblue\", high = \"darkblue\") +\n  labs(title = \"Top 20 Most Frequent Words in Game of Thrones\", x = \"Frequency Count\", y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12))\n\nggplotly(top_words_plot, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-5-vocabulary-number-by-season",
+    "href": "frequency.html#plot-5-vocabulary-number-by-season",
+    "title": "Frequency Analysis",
+    "section": "Plot 5: Vocabulary Number by Season",
+    "text": "Plot 5: Vocabulary Number by Season\nHow diverse is the vocabulary in each season? A larger vocabulary might indicate more varied dialogue.\n\n\nCode\nvocab_diversity &lt;- got_tokens %&gt;%\n  group_by(Season) %&gt;%\n  summarise(unique_words = n_distinct(word), total_words = n(), avg_word_length = mean(nchar(word))) %&gt;%\n  ggplot(aes(x = Season, y = unique_words, fill = Season)) +\n  geom_col(show.legend = FALSE) +\n  geom_line(aes(group = 1), color = \"black\", size = 0.8) +\n  scale_fill_viridis_d() +\n  labs(title = \"Vocabulary Diversity by Season\", subtitle = \"Number of Unique Words Used\", x = \"Season\", y = \"Number of Unique Words\") +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12), axis.text.x = element_text(size = 10))\n\nggplotly(vocab_diversity, tooltip = c(\"x\", \"y\"))"
+  },
+  {
+    "objectID": "frequency.html#plot-6-words-distinctive-to-seasons-tf-idf-analysis",
+    "href": "frequency.html#plot-6-words-distinctive-to-seasons-tf-idf-analysis",
+    "title": "Frequency Analysis",
+    "section": "Plot 6: Words Distinctive to Seasons (TF-IDF Analysis)",
+    "text": "Plot 6: Words Distinctive to Seasons (TF-IDF Analysis)\nTF-IDF (Term Frequency-Inverse Document Frequency) identifies words that are uniquely important to each season. High TF-IDF scores indicate words that appear frequently in one season but rarely in others.\n\n\nCode\ntfidf_data &lt;- got_tokens %&gt;%\n  count(Season, word, sort = TRUE) %&gt;%\n  bind_tf_idf(word, Season, n) %&gt;%\n  group_by(Season) %&gt;%\n  top_n(8, tf_idf) %&gt;%\n  ungroup() %&gt;%\n  mutate(word = reorder_within(word, tf_idf, Season))\n\ntfidf_plot &lt;- tfidf_data %&gt;%\n  ggplot(aes(tf_idf, word, fill = Season)) +\n  geom_col(show.legend = TRUE) +\n  facet_wrap(~Season, scales = \"free\") +\n  scale_y_reordered() +\n  scale_fill_viridis_d() +\n  labs(title = \"Most Distinctive Words by Season (TF-IDF Analysis)\", x = \"TF-IDF Score\", y = NULL) +\n  theme_minimal() +\n  theme(plot.title = element_text(face = \"bold\", size = 12), strip.text = element_text(face = \"bold\"))\n\nggplotly(tfidf_plot, tooltip = c(\"x\", \"y\", \"fill\"))"
+  },
+  {
+    "objectID": "frequency.html#summary",
+    "href": "frequency.html#summary",
+    "title": "Frequency Analysis",
+    "section": "Summary",
+    "text": "Summary\n\nWords like “lord,” “king,” and “father” dominate the dialogue, which matches the show’s focus on power and relationships.\nA small group of characters dominates the dialogue, with Jon Snow, Daenerys, and Tyrion among the most frequently speaking characters.\nThe series have a relatively consistent vocabulary richness across seasons but eventually dies down (with Season 8 having half the number of unique words)\nCertain seasons emphasize particular distinctive words shows how the movie plot focuses shift across time."
+  }
+]

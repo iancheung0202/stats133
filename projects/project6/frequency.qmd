@@ -1,0 +1,163 @@
+---
+title: "Frequency Analysis"
+---
+
+## Introduction
+
+Frequency analysis shows the most important topics in a text by examining word occurrence patterns. After removing common stop words (the, and, of, etc.), we can identify which topic dominate the Game of Thrones dialogue.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytext)
+library(plotly)
+
+got <- read_csv("game-of-thrones.csv")
+
+got_tokens <- got %>%
+  unnest_tokens(word, Sentence) %>%
+  anti_join(stop_words)
+
+got_tokens <- got_tokens %>%
+  mutate(Season = as.factor(Season))
+```
+
+## Plot 1: Most Common Words Overall
+
+The most frequently occurring words in the entire series.
+
+```{r plot1, warning=FALSE}
+top_words_plot <- got_tokens %>%
+  count(word, sort = TRUE) %>%
+  head(20) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word, fill = n)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_gradient(low = "steelblue", high = "darkblue") +
+  labs(title = "Top 20 Most Frequent Words in Game of Thrones", x = "Frequency Count", y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+
+ggplotly(top_words_plot, tooltip = c("x", "y"))
+```
+
+## Plot 2: Word Frequency Trends by Season
+
+How do the most common themes shift as the series progresses? 
+
+```{r plot2, warning=FALSE}
+top_10_words <- got_tokens %>%
+  count(word, sort = TRUE) %>%
+  head(10) %>%
+  pull(word)
+
+season_trends <- got_tokens %>%
+  filter(word %in% top_10_words) %>%
+  count(Season, word) %>%
+  ggplot(aes(Season, n, color = word, group = word)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(title = "Top 10 Words: Frequency Trends Across Seasons", x = "Season", y = "Frequency", color = "Word") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12), legend.position = "right")
+
+ggplotly(season_trends, tooltip = c("x", "y", "color"))
+```
+
+## Plot 3: Most Frequent Characters Speaking
+
+Who speaks the most in Game of Thrones? 
+
+```{r plot3, warning=FALSE}
+character_freq <- got %>%
+  count(Name, sort = TRUE) %>%
+  head(15) %>%
+  mutate(Name = reorder(Name, n)) %>%
+  ggplot(aes(n, Name, fill = n)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_gradient(low = "coral", high = "darkred") +
+  labs(title = "Top 15 Characters by Number of Sentences Spoken", x = "Number of Sentences", y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+
+ggplotly(character_freq, tooltip = c("x", "y"))
+```
+
+## Plot 4: Top Words Used by Top Characters
+
+What words are most commonly spoken by the major characters? 
+
+```{r plot4, warning=FALSE}
+top_characters <- got %>%
+  count(Name, sort = TRUE) %>%
+  head(5) %>%
+  pull(Name)
+
+character_words <- got_tokens %>%
+  filter(Name %in% top_characters) %>%
+  count(Name, word, sort = TRUE) %>%
+  group_by(Name) %>%
+  top_n(8, n) %>%
+  ungroup() %>%
+  mutate(word = reorder_within(word, n, Name)) %>%
+  ggplot(aes(n, word, fill = Name)) +
+  geom_col(show.legend = TRUE) +
+  facet_wrap(~Name, scales = "free") +
+  scale_y_reordered() +
+  labs(title = "Most Common Words by Top 5 Characters", x = "Frequency", y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12), strip.text = element_text(face = "bold"))
+
+ggplotly(character_words, tooltip = c("x", "y"))
+```
+
+## Plot 5: Vocabulary Number by Season
+
+How diverse is the vocabulary in each season? A larger vocabulary might indicate more varied dialogue.
+
+```{r plot5, warning=FALSE}
+vocab_diversity <- got_tokens %>%
+  group_by(Season) %>%
+  summarise(unique_words = n_distinct(word), total_words = n(), avg_word_length = mean(nchar(word))) %>%
+  ggplot(aes(x = Season, y = unique_words, fill = Season)) +
+  geom_col(show.legend = FALSE) +
+  geom_line(aes(group = 1), color = "black", size = 0.8) +
+  scale_fill_viridis_d() +
+  labs(title = "Vocabulary Diversity by Season", subtitle = "Number of Unique Words Used", x = "Season", y = "Number of Unique Words") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12), axis.text.x = element_text(size = 10))
+
+ggplotly(vocab_diversity, tooltip = c("x", "y"))
+```
+
+## Plot 6: Words Distinctive to Seasons (TF-IDF Analysis)
+
+TF-IDF (Term Frequency-Inverse Document Frequency) identifies words that are uniquely important to each season. High TF-IDF scores indicate words that appear frequently in one season but rarely in others.
+
+```{r plot6, warning=FALSE}
+tfidf_data <- got_tokens %>%
+  count(Season, word, sort = TRUE) %>%
+  bind_tf_idf(word, Season, n) %>%
+  group_by(Season) %>%
+  top_n(8, tf_idf) %>%
+  ungroup() %>%
+  mutate(word = reorder_within(word, tf_idf, Season))
+
+tfidf_plot <- tfidf_data %>%
+  ggplot(aes(tf_idf, word, fill = Season)) +
+  geom_col(show.legend = TRUE) +
+  facet_wrap(~Season, scales = "free") +
+  scale_y_reordered() +
+  scale_fill_viridis_d() +
+  labs(title = "Most Distinctive Words by Season (TF-IDF Analysis)", x = "TF-IDF Score", y = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 12), strip.text = element_text(face = "bold"))
+
+ggplotly(tfidf_plot, tooltip = c("x", "y", "fill"))
+```
+
+## Summary 
+
+- Words like "lord," "king," and "father" dominate the dialogue, which matches the show's focus on power and relationships.
+- A small group of characters dominates the dialogue, with Jon Snow, Daenerys, and Tyrion among the most frequently speaking characters.
+- The series have a relatively consistent vocabulary richness across seasons but eventually dies down (with Season 8 having half the number of unique words)
+- Certain seasons emphasize particular distinctive words shows how the movie plot focuses shift across time.

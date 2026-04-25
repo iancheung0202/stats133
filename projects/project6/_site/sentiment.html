@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Sentiment Analysis – Game of Thrones Text Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-158031087360bce0ff56dc785ce39e06.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.12.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Game of Thrones Text Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./frequency.html"> 
+<span class="menu-text">Frequency Analysis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./sentiment.html" aria-current="page"> 
+<span class="menu-text">Sentiment Analysis</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#part-1-dictionary-comparison---bing-vs-nrc" id="toc-part-1-dictionary-comparison---bing-vs-nrc" class="nav-link" data-scroll-target="#part-1-dictionary-comparison---bing-vs-nrc">Part 1: Dictionary Comparison - Bing vs NRC</a>
+  <ul class="collapse">
+  <li><a href="#plot-1-binary-sentiment-comparison-bing-lexicon" id="toc-plot-1-binary-sentiment-comparison-bing-lexicon" class="nav-link" data-scroll-target="#plot-1-binary-sentiment-comparison-bing-lexicon">Plot 1: Binary Sentiment Comparison (Bing Lexicon)</a></li>
+  <li><a href="#plot-2-emotion-categories-nrc-lexicon" id="toc-plot-2-emotion-categories-nrc-lexicon" class="nav-link" data-scroll-target="#plot-2-emotion-categories-nrc-lexicon">Plot 2: Emotion Categories (NRC Lexicon)</a></li>
+  <li><a href="#lexicon-comparison-summary" id="toc-lexicon-comparison-summary" class="nav-link" data-scroll-target="#lexicon-comparison-summary">Lexicon Comparison Summary</a></li>
+  </ul></li>
+  <li><a href="#part-2-sentiment-trajectory" id="toc-part-2-sentiment-trajectory" class="nav-link" data-scroll-target="#part-2-sentiment-trajectory">Part 2: Sentiment Trajectory</a>
+  <ul class="collapse">
+  <li><a href="#plot-3-net-sentiment-over-time-by-episode" id="toc-plot-3-net-sentiment-over-time-by-episode" class="nav-link" data-scroll-target="#plot-3-net-sentiment-over-time-by-episode">Plot 3: Net Sentiment Over Time (by Episode)</a></li>
+  <li><a href="#plot-4-average-sentiment-by-season" id="toc-plot-4-average-sentiment-by-season" class="nav-link" data-scroll-target="#plot-4-average-sentiment-by-season">Plot 4: Average Sentiment by Season</a></li>
+  </ul></li>
+  <li><a href="#part-3-contribution-analysis" id="toc-part-3-contribution-analysis" class="nav-link" data-scroll-target="#part-3-contribution-analysis">Part 3: Contribution Analysis</a>
+  <ul class="collapse">
+  <li><a href="#plot-5-top-positive-word-contributions" id="toc-plot-5-top-positive-word-contributions" class="nav-link" data-scroll-target="#plot-5-top-positive-word-contributions">Plot 5: Top Positive Word Contributions</a></li>
+  <li><a href="#plot-6-top-negative-word-contributions" id="toc-plot-6-top-negative-word-contributions" class="nav-link" data-scroll-target="#plot-6-top-negative-word-contributions">Plot 6: Top Negative Word Contributions</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Sentiment Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Sentiment analysis examines the emotional tone of text. Rather than just counting words, sentiment analysis assigns emotional values to words and aggregates them to understand the overall emotional trajectory.</p>
+<p>This analysis uses these three approaches:</p>
+<ol type="1">
+<li><strong>Dictionary Comparison</strong>: Comparing multiple sentiment lexicons to understand nuances</li>
+<li><strong>Sentiment Trajectory</strong>: Tracking how sentiment evolves across the series</li>
+<li><strong>Contribution Analysis</strong>: Identifying which words have the greatest impact on sentiment</li>
+</ol>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>got <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"game-of-thrones.csv"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>bing <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"bing.csv"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>nrc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"nrc.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>got_tokens <span class="ot">&lt;-</span> got <span class="sc">%&gt;%</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, Sentence)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>got_tokens <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Season, Episode) <span class="sc">%&gt;%</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">episode_id =</span> <span class="fu">cur_group_id</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="part-1-dictionary-comparison---bing-vs-nrc" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-dictionary-comparison---bing-vs-nrc">Part 1: Dictionary Comparison - Bing vs NRC</h2>
+<p>Different sentiment lexicons capture emotion in different ways. <strong>Bing</strong> provides binary sentiment (positive/negative), while <strong>NRC</strong> provides multiple emotion categories (joy, fear, anger, anticipation, etc.).</p>
+<section id="plot-1-binary-sentiment-comparison-bing-lexicon" class="level3">
+<h3 class="anchored" data-anchor-id="plot-1-binary-sentiment-comparison-bing-lexicon">Plot 1: Binary Sentiment Comparison (Bing Lexicon)</h3>
+<p>The Bing lexicon classifies words as either positive or negative.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>bing_sentiment <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(bing, <span class="at">by =</span> <span class="st">"word"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Season, sentiment) <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sentiment, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">net_sentiment =</span> positive <span class="sc">-</span> negative,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">Season =</span> <span class="fu">as.factor</span>(Season))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>bing_plot <span class="ot">&lt;-</span> bing_sentiment <span class="sc">%&gt;%</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(positive, negative), <span class="at">names_to =</span> <span class="st">"sentiment"</span>, <span class="at">values_to =</span> <span class="st">"count"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Season, <span class="at">y =</span> count, <span class="at">fill =</span> sentiment)) <span class="sc">+</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"positive"</span> <span class="ot">=</span> <span class="st">"green"</span>, <span class="st">"negative"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Positive vs Negative Words by Season"</span>, <span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Word Count"</span>, <span class="at">fill =</span> <span class="st">"Sentiment"</span>) <span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(bing_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"fill"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-9b24994194474abd681c" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-9b24994194474abd681c">{"x":{"data":[{"orientation":"v","width":[0.44999999999999996,0.45000000000000018,0.45000000000000018,0.45000000000000018,0.44999999999999929,0.44999999999999929,0.44999999999999929,0.44999999999999929],"base":[0,0,0,0,0,0,0,0],"x":[0.77500000000000002,1.7749999999999999,2.7749999999999999,3.7749999999999999,4.7750000000000004,5.7750000000000004,6.7750000000000004,7.7750000000000004],"y":[1426,1752,1547,1592,1315,1330,1115,450],"text":["Season: Season 1<br />count: 1426<br />sentiment: negative","Season: Season 2<br />count: 1752<br />sentiment: negative","Season: Season 3<br />count: 1547<br />sentiment: negative","Season: Season 4<br />count: 1592<br />sentiment: negative","Season: Season 5<br />count: 1315<br />sentiment: negative","Season: Season 6<br />count: 1330<br />sentiment: negative","Season: Season 7<br />count: 1115<br />sentiment: negative","Season: Season 8<br />count:  450<br />sentiment: negative"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(255,0,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"negative","legendgroup":"negative","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45000000000000018,0.45000000000000018,0.45000000000000018,0.44999999999999973,0.44999999999999929,0.44999999999999929,0.44999999999999929,0.44999999999999929],"base":[0,0,0,0,0,0,0,0],"x":[1.2250000000000001,2.2250000000000001,3.2250000000000001,4.2249999999999996,5.2249999999999996,6.2249999999999996,7.2249999999999996,8.2249999999999996],"y":[1322,1767,1582,1581,1535,1348,1085,531],"text":["Season: Season 1<br />count: 1322<br />sentiment: positive","Season: Season 2<br />count: 1767<br />sentiment: positive","Season: Season 3<br />count: 1582<br />sentiment: positive","Season: Season 4<br />count: 1581<br />sentiment: positive","Season: Season 5<br />count: 1535<br />sentiment: positive","Season: Season 6<br />count: 1348<br />sentiment: positive","Season: Season 7<br />count: 1085<br />sentiment: positive","Season: Season 8<br />count:  531<br />sentiment: positive"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,255,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"positive","legendgroup":"positive","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":48.949771689497723},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Positive vs Negative Words by Season <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Season","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-88.350000000000009,1855.3499999999999],"tickmode":"array","ticktext":["0","500","1000","1500"],"tickvals":[0,500,999.99999999999989,1500],"categoryorder":"array","categoryarray":["0","500","1000","1500"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Word Count","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Sentiment","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"611022dc3bbf":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"611022dc3bbf","visdat":{"611022dc3bbf":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-2-emotion-categories-nrc-lexicon" class="level3">
+<h3 class="anchored" data-anchor-id="plot-2-emotion-categories-nrc-lexicon">Plot 2: Emotion Categories (NRC Lexicon)</h3>
+<p>The NRC lexicon provides a richer emotional picture by categorizing words into specific emotions beyond just positive/negative.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nrc_sentiment <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(nrc, <span class="at">by =</span> <span class="st">"word"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Season, sentiment) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Season =</span> <span class="fu">as.factor</span>(Season))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>nrc_plot <span class="ot">&lt;-</span> nrc_sentiment <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Season, <span class="at">y =</span> n, <span class="at">fill =</span> sentiment)) <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sentiment, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>() <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Emotion Distribution by Season"</span>, <span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Word Count"</span>, <span class="at">fill =</span> <span class="st">"Emotion"</span>) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>), <span class="at">legend.position =</span> <span class="st">"bottom"</span>, <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">9</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(nrc_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"fill"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-903b2696b75afc3ca846" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-903b2696b75afc3ca846">{"x":{"data":[{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[615,759,708,705,657,619,493,196],"text":["Season: Season 1<br />n:  615<br />sentiment: anger","Season: Season 2<br />n:  759<br />sentiment: anger","Season: Season 3<br />n:  708<br />sentiment: anger","Season: Season 4<br />n:  705<br />sentiment: anger","Season: Season 5<br />n:  657<br />sentiment: anger","Season: Season 6<br />n:  619<br />sentiment: anger","Season: Season 7<br />n:  493<br />sentiment: anger","Season: Season 8<br />n:  196<br />sentiment: anger"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"anger","legendgroup":"anger","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[860,1067,997,920,1024,879,630,282],"text":["Season: Season 1<br />n:  860<br />sentiment: anticipation","Season: Season 2<br />n: 1067<br />sentiment: anticipation","Season: Season 3<br />n:  997<br />sentiment: anticipation","Season: Season 4<br />n:  920<br />sentiment: anticipation","Season: Season 5<br />n: 1024<br />sentiment: anticipation","Season: Season 6<br />n:  879<br />sentiment: anticipation","Season: Season 7<br />n:  630<br />sentiment: anticipation","Season: Season 8<br />n:  282<br />sentiment: anticipation"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(72,40,120,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"anticipation","legendgroup":"anticipation","showlegend":true,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[700,757,697,681,588,534,421,172],"text":["Season: Season 1<br />n:  700<br />sentiment: disgust","Season: Season 2<br />n:  757<br />sentiment: disgust","Season: Season 3<br />n:  697<br />sentiment: disgust","Season: Season 4<br />n:  681<br />sentiment: disgust","Season: Season 5<br />n:  588<br />sentiment: disgust","Season: Season 6<br />n:  534<br />sentiment: disgust","Season: Season 7<br />n:  421<br />sentiment: disgust","Season: Season 8<br />n:  172<br />sentiment: disgust"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(62,74,137,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"disgust","legendgroup":"disgust","showlegend":true,"xaxis":"x3","yaxis":"y3","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[902,1122,1008,1006,917,866,743,329],"text":["Season: Season 1<br />n:  902<br />sentiment: fear","Season: Season 2<br />n: 1122<br />sentiment: fear","Season: Season 3<br />n: 1008<br />sentiment: fear","Season: Season 4<br />n: 1006<br />sentiment: fear","Season: Season 5<br />n:  917<br />sentiment: fear","Season: Season 6<br />n:  866<br />sentiment: fear","Season: Season 7<br />n:  743<br />sentiment: fear","Season: Season 8<br />n:  329<br />sentiment: fear"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(49,104,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"fear","legendgroup":"fear","showlegend":true,"xaxis":"x4","yaxis":"y4","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[703,923,913,823,854,710,513,212],"text":["Season: Season 1<br />n:  703<br />sentiment: joy","Season: Season 2<br />n:  923<br />sentiment: joy","Season: Season 3<br />n:  913<br />sentiment: joy","Season: Season 4<br />n:  823<br />sentiment: joy","Season: Season 5<br />n:  854<br />sentiment: joy","Season: Season 6<br />n:  710<br />sentiment: joy","Season: Season 7<br />n:  513<br />sentiment: joy","Season: Season 8<br />n:  212<br />sentiment: joy"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(38,130,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"joy","legendgroup":"joy","showlegend":true,"xaxis":"x","yaxis":"y5","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[1708,2007,1820,1724,1564,1526,1137,491],"text":["Season: Season 1<br />n: 1708<br />sentiment: negative","Season: Season 2<br />n: 2007<br />sentiment: negative","Season: Season 3<br />n: 1820<br />sentiment: negative","Season: Season 4<br />n: 1724<br />sentiment: negative","Season: Season 5<br />n: 1564<br />sentiment: negative","Season: Season 6<br />n: 1526<br />sentiment: negative","Season: Season 7<br />n: 1137<br />sentiment: negative","Season: Season 8<br />n:  491<br />sentiment: negative"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(31,158,137,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"negative","legendgroup":"negative","showlegend":true,"xaxis":"x2","yaxis":"y6","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[2062,2571,2288,2203,2127,1794,1499,691],"text":["Season: Season 1<br />n: 2062<br />sentiment: positive","Season: Season 2<br />n: 2571<br />sentiment: positive","Season: Season 3<br />n: 2288<br />sentiment: positive","Season: Season 4<br />n: 2203<br />sentiment: positive","Season: Season 5<br />n: 2127<br />sentiment: positive","Season: Season 6<br />n: 1794<br />sentiment: positive","Season: Season 7<br />n: 1499<br />sentiment: positive","Season: Season 8<br />n:  691<br />sentiment: positive"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(53,183,121,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"positive","legendgroup":"positive","showlegend":true,"xaxis":"x3","yaxis":"y7","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[686,846,836,842,742,696,481,265],"text":["Season: Season 1<br />n:  686<br />sentiment: sadness","Season: Season 2<br />n:  846<br />sentiment: sadness","Season: Season 3<br />n:  836<br />sentiment: sadness","Season: Season 4<br />n:  842<br />sentiment: sadness","Season: Season 5<br />n:  742<br />sentiment: sadness","Season: Season 6<br />n:  696<br />sentiment: sadness","Season: Season 7<br />n:  481<br />sentiment: sadness","Season: Season 8<br />n:  265<br />sentiment: sadness"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(109,205,89,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"sadness","legendgroup":"sadness","showlegend":true,"xaxis":"x4","yaxis":"y8","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[431,470,500,457,462,414,296,145],"text":["Season: Season 1<br />n:  431<br />sentiment: surprise","Season: Season 2<br />n:  470<br />sentiment: surprise","Season: Season 3<br />n:  500<br />sentiment: surprise","Season: Season 4<br />n:  457<br />sentiment: surprise","Season: Season 5<br />n:  462<br />sentiment: surprise","Season: Season 6<br />n:  414<br />sentiment: surprise","Season: Season 7<br />n:  296<br />sentiment: surprise","Season: Season 8<br />n:  145<br />sentiment: surprise"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(180,222,44,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"surprise","legendgroup":"surprise","showlegend":true,"xaxis":"x","yaxis":"y9","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.90000000000000036,0.89999999999999947],"base":[0,0,0,0,0,0,0,0],"x":[1,2,3,4,5,6,7,8],"y":[1555,1818,1529,1544,1417,1346,1045,440],"text":["Season: Season 1<br />n: 1555<br />sentiment: trust","Season: Season 2<br />n: 1818<br />sentiment: trust","Season: Season 3<br />n: 1529<br />sentiment: trust","Season: Season 4<br />n: 1544<br />sentiment: trust","Season: Season 5<br />n: 1417<br />sentiment: trust","Season: Season 6<br />n: 1346<br />sentiment: trust","Season: Season 7<br />n: 1045<br />sentiment: trust","Season: Season 8<br />n:  440<br />sentiment: trust"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"name":"trust","legendgroup":"trust","showlegend":true,"xaxis":"x2","yaxis":"y10","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":51.201328352013284,"r":7.3059360730593621,"b":37.260273972602747,"l":43.105022831050235},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Emotion Distribution by Season <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,0.204337899543379],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y9","title":"","hoverformat":".2f"},"annotations":[{"text":"Season","x":0.5,"y":0,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"top","annotationType":"axis","yshift":-21.917808219178081},{"text":"Word Count","x":0,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xref":"paper","yref":"paper","textangle":-90,"xanchor":"right","yanchor":"center","annotationType":"axis","xshift":-27.762557077625573},{"text":"anger","x":0.1021689497716895,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"anticipation","x":0.375,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"disgust","x":0.625,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"fear","x":0.89783105022831045,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"joy","x":0.1021689497716895,"y":0.62653936626539375,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"negative","x":0.375,"y":0.62653936626539375,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"positive","x":0.625,"y":0.62653936626539375,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"sadness","x":0.89783105022831045,"y":0.62653936626539375,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"surprise","x":0.1021689497716895,"y":0.29320603293206038,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"trust","x":0.375,"y":0.29320603293206038,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.955168119551681},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"yaxis":{"domain":[0.70679396706793973,1],"automargin":true,"type":"linear","autorange":false,"range":[-37.950000000000003,796.95000000000005],"tickmode":"array","ticktext":["0","200","400","600"],"tickvals":[0,199.99999999999994,400,600],"categoryorder":"array","categoryarray":["0","200","400","600"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.204337899543379,"y0":0,"y1":23.644665836446663,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.295662100456621,"x1":0.454337899543379,"y0":0,"y1":23.644665836446663,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.545662100456621,"x1":0.704337899543379,"y0":0,"y1":23.644665836446663,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.795662100456621,"x1":1,"y0":0,"y1":23.644665836446663,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.204337899543379,"y0":0,"y1":23.644665836446663,"yanchor":0.62653936626539375,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.295662100456621,"x1":0.454337899543379,"y0":0,"y1":23.644665836446663,"yanchor":0.62653936626539375,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.545662100456621,"x1":0.704337899543379,"y0":0,"y1":23.644665836446663,"yanchor":0.62653936626539375,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.795662100456621,"x1":1,"y0":0,"y1":23.644665836446663,"yanchor":0.62653936626539375,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":0.204337899543379,"y0":0,"y1":23.644665836446663,"yanchor":0.29320603293206038,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0.295662100456621,"x1":0.454337899543379,"y0":0,"y1":23.644665836446663,"yanchor":0.29320603293206038,"ysizemode":"pixel"}],"xaxis2":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.295662100456621,0.454337899543379],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y10","title":"","hoverformat":".2f"},"yaxis2":{"type":"linear","autorange":false,"range":[-53.350000000000001,1120.3499999999999],"tickmode":"array","ticktext":["0","300","600","900"],"tickvals":[0,300,600,900],"categoryorder":"array","categoryarray":["0","300","600","900"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.70679396706793973,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x2","title":"","hoverformat":".2f"},"xaxis3":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.545662100456621,0.704337899543379],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y7","title":"","hoverformat":".2f"},"yaxis3":{"type":"linear","autorange":false,"range":[-37.850000000000001,794.85000000000002],"tickmode":"array","ticktext":["0","200","400","600"],"tickvals":[0,200,400,600],"categoryorder":"array","categoryarray":["0","200","400","600"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.70679396706793973,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x3","title":"","hoverformat":".2f"},"xaxis4":{"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.795662100456621,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y8","title":"","hoverformat":".2f"},"yaxis4":{"type":"linear","autorange":false,"range":[-56.100000000000001,1178.0999999999999],"tickmode":"array","ticktext":["0","300","600","900"],"tickvals":[0,300,600,900],"categoryorder":"array","categoryarray":["0","300","600","900"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.70679396706793973,1],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x4","title":"","hoverformat":".2f"},"yaxis5":{"type":"linear","autorange":false,"range":[-46.150000000000006,969.14999999999998],"tickmode":"array","ticktext":["0","250","500","750"],"tickvals":[0,249.99999999999997,500,750],"categoryorder":"array","categoryarray":["0","250","500","750"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.37346063373460636,0.62653936626539375],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"yaxis6":{"type":"linear","autorange":false,"range":[-100.35000000000001,2107.3499999999999],"tickmode":"array","ticktext":["0","500","1000","1500","2000"],"tickvals":[0,500,999.99999999999989,1500,2000],"categoryorder":"array","categoryarray":["0","500","1000","1500","2000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.37346063373460636,0.62653936626539375],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x2","title":"","hoverformat":".2f"},"yaxis7":{"type":"linear","autorange":false,"range":[-128.55000000000001,2699.5500000000002],"tickmode":"array","ticktext":["0","1000","2000"],"tickvals":[0,1000,2000.0000000000002],"categoryorder":"array","categoryarray":["0","1000","2000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.37346063373460636,0.62653936626539375],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x3","title":"","hoverformat":".2f"},"yaxis8":{"type":"linear","autorange":false,"range":[-42.300000000000004,888.29999999999995],"tickmode":"array","ticktext":["0","200","400","600","800"],"tickvals":[0,199.99999999999997,400,600,800],"categoryorder":"array","categoryarray":["0","200","400","600","800"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.37346063373460636,0.62653936626539375],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x4","title":"","hoverformat":".2f"},"yaxis9":{"type":"linear","autorange":false,"range":[-25,525],"tickmode":"array","ticktext":["0","100","200","300","400","500"],"tickvals":[0,100,200,300,400,500],"categoryorder":"array","categoryarray":["0","100","200","300","400","500"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.29320603293206038],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"yaxis10":{"type":"linear","autorange":false,"range":[-90.900000000000006,1908.9000000000001],"tickmode":"array","ticktext":["0","500","1000","1500"],"tickvals":[0,500,1000.0000000000001,1500],"categoryorder":"array","categoryarray":["0","500","1000","1500"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.29320603293206038],"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x2","title":"","hoverformat":".2f"},"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"orientation":"h","x":0.5,"y":-0.14999999999999999,"xanchor":"center","yanchor":"top","title":{"text":"Emotion","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"611060ad6a04":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"611060ad6a04","visdat":{"611060ad6a04":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="lexicon-comparison-summary" class="level3">
+<h3 class="anchored" data-anchor-id="lexicon-comparison-summary">Lexicon Comparison Summary</h3>
+<ul>
+<li><strong>Bing Lexicon</strong> reveals an overall balance between positive and negative sentiment across the series, with notable variation by season.</li>
+<li><strong>NRC Lexicon</strong> shows that emotions like positive, negative, trust are most prevalent in Game of Thrones dialogue, reflecting the show’s dramatic and often dark narrative.</li>
+</ul>
+</section>
+</section>
+<section id="part-2-sentiment-trajectory" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-sentiment-trajectory">Part 2: Sentiment Trajectory</h2>
+<p>How does emotional tone shift throughout the series?</p>
+<section id="plot-3-net-sentiment-over-time-by-episode" class="level3">
+<h3 class="anchored" data-anchor-id="plot-3-net-sentiment-over-time-by-episode">Plot 3: Net Sentiment Over Time (by Episode)</h3>
+<p>This visualization tracks the cumulative sentiment trajectory across all episodes.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sentiment_trajectory <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(bing, <span class="at">by =</span> <span class="st">"word"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sentiment_value =</span> <span class="fu">ifelse</span>(sentiment <span class="sc">==</span> <span class="st">"positive"</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Season, Episode, episode_id) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">net_sentiment =</span> <span class="fu">sum</span>(sentiment_value), <span class="at">total_words =</span> <span class="fu">n</span>(), <span class="at">sentiment_score =</span> net_sentiment <span class="sc">/</span> total_words, <span class="at">.groups =</span> <span class="st">'drop'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Season, Episode) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">episode_num =</span> <span class="fu">row_number</span>())</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>trajectory_plot <span class="ot">&lt;-</span> sentiment_trajectory <span class="sc">%&gt;%</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> episode_num, <span class="at">y =</span> sentiment_score, <span class="at">color =</span> <span class="fu">as.factor</span>(Season), <span class="at">group =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">span =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_d</span>(<span class="at">name =</span> <span class="st">"Season"</span>) <span class="sc">+</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sentiment Score Trajectory Across All Episodes"</span>, <span class="at">x =</span> <span class="st">"Episode Number (Chronological)"</span>, <span class="at">y =</span> <span class="st">"Sentiment Score (positive - negative) / total words"</span>, <span class="at">color =</span> <span class="st">"Season"</span>) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(trajectory_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"color"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-d0463d3088a08cb078bf" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-d0463d3088a08cb078bf">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10],"y":[0.05627705627705628,-0.12,-0.033057851239669422,-0.082051282051282051,-0.018567639257294429,-0.097949886104783598,0.058823529411764705,-0.064516129032258063,-0.042016806722689079,0.0031152647975077881],"text":["episode_num:  1<br />sentiment_score:  0.056277056<br />as.factor(Season): Season 1","episode_num:  2<br />sentiment_score: -0.120000000<br />as.factor(Season): Season 1","episode_num:  3<br />sentiment_score: -0.033057851<br />as.factor(Season): Season 1","episode_num:  4<br />sentiment_score: -0.082051282<br />as.factor(Season): Season 1","episode_num:  5<br />sentiment_score: -0.018567639<br />as.factor(Season): Season 1","episode_num:  6<br />sentiment_score: -0.097949886<br />as.factor(Season): Season 1","episode_num:  7<br />sentiment_score:  0.058823529<br />as.factor(Season): Season 1","episode_num:  8<br />sentiment_score: -0.064516129<br />as.factor(Season): Season 1","episode_num:  9<br />sentiment_score: -0.042016807<br />as.factor(Season): Season 1","episode_num: 10<br />sentiment_score:  0.003115265<br />as.factor(Season): Season 1"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(68,1,84,0.6)","dash":"solid"},"hoveron":"points","name":"Season 1","legendgroup":"Season 1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(68,1,84,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(68,1,84,1)"}},"frame":null},{"x":[11,12,13,14,15,16,17,18,19,20],"y":[-0.019417475728155338,0.10030395136778116,-0.046153846153846156,0.061538461538461542,0.082508250825082508,0.044854881266490766,-0.1182108626198083,-0.053763440860215055,0.0065359477124183009,0.013245033112582781],"text":["episode_num: 11<br />sentiment_score: -0.019417476<br />as.factor(Season): Season 2","episode_num: 12<br />sentiment_score:  0.100303951<br />as.factor(Season): Season 2","episode_num: 13<br />sentiment_score: -0.046153846<br />as.factor(Season): Season 2","episode_num: 14<br />sentiment_score:  0.061538462<br />as.factor(Season): Season 2","episode_num: 15<br />sentiment_score:  0.082508251<br />as.factor(Season): Season 2","episode_num: 16<br />sentiment_score:  0.044854881<br />as.factor(Season): Season 2","episode_num: 17<br />sentiment_score: -0.118210863<br />as.factor(Season): Season 2","episode_num: 18<br />sentiment_score: -0.053763441<br />as.factor(Season): Season 2","episode_num: 19<br />sentiment_score:  0.006535948<br />as.factor(Season): Season 2","episode_num: 20<br />sentiment_score:  0.013245033<br />as.factor(Season): Season 2"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(70,51,126,0.6)","dash":"solid"},"hoveron":"points","name":"Season 2","legendgroup":"Season 2","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(70,51,126,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(70,51,126,1)"}},"frame":null},{"x":[21,22,23,24,25,26,27,28,29,30],"y":[0.029940119760479042,-0.1182108626198083,-0.02564102564102564,0.11174785100286533,-0.18248175182481752,-0.13253012048192772,-0.022508038585209004,0.15531335149863759,0.1134020618556701,0.13513513513513514],"text":["episode_num: 21<br />sentiment_score:  0.029940120<br />as.factor(Season): Season 3","episode_num: 22<br />sentiment_score: -0.118210863<br />as.factor(Season): Season 3","episode_num: 23<br />sentiment_score: -0.025641026<br />as.factor(Season): Season 3","episode_num: 24<br />sentiment_score:  0.111747851<br />as.factor(Season): Season 3","episode_num: 25<br />sentiment_score: -0.182481752<br />as.factor(Season): Season 3","episode_num: 26<br />sentiment_score: -0.132530120<br />as.factor(Season): Season 3","episode_num: 27<br />sentiment_score: -0.022508039<br />as.factor(Season): Season 3","episode_num: 28<br />sentiment_score:  0.155313351<br />as.factor(Season): Season 3","episode_num: 29<br />sentiment_score:  0.113402062<br />as.factor(Season): Season 3","episode_num: 30<br />sentiment_score:  0.135135135<br />as.factor(Season): Season 3"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(54,92,141,0.6)","dash":"solid"},"hoveron":"points","name":"Season 3","legendgroup":"Season 3","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(54,92,141,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(54,92,141,1)"}},"frame":null},{"x":[31,32,33,34,35,36,37,38,39,40],"y":[0.039408866995073892,0.019157088122605363,0.10674157303370786,0.087281795511221949,-0.07407407407407407,0.11564625850340136,-0.038461538461538464,-0.067010309278350513,-0.22186495176848875,-0.068965517241379309],"text":["episode_num: 31<br />sentiment_score:  0.039408867<br />as.factor(Season): Season 4","episode_num: 32<br />sentiment_score:  0.019157088<br />as.factor(Season): Season 4","episode_num: 33<br />sentiment_score:  0.106741573<br />as.factor(Season): Season 4","episode_num: 34<br />sentiment_score:  0.087281796<br />as.factor(Season): Season 4","episode_num: 35<br />sentiment_score: -0.074074074<br />as.factor(Season): Season 4","episode_num: 36<br />sentiment_score:  0.115646259<br />as.factor(Season): Season 4","episode_num: 37<br />sentiment_score: -0.038461538<br />as.factor(Season): Season 4","episode_num: 38<br />sentiment_score: -0.067010309<br />as.factor(Season): Season 4","episode_num: 39<br />sentiment_score: -0.221864952<br />as.factor(Season): Season 4","episode_num: 40<br />sentiment_score: -0.068965517<br />as.factor(Season): Season 4"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(39,127,142,0.6)","dash":"solid"},"hoveron":"points","name":"Season 4","legendgroup":"Season 4","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(39,127,142,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(39,127,142,1)"}},"frame":null},{"x":[41,42,43,44,45,46,47,48,49,50],"y":[0.1705685618729097,0.066037735849056603,0.1396011396011396,0.087431693989071038,0.096000000000000002,-0.0038610038610038611,0.065743944636678195,0.0089552238805970154,-0.015503875968992248,0.14285714285714285],"text":["episode_num: 41<br />sentiment_score:  0.170568562<br />as.factor(Season): Season 5","episode_num: 42<br />sentiment_score:  0.066037736<br />as.factor(Season): Season 5","episode_num: 43<br />sentiment_score:  0.139601140<br />as.factor(Season): Season 5","episode_num: 44<br />sentiment_score:  0.087431694<br />as.factor(Season): Season 5","episode_num: 45<br />sentiment_score:  0.096000000<br />as.factor(Season): Season 5","episode_num: 46<br />sentiment_score: -0.003861004<br />as.factor(Season): Season 5","episode_num: 47<br />sentiment_score:  0.065743945<br />as.factor(Season): Season 5","episode_num: 48<br />sentiment_score:  0.008955224<br />as.factor(Season): Season 5","episode_num: 49<br />sentiment_score: -0.015503876<br />as.factor(Season): Season 5","episode_num: 50<br />sentiment_score:  0.142857143<br />as.factor(Season): Season 5"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(31,161,135,0.6)","dash":"solid"},"hoveron":"points","name":"Season 5","legendgroup":"Season 5","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(31,161,135,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(31,161,135,1)"}},"frame":null},{"x":[51,52,53,54,55,56,57,58,59,60],"y":[-0.1111111111111111,-0.090909090909090912,-0.086956521739130432,0.079847908745247151,0.025773195876288658,0.2029520295202952,-0.015037593984962405,-0.077441077441077436,0.0064516129032258064,0.116751269035533],"text":["episode_num: 51<br />sentiment_score: -0.111111111<br />as.factor(Season): Season 6","episode_num: 52<br />sentiment_score: -0.090909091<br />as.factor(Season): Season 6","episode_num: 53<br />sentiment_score: -0.086956522<br />as.factor(Season): Season 6","episode_num: 54<br />sentiment_score:  0.079847909<br />as.factor(Season): Season 6","episode_num: 55<br />sentiment_score:  0.025773196<br />as.factor(Season): Season 6","episode_num: 56<br />sentiment_score:  0.202952030<br />as.factor(Season): Season 6","episode_num: 57<br />sentiment_score: -0.015037594<br />as.factor(Season): Season 6","episode_num: 58<br />sentiment_score: -0.077441077<br />as.factor(Season): Season 6","episode_num: 59<br />sentiment_score:  0.006451613<br />as.factor(Season): Season 6","episode_num: 60<br />sentiment_score:  0.116751269<br />as.factor(Season): Season 6"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(74,193,109,0.6)","dash":"solid"},"hoveron":"points","name":"Season 6","legendgroup":"Season 6","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(74,193,109,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(74,193,109,1)"}},"frame":null},{"x":[61,62,63,64,65,66,67],"y":[0.00641025641025641,0.1038961038961039,0.017391304347826087,-0.1169811320754717,0.017751479289940829,-0.022988505747126436,-0.12536443148688048],"text":["episode_num: 61<br />sentiment_score:  0.006410256<br />as.factor(Season): Season 7","episode_num: 62<br />sentiment_score:  0.103896104<br />as.factor(Season): Season 7","episode_num: 63<br />sentiment_score:  0.017391304<br />as.factor(Season): Season 7","episode_num: 64<br />sentiment_score: -0.116981132<br />as.factor(Season): Season 7","episode_num: 65<br />sentiment_score:  0.017751479<br />as.factor(Season): Season 7","episode_num: 66<br />sentiment_score: -0.022988506<br />as.factor(Season): Season 7","episode_num: 67<br />sentiment_score: -0.125364431<br />as.factor(Season): Season 7"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(159,218,58,0.6)","dash":"solid"},"hoveron":"points","name":"Season 7","legendgroup":"Season 7","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(159,218,58,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(159,218,58,1)"}},"frame":null},{"x":[68,69,70,71,72,73],"y":[0.0625,0.096085409252669035,-0.095238095238095233,0.29999999999999999,-0.095541401273885357,0.19831223628691982],"text":["episode_num: 68<br />sentiment_score:  0.062500000<br />as.factor(Season): Season 8","episode_num: 69<br />sentiment_score:  0.096085409<br />as.factor(Season): Season 8","episode_num: 70<br />sentiment_score: -0.095238095<br />as.factor(Season): Season 8","episode_num: 71<br />sentiment_score:  0.300000000<br />as.factor(Season): Season 8","episode_num: 72<br />sentiment_score: -0.095541401<br />as.factor(Season): Season 8","episode_num: 73<br />sentiment_score:  0.198312236<br />as.factor(Season): Season 8"],"type":"scatter","mode":"lines+markers","line":{"width":1.8897637795275593,"color":"rgba(253,231,37,0.6)","dash":"solid"},"hoveron":"points","name":"Season 8","legendgroup":"Season 8","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","marker":{"autocolorscale":false,"color":"rgba(253,231,37,1)","opacity":0.5,"size":7.559055118110237,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(253,231,37,1)"}},"frame":null},{"x":[1,1.9113924050632911,2.8227848101265822,3.7341772151898733,4.6455696202531644,5.5569620253164551,6.4683544303797467,7.3797468354430382,8.2911392405063289,9.2025316455696196,10.11392405063291,11.025316455696203,11.936708860759493,12.848101265822784,13.759493670886076,14.670886075949367,15.582278481012658,16.493670886075947,17.405063291139239,18.316455696202532,19.22784810126582,20.139240506329113,21.050632911392405,21.962025316455694,22.873417721518987,23.784810126582279,24.696202531645568,25.60759493670886,26.518987341772153,27.430379746835442,28.341772151898734,29.253164556962023,30.164556962025316,31.075949367088608,31.987341772151897,32.898734177215189,33.810126582278478,34.721518987341774,35.632911392405063,36.544303797468352,37.455696202531641,38.367088607594937,39.278481012658226,40.189873417721515,41.101265822784811,42.0126582278481,42.924050632911388,43.835443037974684,44.746835443037973,45.658227848101262,46.569620253164558,47.481012658227847,48.392405063291136,49.303797468354432,50.215189873417721,51.12658227848101,52.037974683544306,52.949367088607595,53.860759493670884,54.772151898734172,55.683544303797468,56.594936708860757,57.506329113924046,58.417721518987342,59.329113924050631,60.24050632911392,61.151898734177216,62.063291139240505,62.974683544303794,63.88607594936709,64.797468354430379,65.708860759493675,66.620253164556956,67.531645569620252,68.443037974683548,69.35443037974683,70.265822784810126,71.177215189873422,72.088607594936704,73],"y":[-0.035900670304368498,-0.037883148829509272,-0.038583898882143711,-0.037469341632469143,-0.035264529130031141,-0.031956380666722246,-0.026670721571126453,-0.020677451215029355,-0.014838112331149633,-0.0044878335586861278,0.0038600212126777781,0.010155324738596413,0.016346946944270819,0.020100798576858151,0.019513787366343193,0.016498406457215793,0.013306239897110998,0.0071640713291580786,-0.000761635380950212,-0.0088515402902131952,-0.015880564295179665,-0.027342306533072191,-0.039734192740102758,-0.045443413316186211,-0.042656296056763993,-0.036631058288639433,-0.026782854288848312,-0.010478015726105575,0.008327397666199764,0.025421442230377494,0.038225940054233146,0.057418831814146948,0.076876602517270923,0.085509772840718506,0.079885223444157355,0.069603318207438356,0.053603600028518952,0.025494379003556496,-0.0043496469424266701,-0.025380393348659037,-0.028714699404054366,-0.020372823002472947,-0.0082840933883778431,0.001379346947174359,0.021923453403993595,0.040127317187142027,0.050593759853933475,0.062539721983442847,0.072094553619316978,0.075387604805203026,0.065607509902450997,0.037751008773936952,0.0089105707067307222,-0.0037096153402311175,-0.0071510282276111021,-0.0089998520804598948,-0.007634160416455078,-0.0025309425944423586,0.0041416886191891836,0.010215620458050478,0.017749480708897057,0.031592143174155762,0.043618003131359551,0.045873137853509556,0.040481484979741009,0.034611246543952062,0.024132220449387991,0.009989273836421439,-0.0028152042633243814,-0.0092788248182262157,-0.0092715095855001838,-0.0075492567343051816,-0.0026177507041087651,0.0063570158223275226,0.017860348434585695,0.033354145441651585,0.052656456814527366,0.07546423089183836,0.10173502193715689,0.1314263842140565],"text":["episode_num:  1.000000<br />sentiment_score: -0.0359006703<br />as.factor(Season): black","episode_num:  1.911392<br />sentiment_score: -0.0378831488<br />as.factor(Season): black","episode_num:  2.822785<br />sentiment_score: -0.0385838989<br />as.factor(Season): black","episode_num:  3.734177<br />sentiment_score: -0.0374693416<br />as.factor(Season): black","episode_num:  4.645570<br />sentiment_score: -0.0352645291<br />as.factor(Season): black","episode_num:  5.556962<br />sentiment_score: -0.0319563807<br />as.factor(Season): black","episode_num:  6.468354<br />sentiment_score: -0.0266707216<br />as.factor(Season): black","episode_num:  7.379747<br />sentiment_score: -0.0206774512<br />as.factor(Season): black","episode_num:  8.291139<br />sentiment_score: -0.0148381123<br />as.factor(Season): black","episode_num:  9.202532<br />sentiment_score: -0.0044878336<br />as.factor(Season): black","episode_num: 10.113924<br />sentiment_score:  0.0038600212<br />as.factor(Season): black","episode_num: 11.025316<br />sentiment_score:  0.0101553247<br />as.factor(Season): black","episode_num: 11.936709<br />sentiment_score:  0.0163469469<br />as.factor(Season): black","episode_num: 12.848101<br />sentiment_score:  0.0201007986<br />as.factor(Season): black","episode_num: 13.759494<br />sentiment_score:  0.0195137874<br />as.factor(Season): black","episode_num: 14.670886<br />sentiment_score:  0.0164984065<br />as.factor(Season): black","episode_num: 15.582278<br />sentiment_score:  0.0133062399<br />as.factor(Season): black","episode_num: 16.493671<br />sentiment_score:  0.0071640713<br />as.factor(Season): black","episode_num: 17.405063<br />sentiment_score: -0.0007616354<br />as.factor(Season): black","episode_num: 18.316456<br />sentiment_score: -0.0088515403<br />as.factor(Season): black","episode_num: 19.227848<br />sentiment_score: -0.0158805643<br />as.factor(Season): black","episode_num: 20.139241<br />sentiment_score: -0.0273423065<br />as.factor(Season): black","episode_num: 21.050633<br />sentiment_score: -0.0397341927<br />as.factor(Season): black","episode_num: 21.962025<br />sentiment_score: -0.0454434133<br />as.factor(Season): black","episode_num: 22.873418<br />sentiment_score: -0.0426562961<br />as.factor(Season): black","episode_num: 23.784810<br />sentiment_score: -0.0366310583<br />as.factor(Season): black","episode_num: 24.696203<br />sentiment_score: -0.0267828543<br />as.factor(Season): black","episode_num: 25.607595<br />sentiment_score: -0.0104780157<br />as.factor(Season): black","episode_num: 26.518987<br />sentiment_score:  0.0083273977<br />as.factor(Season): black","episode_num: 27.430380<br />sentiment_score:  0.0254214422<br />as.factor(Season): black","episode_num: 28.341772<br />sentiment_score:  0.0382259401<br />as.factor(Season): black","episode_num: 29.253165<br />sentiment_score:  0.0574188318<br />as.factor(Season): black","episode_num: 30.164557<br />sentiment_score:  0.0768766025<br />as.factor(Season): black","episode_num: 31.075949<br />sentiment_score:  0.0855097728<br />as.factor(Season): black","episode_num: 31.987342<br />sentiment_score:  0.0798852234<br />as.factor(Season): black","episode_num: 32.898734<br />sentiment_score:  0.0696033182<br />as.factor(Season): black","episode_num: 33.810127<br />sentiment_score:  0.0536036000<br />as.factor(Season): black","episode_num: 34.721519<br />sentiment_score:  0.0254943790<br />as.factor(Season): black","episode_num: 35.632911<br />sentiment_score: -0.0043496469<br />as.factor(Season): black","episode_num: 36.544304<br />sentiment_score: -0.0253803933<br />as.factor(Season): black","episode_num: 37.455696<br />sentiment_score: -0.0287146994<br />as.factor(Season): black","episode_num: 38.367089<br />sentiment_score: -0.0203728230<br />as.factor(Season): black","episode_num: 39.278481<br />sentiment_score: -0.0082840934<br />as.factor(Season): black","episode_num: 40.189873<br />sentiment_score:  0.0013793469<br />as.factor(Season): black","episode_num: 41.101266<br />sentiment_score:  0.0219234534<br />as.factor(Season): black","episode_num: 42.012658<br />sentiment_score:  0.0401273172<br />as.factor(Season): black","episode_num: 42.924051<br />sentiment_score:  0.0505937599<br />as.factor(Season): black","episode_num: 43.835443<br />sentiment_score:  0.0625397220<br />as.factor(Season): black","episode_num: 44.746835<br />sentiment_score:  0.0720945536<br />as.factor(Season): black","episode_num: 45.658228<br />sentiment_score:  0.0753876048<br />as.factor(Season): black","episode_num: 46.569620<br />sentiment_score:  0.0656075099<br />as.factor(Season): black","episode_num: 47.481013<br />sentiment_score:  0.0377510088<br />as.factor(Season): black","episode_num: 48.392405<br />sentiment_score:  0.0089105707<br />as.factor(Season): black","episode_num: 49.303797<br />sentiment_score: -0.0037096153<br />as.factor(Season): black","episode_num: 50.215190<br />sentiment_score: -0.0071510282<br />as.factor(Season): black","episode_num: 51.126582<br />sentiment_score: -0.0089998521<br />as.factor(Season): black","episode_num: 52.037975<br />sentiment_score: -0.0076341604<br />as.factor(Season): black","episode_num: 52.949367<br />sentiment_score: -0.0025309426<br />as.factor(Season): black","episode_num: 53.860759<br />sentiment_score:  0.0041416886<br />as.factor(Season): black","episode_num: 54.772152<br />sentiment_score:  0.0102156205<br />as.factor(Season): black","episode_num: 55.683544<br />sentiment_score:  0.0177494807<br />as.factor(Season): black","episode_num: 56.594937<br />sentiment_score:  0.0315921432<br />as.factor(Season): black","episode_num: 57.506329<br />sentiment_score:  0.0436180031<br />as.factor(Season): black","episode_num: 58.417722<br />sentiment_score:  0.0458731379<br />as.factor(Season): black","episode_num: 59.329114<br />sentiment_score:  0.0404814850<br />as.factor(Season): black","episode_num: 60.240506<br />sentiment_score:  0.0346112465<br />as.factor(Season): black","episode_num: 61.151899<br />sentiment_score:  0.0241322204<br />as.factor(Season): black","episode_num: 62.063291<br />sentiment_score:  0.0099892738<br />as.factor(Season): black","episode_num: 62.974684<br />sentiment_score: -0.0028152043<br />as.factor(Season): black","episode_num: 63.886076<br />sentiment_score: -0.0092788248<br />as.factor(Season): black","episode_num: 64.797468<br />sentiment_score: -0.0092715096<br />as.factor(Season): black","episode_num: 65.708861<br />sentiment_score: -0.0075492567<br />as.factor(Season): black","episode_num: 66.620253<br />sentiment_score: -0.0026177507<br />as.factor(Season): black","episode_num: 67.531646<br />sentiment_score:  0.0063570158<br />as.factor(Season): black","episode_num: 68.443038<br />sentiment_score:  0.0178603484<br />as.factor(Season): black","episode_num: 69.354430<br />sentiment_score:  0.0333541454<br />as.factor(Season): black","episode_num: 70.265823<br />sentiment_score:  0.0526564568<br />as.factor(Season): black","episode_num: 71.177215<br />sentiment_score:  0.0754642309<br />as.factor(Season): black","episode_num: 72.088608<br />sentiment_score:  0.1017350219<br />as.factor(Season): black","episode_num: 73.000000<br />sentiment_score:  0.1314263842<br />as.factor(Season): black"],"type":"scatter","mode":"lines","name":"fitted values","line":{"width":3.7795275590551185,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,1.9113924050632911,2.8227848101265822,3.7341772151898733,4.6455696202531644,5.5569620253164551,6.4683544303797467,7.3797468354430382,8.2911392405063289,9.2025316455696196,10.11392405063291,11.025316455696203,11.936708860759493,12.848101265822784,13.759493670886076,14.670886075949367,15.582278481012658,16.493670886075947,17.405063291139239,18.316455696202532,19.22784810126582,20.139240506329113,21.050632911392405,21.962025316455694,22.873417721518987,23.784810126582279,24.696202531645568,25.60759493670886,26.518987341772153,27.430379746835442,28.341772151898734,29.253164556962023,30.164556962025316,31.075949367088608,31.987341772151897,32.898734177215189,33.810126582278478,34.721518987341774,35.632911392405063,36.544303797468352,37.455696202531641,38.367088607594937,39.278481012658226,40.189873417721515,41.101265822784811,42.0126582278481,42.924050632911388,43.835443037974684,44.746835443037973,45.658227848101262,46.569620253164558,47.481012658227847,48.392405063291136,49.303797468354432,50.215189873417721,51.12658227848101,52.037974683544306,52.949367088607595,53.860759493670884,54.772151898734172,55.683544303797468,56.594936708860757,57.506329113924046,58.417721518987342,59.329113924050631,60.24050632911392,61.151898734177216,62.063291139240505,62.974683544303794,63.88607594936709,64.797468354430379,65.708860759493675,66.620253164556956,67.531645569620252,68.443037974683548,69.35443037974683,70.265822784810126,71.177215189873422,72.088607594936704,73,73,73,72.088607594936704,71.177215189873422,70.265822784810126,69.35443037974683,68.443037974683548,67.531645569620252,66.620253164556956,65.708860759493675,64.797468354430379,63.88607594936709,62.974683544303794,62.063291139240505,61.151898734177216,60.24050632911392,59.329113924050631,58.417721518987342,57.506329113924046,56.594936708860757,55.683544303797468,54.772151898734172,53.860759493670884,52.949367088607595,52.037974683544306,51.12658227848101,50.215189873417721,49.303797468354432,48.392405063291136,47.481012658227847,46.569620253164558,45.658227848101262,44.746835443037973,43.835443037974684,42.924050632911388,42.0126582278481,41.101265822784811,40.189873417721515,39.278481012658226,38.367088607594937,37.455696202531641,36.544303797468352,35.632911392405063,34.721518987341774,33.810126582278478,32.898734177215189,31.987341772151897,31.075949367088608,30.164556962025316,29.253164556962023,28.341772151898734,27.430379746835442,26.518987341772153,25.60759493670886,24.696202531645568,23.784810126582279,22.873417721518987,21.962025316455694,21.050632911392405,20.139240506329113,19.22784810126582,18.316455696202532,17.405063291139239,16.493670886075947,15.582278481012658,14.670886075949367,13.759493670886076,12.848101265822784,11.936708860759493,11.025316455696203,10.11392405063291,9.2025316455696196,8.2911392405063289,7.3797468354430382,6.4683544303797467,5.5569620253164551,4.6455696202531644,3.7341772151898733,2.8227848101265822,1.9113924050632911,1,1],"y":[-0.16259868498008398,-0.13892014596956898,-0.12040134430814248,-0.10696733462900015,-0.098904973822524167,-0.094648741699116606,-0.090681445102735264,-0.08678420859856989,-0.08287425710490344,-0.073591705873833554,-0.066152902197711333,-0.058331158192872712,-0.053434021268858267,-0.052927521158565236,-0.052198107179125139,-0.056192432648022976,-0.058631684642892617,-0.06122344391002469,-0.068881208724568543,-0.080404650048769108,-0.0887943803235621,-0.097500511723283709,-0.11040184909094983,-0.11858110407015815,-0.11422597229487713,-0.10956109863120031,-0.098285830666391572,-0.078567726873504662,-0.060097067955358824,-0.046562249749033321,-0.03442897939670074,-0.012519567010510491,0.0058411196242980634,0.012394803253434783,0.0083715455560354063,-0.0034894734612296446,-0.017433330251960616,-0.042365628080980183,-0.073137795054309507,-0.097747239020662624,-0.10104323892312848,-0.090169061562839548,-0.079712504015923363,-0.071594747197415834,-0.049625991513180617,-0.03301666437982214,-0.019960773286960408,-0.0051650670366382712,0.0028940678534475767,0.0026994596208219229,-0.006349213729111125,-0.031987322592858851,-0.062915945805939455,-0.076458342112689953,-0.07882446817199136,-0.082077239438206384,-0.077704513812961826,-0.07015931633735803,-0.065508244587821757,-0.062718002619223473,-0.053812084211833665,-0.038175216680379473,-0.028590550561178082,-0.026602250476219551,-0.031391784760548713,-0.038295506608676907,-0.04525719608711154,-0.056611980144506274,-0.070656766539495514,-0.079291156034312568,-0.078532223492564751,-0.075406614446728068,-0.068995299611921954,-0.057704841382530569,-0.044817864018295572,-0.030270149344353701,-0.016781189528632667,-0.0064338379402394813,0.0005247916095016264,0.0046965942119511495,0.0046965942119511495,0.25815617421616188,0.20294525226481214,0.15736229972391619,0.1220941031576874,0.096978440227656865,0.08053856088746697,0.070418873027185608,0.063759798203704435,0.060308100978117708,0.059989204321564377,0.06073350639786014,0.065026358012846758,0.076590527817349152,0.09352163698588753,0.10751799969658103,0.11235475472003073,0.11834852618323866,0.11582655682389718,0.101359503028691,0.089311045629627772,0.083149243535324435,0.073791621826200138,0.0650974311484733,0.062436192980051666,0.064077535277286601,0.06452241171676916,0.069039111432227712,0.080737087219400899,0.10748934014073275,0.13756423353401312,0.14807574998958412,0.14129503938518639,0.13024451100352397,0.12114829299482735,0.11327129875410619,0.093472898321167813,0.074353441091764547,0.063144317239167663,0.049423415557893646,0.043613840115019745,0.046986452323344557,0.064438501169456153,0.093354386088093183,0.12464053030899852,0.14269610987610637,0.15139890133227929,0.15862474242800223,0.14791208541024378,0.12735723063880439,0.11088085950516703,0.097405134209788316,0.076751863287758348,0.057611695421293518,0.044720122088694941,0.036298982053921451,0.028913380181349146,0.027694277437785735,0.030933463610744311,0.04281589865713932,0.057033251733202776,0.062701569468342724,0.067357937962668119,0.075551586568340851,0.085244164437114606,0.089189245562454555,0.091225681911811532,0.093129118312281531,0.086127915157399898,0.078641807670065539,0.0738729446230669,0.064616038756461311,0.053198032442604168,0.04542930616851118,0.037340001960482351,0.030735980365672121,0.028375915562461884,0.032028651364061862,0.043233546543855056,0.063153848310550431,0.090797344371346983,-0.16259868498008398],"text":["episode_num:  1.000000<br />sentiment_score: -0.0359006703<br />as.factor(Season): black","episode_num:  1.911392<br />sentiment_score: -0.0378831488<br />as.factor(Season): black","episode_num:  2.822785<br />sentiment_score: -0.0385838989<br />as.factor(Season): black","episode_num:  3.734177<br />sentiment_score: -0.0374693416<br />as.factor(Season): black","episode_num:  4.645570<br />sentiment_score: -0.0352645291<br />as.factor(Season): black","episode_num:  5.556962<br />sentiment_score: -0.0319563807<br />as.factor(Season): black","episode_num:  6.468354<br />sentiment_score: -0.0266707216<br />as.factor(Season): black","episode_num:  7.379747<br />sentiment_score: -0.0206774512<br />as.factor(Season): black","episode_num:  8.291139<br />sentiment_score: -0.0148381123<br />as.factor(Season): black","episode_num:  9.202532<br />sentiment_score: -0.0044878336<br />as.factor(Season): black","episode_num: 10.113924<br />sentiment_score:  0.0038600212<br />as.factor(Season): black","episode_num: 11.025316<br />sentiment_score:  0.0101553247<br />as.factor(Season): black","episode_num: 11.936709<br />sentiment_score:  0.0163469469<br />as.factor(Season): black","episode_num: 12.848101<br />sentiment_score:  0.0201007986<br />as.factor(Season): black","episode_num: 13.759494<br />sentiment_score:  0.0195137874<br />as.factor(Season): black","episode_num: 14.670886<br />sentiment_score:  0.0164984065<br />as.factor(Season): black","episode_num: 15.582278<br />sentiment_score:  0.0133062399<br />as.factor(Season): black","episode_num: 16.493671<br />sentiment_score:  0.0071640713<br />as.factor(Season): black","episode_num: 17.405063<br />sentiment_score: -0.0007616354<br />as.factor(Season): black","episode_num: 18.316456<br />sentiment_score: -0.0088515403<br />as.factor(Season): black","episode_num: 19.227848<br />sentiment_score: -0.0158805643<br />as.factor(Season): black","episode_num: 20.139241<br />sentiment_score: -0.0273423065<br />as.factor(Season): black","episode_num: 21.050633<br />sentiment_score: -0.0397341927<br />as.factor(Season): black","episode_num: 21.962025<br />sentiment_score: -0.0454434133<br />as.factor(Season): black","episode_num: 22.873418<br />sentiment_score: -0.0426562961<br />as.factor(Season): black","episode_num: 23.784810<br />sentiment_score: -0.0366310583<br />as.factor(Season): black","episode_num: 24.696203<br />sentiment_score: -0.0267828543<br />as.factor(Season): black","episode_num: 25.607595<br />sentiment_score: -0.0104780157<br />as.factor(Season): black","episode_num: 26.518987<br />sentiment_score:  0.0083273977<br />as.factor(Season): black","episode_num: 27.430380<br />sentiment_score:  0.0254214422<br />as.factor(Season): black","episode_num: 28.341772<br />sentiment_score:  0.0382259401<br />as.factor(Season): black","episode_num: 29.253165<br />sentiment_score:  0.0574188318<br />as.factor(Season): black","episode_num: 30.164557<br />sentiment_score:  0.0768766025<br />as.factor(Season): black","episode_num: 31.075949<br />sentiment_score:  0.0855097728<br />as.factor(Season): black","episode_num: 31.987342<br />sentiment_score:  0.0798852234<br />as.factor(Season): black","episode_num: 32.898734<br />sentiment_score:  0.0696033182<br />as.factor(Season): black","episode_num: 33.810127<br />sentiment_score:  0.0536036000<br />as.factor(Season): black","episode_num: 34.721519<br />sentiment_score:  0.0254943790<br />as.factor(Season): black","episode_num: 35.632911<br />sentiment_score: -0.0043496469<br />as.factor(Season): black","episode_num: 36.544304<br />sentiment_score: -0.0253803933<br />as.factor(Season): black","episode_num: 37.455696<br />sentiment_score: -0.0287146994<br />as.factor(Season): black","episode_num: 38.367089<br />sentiment_score: -0.0203728230<br />as.factor(Season): black","episode_num: 39.278481<br />sentiment_score: -0.0082840934<br />as.factor(Season): black","episode_num: 40.189873<br />sentiment_score:  0.0013793469<br />as.factor(Season): black","episode_num: 41.101266<br />sentiment_score:  0.0219234534<br />as.factor(Season): black","episode_num: 42.012658<br />sentiment_score:  0.0401273172<br />as.factor(Season): black","episode_num: 42.924051<br />sentiment_score:  0.0505937599<br />as.factor(Season): black","episode_num: 43.835443<br />sentiment_score:  0.0625397220<br />as.factor(Season): black","episode_num: 44.746835<br />sentiment_score:  0.0720945536<br />as.factor(Season): black","episode_num: 45.658228<br />sentiment_score:  0.0753876048<br />as.factor(Season): black","episode_num: 46.569620<br />sentiment_score:  0.0656075099<br />as.factor(Season): black","episode_num: 47.481013<br />sentiment_score:  0.0377510088<br />as.factor(Season): black","episode_num: 48.392405<br />sentiment_score:  0.0089105707<br />as.factor(Season): black","episode_num: 49.303797<br />sentiment_score: -0.0037096153<br />as.factor(Season): black","episode_num: 50.215190<br />sentiment_score: -0.0071510282<br />as.factor(Season): black","episode_num: 51.126582<br />sentiment_score: -0.0089998521<br />as.factor(Season): black","episode_num: 52.037975<br />sentiment_score: -0.0076341604<br />as.factor(Season): black","episode_num: 52.949367<br />sentiment_score: -0.0025309426<br />as.factor(Season): black","episode_num: 53.860759<br />sentiment_score:  0.0041416886<br />as.factor(Season): black","episode_num: 54.772152<br />sentiment_score:  0.0102156205<br />as.factor(Season): black","episode_num: 55.683544<br />sentiment_score:  0.0177494807<br />as.factor(Season): black","episode_num: 56.594937<br />sentiment_score:  0.0315921432<br />as.factor(Season): black","episode_num: 57.506329<br />sentiment_score:  0.0436180031<br />as.factor(Season): black","episode_num: 58.417722<br />sentiment_score:  0.0458731379<br />as.factor(Season): black","episode_num: 59.329114<br />sentiment_score:  0.0404814850<br />as.factor(Season): black","episode_num: 60.240506<br />sentiment_score:  0.0346112465<br />as.factor(Season): black","episode_num: 61.151899<br />sentiment_score:  0.0241322204<br />as.factor(Season): black","episode_num: 62.063291<br />sentiment_score:  0.0099892738<br />as.factor(Season): black","episode_num: 62.974684<br />sentiment_score: -0.0028152043<br />as.factor(Season): black","episode_num: 63.886076<br />sentiment_score: -0.0092788248<br />as.factor(Season): black","episode_num: 64.797468<br />sentiment_score: -0.0092715096<br />as.factor(Season): black","episode_num: 65.708861<br />sentiment_score: -0.0075492567<br />as.factor(Season): black","episode_num: 66.620253<br />sentiment_score: -0.0026177507<br />as.factor(Season): black","episode_num: 67.531646<br />sentiment_score:  0.0063570158<br />as.factor(Season): black","episode_num: 68.443038<br />sentiment_score:  0.0178603484<br />as.factor(Season): black","episode_num: 69.354430<br />sentiment_score:  0.0333541454<br />as.factor(Season): black","episode_num: 70.265823<br />sentiment_score:  0.0526564568<br />as.factor(Season): black","episode_num: 71.177215<br />sentiment_score:  0.0754642309<br />as.factor(Season): black","episode_num: 72.088608<br />sentiment_score:  0.1017350219<br />as.factor(Season): black","episode_num: 73.000000<br />sentiment_score:  0.1314263842<br />as.factor(Season): black","episode_num: 73.000000<br />sentiment_score:  0.1314263842<br />as.factor(Season): black","episode_num: 73.000000<br />sentiment_score:  0.1314263842<br />as.factor(Season): black","episode_num: 72.088608<br />sentiment_score:  0.1017350219<br />as.factor(Season): black","episode_num: 71.177215<br />sentiment_score:  0.0754642309<br />as.factor(Season): black","episode_num: 70.265823<br />sentiment_score:  0.0526564568<br />as.factor(Season): black","episode_num: 69.354430<br />sentiment_score:  0.0333541454<br />as.factor(Season): black","episode_num: 68.443038<br />sentiment_score:  0.0178603484<br />as.factor(Season): black","episode_num: 67.531646<br />sentiment_score:  0.0063570158<br />as.factor(Season): black","episode_num: 66.620253<br />sentiment_score: -0.0026177507<br />as.factor(Season): black","episode_num: 65.708861<br />sentiment_score: -0.0075492567<br />as.factor(Season): black","episode_num: 64.797468<br />sentiment_score: -0.0092715096<br />as.factor(Season): black","episode_num: 63.886076<br />sentiment_score: -0.0092788248<br />as.factor(Season): black","episode_num: 62.974684<br />sentiment_score: -0.0028152043<br />as.factor(Season): black","episode_num: 62.063291<br />sentiment_score:  0.0099892738<br />as.factor(Season): black","episode_num: 61.151899<br />sentiment_score:  0.0241322204<br />as.factor(Season): black","episode_num: 60.240506<br />sentiment_score:  0.0346112465<br />as.factor(Season): black","episode_num: 59.329114<br />sentiment_score:  0.0404814850<br />as.factor(Season): black","episode_num: 58.417722<br />sentiment_score:  0.0458731379<br />as.factor(Season): black","episode_num: 57.506329<br />sentiment_score:  0.0436180031<br />as.factor(Season): black","episode_num: 56.594937<br />sentiment_score:  0.0315921432<br />as.factor(Season): black","episode_num: 55.683544<br />sentiment_score:  0.0177494807<br />as.factor(Season): black","episode_num: 54.772152<br />sentiment_score:  0.0102156205<br />as.factor(Season): black","episode_num: 53.860759<br />sentiment_score:  0.0041416886<br />as.factor(Season): black","episode_num: 52.949367<br />sentiment_score: -0.0025309426<br />as.factor(Season): black","episode_num: 52.037975<br />sentiment_score: -0.0076341604<br />as.factor(Season): black","episode_num: 51.126582<br />sentiment_score: -0.0089998521<br />as.factor(Season): black","episode_num: 50.215190<br />sentiment_score: -0.0071510282<br />as.factor(Season): black","episode_num: 49.303797<br />sentiment_score: -0.0037096153<br />as.factor(Season): black","episode_num: 48.392405<br />sentiment_score:  0.0089105707<br />as.factor(Season): black","episode_num: 47.481013<br />sentiment_score:  0.0377510088<br />as.factor(Season): black","episode_num: 46.569620<br />sentiment_score:  0.0656075099<br />as.factor(Season): black","episode_num: 45.658228<br />sentiment_score:  0.0753876048<br />as.factor(Season): black","episode_num: 44.746835<br />sentiment_score:  0.0720945536<br />as.factor(Season): black","episode_num: 43.835443<br />sentiment_score:  0.0625397220<br />as.factor(Season): black","episode_num: 42.924051<br />sentiment_score:  0.0505937599<br />as.factor(Season): black","episode_num: 42.012658<br />sentiment_score:  0.0401273172<br />as.factor(Season): black","episode_num: 41.101266<br />sentiment_score:  0.0219234534<br />as.factor(Season): black","episode_num: 40.189873<br />sentiment_score:  0.0013793469<br />as.factor(Season): black","episode_num: 39.278481<br />sentiment_score: -0.0082840934<br />as.factor(Season): black","episode_num: 38.367089<br />sentiment_score: -0.0203728230<br />as.factor(Season): black","episode_num: 37.455696<br />sentiment_score: -0.0287146994<br />as.factor(Season): black","episode_num: 36.544304<br />sentiment_score: -0.0253803933<br />as.factor(Season): black","episode_num: 35.632911<br />sentiment_score: -0.0043496469<br />as.factor(Season): black","episode_num: 34.721519<br />sentiment_score:  0.0254943790<br />as.factor(Season): black","episode_num: 33.810127<br />sentiment_score:  0.0536036000<br />as.factor(Season): black","episode_num: 32.898734<br />sentiment_score:  0.0696033182<br />as.factor(Season): black","episode_num: 31.987342<br />sentiment_score:  0.0798852234<br />as.factor(Season): black","episode_num: 31.075949<br />sentiment_score:  0.0855097728<br />as.factor(Season): black","episode_num: 30.164557<br />sentiment_score:  0.0768766025<br />as.factor(Season): black","episode_num: 29.253165<br />sentiment_score:  0.0574188318<br />as.factor(Season): black","episode_num: 28.341772<br />sentiment_score:  0.0382259401<br />as.factor(Season): black","episode_num: 27.430380<br />sentiment_score:  0.0254214422<br />as.factor(Season): black","episode_num: 26.518987<br />sentiment_score:  0.0083273977<br />as.factor(Season): black","episode_num: 25.607595<br />sentiment_score: -0.0104780157<br />as.factor(Season): black","episode_num: 24.696203<br />sentiment_score: -0.0267828543<br />as.factor(Season): black","episode_num: 23.784810<br />sentiment_score: -0.0366310583<br />as.factor(Season): black","episode_num: 22.873418<br />sentiment_score: -0.0426562961<br />as.factor(Season): black","episode_num: 21.962025<br />sentiment_score: -0.0454434133<br />as.factor(Season): black","episode_num: 21.050633<br />sentiment_score: -0.0397341927<br />as.factor(Season): black","episode_num: 20.139241<br />sentiment_score: -0.0273423065<br />as.factor(Season): black","episode_num: 19.227848<br />sentiment_score: -0.0158805643<br />as.factor(Season): black","episode_num: 18.316456<br />sentiment_score: -0.0088515403<br />as.factor(Season): black","episode_num: 17.405063<br />sentiment_score: -0.0007616354<br />as.factor(Season): black","episode_num: 16.493671<br />sentiment_score:  0.0071640713<br />as.factor(Season): black","episode_num: 15.582278<br />sentiment_score:  0.0133062399<br />as.factor(Season): black","episode_num: 14.670886<br />sentiment_score:  0.0164984065<br />as.factor(Season): black","episode_num: 13.759494<br />sentiment_score:  0.0195137874<br />as.factor(Season): black","episode_num: 12.848101<br />sentiment_score:  0.0201007986<br />as.factor(Season): black","episode_num: 11.936709<br />sentiment_score:  0.0163469469<br />as.factor(Season): black","episode_num: 11.025316<br />sentiment_score:  0.0101553247<br />as.factor(Season): black","episode_num: 10.113924<br />sentiment_score:  0.0038600212<br />as.factor(Season): black","episode_num:  9.202532<br />sentiment_score: -0.0044878336<br />as.factor(Season): black","episode_num:  8.291139<br />sentiment_score: -0.0148381123<br />as.factor(Season): black","episode_num:  7.379747<br />sentiment_score: -0.0206774512<br />as.factor(Season): black","episode_num:  6.468354<br />sentiment_score: -0.0266707216<br />as.factor(Season): black","episode_num:  5.556962<br />sentiment_score: -0.0319563807<br />as.factor(Season): black","episode_num:  4.645570<br />sentiment_score: -0.0352645291<br />as.factor(Season): black","episode_num:  3.734177<br />sentiment_score: -0.0374693416<br />as.factor(Season): black","episode_num:  2.822785<br />sentiment_score: -0.0385838989<br />as.factor(Season): black","episode_num:  1.911392<br />sentiment_score: -0.0378831488<br />as.factor(Season): black","episode_num:  1.000000<br />sentiment_score: -0.0359006703<br />as.factor(Season): black","episode_num:  1.000000<br />sentiment_score: -0.0359006703<br />as.factor(Season): black"],"type":"scatter","mode":"lines","line":{"width":3.7795275590551185,"color":"rgba(0,0,0,0.1)","dash":"solid"},"fill":"toself","fillcolor":"rgba(153,153,153,0.1)","hoveron":"points","hoverinfo":"x+y","showlegend":false,"xaxis":"x","yaxis":"y","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":48.949771689497723},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Sentiment Score Trajectory Across All Episodes <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.6000000000000001,76.599999999999994],"tickmode":"array","ticktext":["0","20","40","60"],"tickvals":[0,20,40,60],"categoryorder":"array","categoryarray":["0","20","40","60"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Episode Number (Chronological)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.24795819935691318,0.32609324758842445],"tickmode":"array","ticktext":["-0.2","-0.1","0.0","0.1","0.2","0.3"],"tickvals":[-0.20000000000000001,-0.10000000000000001,0,0.10000000000000001,0.19999999999999998,0.29999999999999993],"categoryorder":"array","categoryarray":["-0.2","-0.1","0.0","0.1","0.2","0.3"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Sentiment Score (positive - negative) / total words","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Season","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"611073fed4fe":{"x":{},"y":{},"colour":{},"type":"scatter"},"61105f51ab30":{"x":{},"y":{},"colour":{}},"61106abe0d33":{"x":{},"y":{},"colour":{}}},"cur_data":"611073fed4fe","visdat":{"611073fed4fe":["function (y) ","x"],"61105f51ab30":["function (y) ","x"],"61106abe0d33":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-4-average-sentiment-by-season" class="level3">
+<h3 class="anchored" data-anchor-id="plot-4-average-sentiment-by-season">Plot 4: Average Sentiment by Season</h3>
+<p>Which seasons are emotionally the most intense?</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>season_sentiment <span class="ot">&lt;-</span> sentiment_trajectory <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Season) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg_sentiment =</span> <span class="fu">mean</span>(sentiment_score), <span class="at">min_sentiment =</span> <span class="fu">min</span>(sentiment_score), <span class="at">max_sentiment =</span> <span class="fu">max</span>(sentiment_score), <span class="at">.groups =</span> <span class="st">'drop'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Season =</span> <span class="fu">as.factor</span>(Season))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>season_plot <span class="ot">&lt;-</span> season_sentiment <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Season, <span class="at">y =</span> avg_sentiment, <span class="at">fill =</span> avg_sentiment)) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> min_sentiment, <span class="at">ymax =</span> max_sentiment), <span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">mid =</span> <span class="st">"gray"</span>, <span class="at">high =</span> <span class="st">"green"</span>, <span class="at">midpoint =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Sentiment Score by Season"</span>, <span class="at">subtitle =</span> <span class="st">"Error bars show min-max range"</span>, <span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Average Sentiment Score"</span>) <span class="sc">+</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>), <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"italic"</span>,  <span class="at">size =</span> <span class="dv">10</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(season_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-37fb5afa1c108652fa08" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-37fb5afa1c108652fa08">{"x":{"data":[{"orientation":"v","width":0.89999999999999991,"base":-0.033994374392164788,"x":[1],"y":[0.033994374392164788],"text":"Season: Season 1<br />avg_sentiment: -0.033994374","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(234,136,111,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":-0.017126417909335914,"x":[7],"y":[0.017126417909335914],"text":"Season: Season 7<br />avg_sentiment: -0.017126418","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(217,164,150,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":-0.010214080865782068,"x":[4],"y":[0.010214080865782068],"text":"Season: Season 4<br />avg_sentiment: -0.010214081","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(207,174,166,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[6],"y":[0.0050320620895217523],"text":"Season: Season 6<br />avg_sentiment:  0.005032062","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(185,195,182,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[3],"y":[0.0064166720099999019],"text":"Season: Season 3<br />avg_sentiment:  0.006416672","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(184,196,180,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000013,"base":0,"x":[2],"y":[0.0071440900460792199],"text":"Season: Season 2<br />avg_sentiment:  0.007144090","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(183,197,178,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.90000000000000036,"base":0,"x":[5],"y":[0.075783056285659886],"text":"Season: Season 5<br />avg_sentiment:  0.075783056","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(32,254,21,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.89999999999999947,"base":0,"x":[8],"y":[0.077686358171268038],"text":"Season: Season 8<br />avg_sentiment:  0.077686358","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,255,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8],"y":[-0.033994374392164788,0.0071440900460792199,0.0064166720099999019,-0.010214080865782068,0.075783056285659886,0.0050320620895217523,-0.017126417909335914,0.077686358171268038],"text":["Season: Season 1<br />avg_sentiment: -0.033994374","Season: Season 2<br />avg_sentiment:  0.007144090","Season: Season 3<br />avg_sentiment:  0.006416672","Season: Season 4<br />avg_sentiment: -0.010214081","Season: Season 5<br />avg_sentiment:  0.075783056","Season: Season 6<br />avg_sentiment:  0.005032062","Season: Season 7<br />avg_sentiment: -0.017126418","Season: Season 8<br />avg_sentiment:  0.077686358"],"type":"scatter","mode":"lines","opacity":0.59999999999999998,"line":{"color":"transparent"},"error_y":{"array":[0.092817903803929486,0.093159861321701939,0.14889667948863769,0.12586033936918342,0.09478550558724981,0.19791996743077345,0.12102252180543982,0.22231364182873195],"arrayminus":[0.086005625607835201,0.12535495266588753,0.18889842383481742,0.21165087090270668,0.091286932254652134,0.11614317320063286,0.10823801357754456,0.1732277594451534],"type":"data","width":6.1463414634146325,"symmetric":false,"color":"rgba(0,0,0,1)"},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":48.949771689497723},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Average Sentiment Score by Season <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,8.5999999999999996],"tickmode":"array","ticktext":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"tickvals":[1,2,3,4,5,6,7,8],"categoryorder":"array","categoryarray":["Season 1","Season 2","Season 3","Season 4","Season 5","Season 6","Season 7","Season 8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Season","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.24795819935691318,0.32609324758842445],"tickmode":"array","ticktext":["-0.2","-0.1","0.0","0.1","0.2","0.3"],"tickvals":[-0.20000000000000001,-0.10000000000000001,0,0.10000000000000001,0.19999999999999998,0.29999999999999993],"categoryorder":"array","categoryarray":["-0.2","-0.1","0.0","0.1","0.2","0.3"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Average Sentiment Score","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"611036490816":{"x":{},"y":{},"fill":{},"type":"bar"},"611074b1f831":{"x":{},"y":{},"fill":{},"ymin":{},"ymax":{}}},"cur_data":"611036490816","visdat":{"611036490816":["function (y) ","x"],"611074b1f831":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="part-3-contribution-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="part-3-contribution-analysis">Part 3: Contribution Analysis</h2>
+<p>Which specific words contribute the most to the overall sentiment?</p>
+<section id="plot-5-top-positive-word-contributions" class="level3">
+<h3 class="anchored" data-anchor-id="plot-5-top-positive-word-contributions">Plot 5: Top Positive Word Contributions</h3>
+<p>Words with the highest positive contribution (frequency × positive sentiment value).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>positive_contributions <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(bing, <span class="at">by =</span> <span class="st">"word"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sentiment <span class="sc">==</span> <span class="st">"positive"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">word =</span> <span class="fu">reorder</span>(word, n),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">contribution =</span> n)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>positive_plot <span class="ot">&lt;-</span> positive_contributions <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(contribution, word, <span class="at">fill =</span> contribution)) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"lightgreen"</span>, <span class="at">high =</span> <span class="st">"darkgreen"</span>) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 15 Positive Words Contribution"</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(positive_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-e91c12c00dc689e606e6" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-e91c12c00dc689e606e6">{"x":{"data":[{"orientation":"v","width":128,"base":0.55000000000000004,"x":[64],"y":[0.89999999999999991],"text":"contribution: 128<br />word: best","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(144,238,144,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":140,"base":1.55,"x":[70],"y":[0.90000000000000013],"text":"contribution: 140<br />word: honor","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(142,236,142,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":149,"base":2.5499999999999998,"x":[74.5],"y":[0.90000000000000036],"text":"contribution: 149<br />word: free","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(140,234,140,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":151,"base":3.5499999999999998,"x":[75.5],"y":[0.90000000000000036],"text":"contribution: 151<br />word: trust","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(140,233,140,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":161,"base":4.5499999999999998,"x":[80.5],"y":[0.90000000000000036],"text":"contribution: 161<br />word: gold","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(138,231,138,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":190,"base":5.5499999999999998,"x":[95],"y":[0.90000000000000036],"text":"contribution: 190<br />word: thank","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(133,226,132,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":237,"base":6.5499999999999998,"x":[118.5],"y":[0.90000000000000036],"text":"contribution: 237<br />word: great","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(125,216,123,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":240,"base":7.5499999999999998,"x":[120],"y":[0.89999999999999947],"text":"contribution: 240<br />word: enough","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(124,216,122,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":268,"base":8.5500000000000007,"x":[134],"y":[0.89999999999999858],"text":"contribution: 268<br />word: love","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(120,210,117,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":296,"base":9.5500000000000007,"x":[148],"y":[0.89999999999999858],"text":"contribution: 296<br />word: better","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(115,205,112,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":531,"base":10.550000000000001,"x":[265.5],"y":[0.89999999999999858],"text":"contribution: 531<br />word: grace","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(74,160,68,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":533,"base":11.550000000000001,"x":[266.5],"y":[0.89999999999999858],"text":"contribution: 533<br />word: right","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(73,160,68,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":555,"base":12.550000000000001,"x":[277.5],"y":[0.89999999999999858],"text":"contribution: 555<br />word: well","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(70,156,64,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":672,"base":13.550000000000001,"x":[336],"y":[0.89999999999999858],"text":"contribution: 672<br />word: good","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(48,134,42,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":864,"base":14.550000000000001,"x":[432],"y":[0.89999999999999858],"text":"contribution: 864<br />word: like","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(0,100,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":46.027397260273986},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Top 15 Positive Words Contribution <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-43.200000000000003,907.20000000000005],"tickmode":"array","ticktext":["0","250","500","750"],"tickvals":[0,250,500.00000000000006,750],"categoryorder":"array","categoryarray":["0","250","500","750"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Frequency","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,15.6],"tickmode":"array","ticktext":["best","honor","free","trust","gold","thank","great","enough","love","better","grace","right","well","good","like"],"tickvals":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"categoryorder":"array","categoryarray":["best","honor","free","trust","gold","thank","great","enough","love","better","grace","right","well","good","like"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"61103e57ef2a":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"61103e57ef2a","visdat":{"61103e57ef2a":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="plot-6-top-negative-word-contributions" class="level3">
+<h3 class="anchored" data-anchor-id="plot-6-top-negative-word-contributions">Plot 6: Top Negative Word Contributions</h3>
+<p>Words with the highest negative contribution (frequency × negative sentiment value).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>negative_contributions <span class="ot">&lt;-</span> got_tokens <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(bing, <span class="at">by =</span> <span class="st">"word"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sentiment <span class="sc">==</span> <span class="st">"negative"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">word =</span> <span class="fu">reorder</span>(word, n),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">contribution =</span> n)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>negative_plot <span class="ot">&lt;-</span> negative_contributions <span class="sc">%&gt;%</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(contribution, word, <span class="at">fill =</span> contribution)) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"lightcoral"</span>, <span class="at">high =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 15 Negative Words Contribution"</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(negative_plot, <span class="at">tooltip =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-405beecab743ec6d8fc9" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-405beecab743ec6d8fc9">{"x":{"data":[{"orientation":"v","width":100,"base":0.55000000000000004,"x":[50],"y":[0.89999999999999991],"text":"contribution: 100<br />word: hard","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(240,128,128,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":104,"base":1.55,"x":[52],"y":[0.90000000000000013],"text":"contribution: 104<br />word: enemies","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(239,126,126,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":106,"base":2.5499999999999998,"x":[53],"y":[0.90000000000000036],"text":"contribution: 106<br />word: lost","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(238,126,125,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":113,"base":3.5499999999999998,"x":[56.5],"y":[0.90000000000000036],"text":"contribution: 113<br />word: bastard","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(236,123,122,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":114,"base":4.5499999999999998,"x":[57],"y":[0.90000000000000036],"text":"contribution: 114<br />word: wrong","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(235,123,121,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":117,"base":5.5499999999999998,"x":[58.5],"y":[0.90000000000000036],"text":"contribution: 117<br />word: fuck","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(234,121,120,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":118,"base":6.5499999999999998,"x":[59],"y":[0.90000000000000036],"text":"contribution: 118<br />word: died","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(234,121,120,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":133,"base":7.5499999999999998,"x":[66.5],"y":[0.89999999999999947],"text":"contribution: 133<br />word: afraid","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(229,115,113,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":148,"base":8.5500000000000007,"x":[74],"y":[0.89999999999999858],"text":"contribution: 148<br />word: death","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(224,110,106,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":171,"base":9.5500000000000007,"x":[85.5],"y":[0.89999999999999858],"text":"contribution: 171<br />word: sorry","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(216,101,96,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":250,"base":10.550000000000001,"x":[125],"y":[0.89999999999999858],"text":"contribution: 250<br />word: killed","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(189,70,61,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":305,"base":11.550000000000001,"x":[152.5],"y":[0.89999999999999858],"text":"contribution: 305<br />word: die","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(169,48,38,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":355,"base":12.550000000000001,"x":[177.5],"y":[0.89999999999999858],"text":"contribution: 355<br />word: kill","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(151,25,17,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":381,"base":13.550000000000001,"x":[190.5],"y":[0.89999999999999858],"text":"contribution: 381<br />word: dead","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(142,7,4,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":389,"base":14.550000000000001,"x":[194.5],"y":[0.89999999999999858],"text":"contribution: 389<br />word: stark","type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(139,0,0,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.246160232461605,"r":7.3059360730593621,"b":37.260273972602747,"l":51.872146118721474},"paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Top 15 Negative Words Contribution <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":15.940224159402241},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-19.450000000000003,408.44999999999999],"tickmode":"array","ticktext":["0","100","200","300","400"],"tickvals":[0,100.00000000000001,200,300,400],"categoryorder":"array","categoryarray":["0","100","200","300","400"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Frequency","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,15.6],"tickmode":"array","ticktext":["hard","enemies","lost","bastard","wrong","fuck","died","afraid","death","sorry","killed","die","kill","dead","stark"],"tickvals":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"categoryorder":"array","categoryarray":["hard","enemies","lost","bastard","wrong","fuck","died","afraid","death","sorry","killed","die","kill","dead","stark"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"611014df676d":{"x":{},"y":{},"fill":{},"type":"bar"}},"cur_data":"611014df676d","visdat":{"611014df676d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<ul>
+<li>The Bing lexicon captures a binary view of sentiment, which is useful for quick assessment. NRC provides emotional granularity that reveals specific emotional tones shown in the series.</li>
+<li>The series shows a most upward but mixed trajectory, withthe first season being most negative and last season being most positive.</li>
+<li>The sentiment is driven primarily by recurring words that appear throughout the series, such as “good”, “well”, “right” for positive sentiment and “stark”, “dead”, “kill” for negative sentiment.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

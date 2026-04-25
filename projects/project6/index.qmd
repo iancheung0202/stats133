@@ -1,0 +1,27 @@
+---
+title: "Game of Thrones Text Analysis"
+---
+
+## Purpose and Scope
+
+This project is a text mining analysis of the HBO series *Game of Thrones*:
+
+1. **Frequency Analysis**: Understanding the most common words and topics discussed throughout the series.
+2. **Sentiment Analysis**: Tracking how the emotional tone shifts across episodes and seasons.
+
+## The Dataset
+
+The `game-of-thrones.csv` dataset contains the complete scripts from all seasons of the HBO television series. 
+
+**Dataset Structure:**
+
+- **Date**: Original air date of each episode
+- **Season**: Season number (1-8)
+- **Episode**: Episode number within each season
+- **Title**: Episode title
+- **Name**: Character name
+- **Sentence**: The dialogue spoken in the episode
+
+## Analysis Methodology
+
+Both analyses uses a "tidy text" approach, where raw dialogue is tokenized into individual words, processed to remove noise, and then aggregated for insights. Multiple sentiment lexicons are compared to provide a nuanced view of emotional content.
