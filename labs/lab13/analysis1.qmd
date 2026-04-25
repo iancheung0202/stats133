@@ -1,0 +1,13 @@
+---
+title: "Analysis 1: Frequency Analysis"
+---
+
+# Frequency Analysis
+
+This page will explore the most common words in the dataset.
+
+## Planned Analysis
+
+- Most frequent words overall
+- Most frequent words by character
+- Word trends across episodes

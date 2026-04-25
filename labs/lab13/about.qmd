@@ -1,0 +1,11 @@
+---
+title: "About"
+---
+
+# About This Project
+
+This website was created for STAT 133 Project 6.
+
+## Author
+
+Ian Cheung

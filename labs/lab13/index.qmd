@@ -1,0 +1,14 @@
+---
+title: "Home"
+---
+
+# Project 6: Text Analysis
+
+## Dataset
+
+I am analyzing the **Game of Thrones scripts dataset** on character dialogue and sentiment trends.
+
+## Explore the Analyses
+
+- [Analysis 1 (Frequency Analysis)](analysis1.qmd)
+- [Analysis 2 (Sentiment Analysis)](analysis2.qmd)

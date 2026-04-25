@@ -1,0 +1,79 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "I am analyzing the Game of Thrones scripts dataset on character dialogue and sentiment trends.\n\n\n\n\nAnalysis 1 (Frequency Analysis)\nAnalysis 2 (Sentiment Analysis)"
+  },
+  {
+    "objectID": "index.html#dataset",
+    "href": "index.html#dataset",
+    "title": "Home",
+    "section": "",
+    "text": "I am analyzing the Game of Thrones scripts dataset on character dialogue and sentiment trends."
+  },
+  {
+    "objectID": "index.html#explore-the-analyses",
+    "href": "index.html#explore-the-analyses",
+    "title": "Home",
+    "section": "",
+    "text": "Analysis 1 (Frequency Analysis)\nAnalysis 2 (Sentiment Analysis)"
+  },
+  {
+    "objectID": "analysis1.html",
+    "href": "analysis1.html",
+    "title": "Analysis 1: Frequency Analysis",
+    "section": "",
+    "text": "This page will explore the most common words in the dataset.\n\n\n\nMost frequent words overall\nMost frequent words by character\nWord trends across episodes"
+  },
+  {
+    "objectID": "analysis1.html#planned-analysis",
+    "href": "analysis1.html#planned-analysis",
+    "title": "Analysis 1: Frequency Analysis",
+    "section": "",
+    "text": "Most frequent words overall\nMost frequent words by character\nWord trends across episodes"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This website was created for STAT 133 Project 6.\n\n\nIan Cheung"
+  },
+  {
+    "objectID": "about.html#author",
+    "href": "about.html#author",
+    "title": "About",
+    "section": "",
+    "text": "Ian Cheung"
+  },
+  {
+    "objectID": "about.html#tools-used",
+    "href": "about.html#tools-used",
+    "title": "About",
+    "section": "",
+    "text": "R\nQuarto\ntidytext"
+  },
+  {
+    "objectID": "about.html#goal",
+    "href": "about.html#goal",
+    "title": "About",
+    "section": "",
+    "text": "To explore patterns in text data using modern text analysis techniques."
+  },
+  {
+    "objectID": "analysis2.html",
+    "href": "analysis2.html",
+    "title": "Analysis 2: Sentiment Analysis",
+    "section": "",
+    "text": "This page will analyze emotional tone in the text.\n\n\n\nCompare Bing vs NRC sentiment lexicons\nSentiment trajectory over episodes\nWords contributing most to sentiment"
+  },
+  {
+    "objectID": "analysis2.html#planned-analysis",
+    "href": "analysis2.html#planned-analysis",
+    "title": "Analysis 2: Sentiment Analysis",
+    "section": "",
+    "text": "Compare Bing vs NRC sentiment lexicons\nSentiment trajectory over episodes\nWords contributing most to sentiment"
+  }
+]

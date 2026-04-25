@@ -1,0 +1,13 @@
+---
+title: "Analysis 2: Sentiment Analysis"
+---
+
+# Sentiment Analysis
+
+This page will analyze emotional tone in the text.
+
+## Planned Analysis
+
+- Compare Bing vs NRC sentiment lexicons
+- Sentiment trajectory over episodes
+- Words contributing most to sentiment
